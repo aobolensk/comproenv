@@ -6,6 +6,7 @@ def executable(filename):
     return filename
 
 def build():
+    subprocess.call("git submodule update --init --recursive", shell=True)
     if not os.path.exists("build"):
         os.mkdir("build")
     os.chdir("build")
