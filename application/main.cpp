@@ -4,7 +4,8 @@
 using namespace std;
 
 int main() {
-    YAMLParser p1("1.txt");
-    YAMLParser p2(p1);
+    YAMLParser p1("build/bin/1.yaml");
+    auto v = p1.parse();
+    cout << v;
     return 0;
 }
