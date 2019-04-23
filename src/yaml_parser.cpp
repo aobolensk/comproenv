@@ -165,6 +165,7 @@ YAMLParser::Sequence YAMLParser::readSequence() {
 
 std::ostream &operator<<(std::ostream &os, YAMLParser::Value &val) {
     val.print(os, 0);
+    return os;
 }
 
 void YAMLParser::Value::print(std::ostream &os, int indent) {
