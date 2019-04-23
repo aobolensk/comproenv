@@ -1,4 +1,4 @@
-import os, subprocess, argparse
+import os, subprocess, argparse, multiprocessing
 
 def executable(filename):
     if os.name == "nt":
@@ -15,7 +15,7 @@ def build():
         return 1
     if os.name == "posix":
         ret_code = subprocess.call("cmake --build . --config Release -- -j" +
-                                    str(multiprocessing.cpu_count()))
+                                    str(multiprocessing.cpu_count()), shell=True)
     elif os.name == "nt":
         ret_code = subprocess.call("cmake --build . --config Release")
     if ret_code != 0:
@@ -39,7 +39,7 @@ def main():
             ret_code = build()
         if arg == "run":
             ret_code = subprocess.call(
-                os.path.join(os.getcwd(), "build", "bin", executable("main")), shell=True)
+                os.path.join(os.getcwd(), "build", "bin", executable("comproenv")), shell=True)
         print("Function " + arg + " returned exit code " + str(ret_code))
         if (ret_code != 0):
             exit(1)
