@@ -28,6 +28,7 @@ def build():
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--function", nargs='*', help="Provide function name")
+    parser.add_argument("--args", nargs='*', help="Args")
     args = parser.parse_args()
     print(args)
     return args
@@ -40,7 +41,7 @@ def main():
             ret_code = build()
         if arg == "run":
             ret_code = subprocess.call(
-                os.path.join(os.getcwd(), "build", "bin", executable("comproenv")), shell=True)
+                os.path.join(os.getcwd(), "build", "bin", executable("comproenv") + ' ' + ' '.join(args.args)), shell=True)
         print("Function " + arg + " returned exit code " + str(ret_code))
         if (ret_code != 0):
             exit(1)
