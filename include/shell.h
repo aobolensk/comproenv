@@ -13,13 +13,14 @@ class Shell {
     };
     std::array <std::unordered_map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     int current_env, current_task, current_state;
+    std::string current_compiler;
     std::vector <Environment> envs_;
     std::unordered_map <std::string, std::string> global_settings;
     void parse_settings(YAMLParser::Mapping &val);
     void create_paths();
     void configure_commands();
     void add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func);
-    void add_alias(int state, std::string new_name, std::string old_name);
+    void add_alias(int old_state, std::string new_name, int new_state, std::string old_name);
  public:
     Shell(const std::string &config_file = "");
     void run();

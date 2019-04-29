@@ -41,7 +41,8 @@ def main():
             ret_code = build()
         if arg == "run":
             ret_code = subprocess.call(
-                os.path.join(os.getcwd(), "build", "bin", executable("comproenv") + ' ' + ' '.join(args.args)), shell=True)
+                os.path.join(os.getcwd(), "build", "bin", executable("comproenv") + ' ' +
+                            (' '.join(args.args) if args.args is not None else "")), shell=True)
         print("Function " + arg + " returned exit code " + str(ret_code))
         if (ret_code != 0):
             exit(1)
