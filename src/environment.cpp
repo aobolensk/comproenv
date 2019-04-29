@@ -16,6 +16,6 @@ std::string Environment::get_name() const {
     return name;
 }
 
-const std::vector <Task> Environment::get_tasks() const {
+std::vector <Task> &Environment::get_tasks() {
     return tasks_;
 }

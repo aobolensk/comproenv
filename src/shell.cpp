@@ -89,6 +89,50 @@ void Shell::configure_commands() {
     });
     add_alias(State::GLOBAL, "q", "exit");
 
+    // Set task
+    add_command(State::ENVIRONMENT, "st", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        for (size_t i = 0; i < envs_[current_env].get_tasks().size(); ++i) {
+            if (envs_[current_env].get_tasks()[i].get_name() == arg[1]) {
+                current_task = i;
+                current_state = State::TASK;
+                return 0;
+            }
+        }
+        throw std::runtime_error("Incorrect task name");
+    });
+
+    // Create task
+    add_command(State::ENVIRONMENT, "ct", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        for (size_t i = 0; i < envs_[current_env].get_tasks().size(); ++i)
+            if (envs_[current_env].get_tasks()[i].get_name() == arg[1])
+                throw std::runtime_error("Task named " + arg[1] + " already exists");
+        envs_[current_env].get_tasks().push_back(arg[1]);
+        fs::path path = fs::current_path() / ("env_" + envs_[current_env].get_name()) / ("task_" + arg[1]);
+        if (!fs::exists(path)) {
+            fs::create_directory(path);
+        }
+        return 0;
+    });
+
+    // Delete task
+    add_command(State::ENVIRONMENT, "dt", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        for (size_t i = 0; i < envs_[current_env].get_tasks().size(); ++i) {
+            if (envs_[current_env].get_tasks()[i].get_name() == arg[1]) {
+                envs_[current_env].get_tasks().erase(envs_[current_env].get_tasks().begin() + i);
+                fs::path path = fs::current_path() / ("env_" + envs_[current_env].get_name()) / ("task_" + arg[1]);
+                if (fs::exists(path)) {
+                    return !fs::remove_all(path);
+                }
+            }
+        }
+        throw std::runtime_error("Incorrect task name");
+    });
 
     // Exit from environment
     add_command(State::ENVIRONMENT, "q", [this](std::vector <std::string> &arg) -> int {
@@ -99,6 +143,16 @@ void Shell::configure_commands() {
         return 0;
     });
     add_alias(State::ENVIRONMENT, "q", "exit");
+
+    // Exit from task
+    add_command(State::TASK, "q", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        current_task = -1;
+        current_state = State::ENVIRONMENT;
+        return 0;
+    });
+    add_alias(State::TASK, "q", "exit");
 }
 
 void Shell::parse_settings(YAMLParser::Mapping &config) {
@@ -151,7 +205,7 @@ void Shell::run() {
             std::cout << "/" << envs_[current_env].get_name();
         }
         if (current_task != -1) {
-            std::cout << "/" << envs_[current_task].get_name();
+            std::cout << "/" << envs_[current_env].get_tasks()[current_task].get_name();
         }
         std::cout << " ";
         std::flush(std::cout);
