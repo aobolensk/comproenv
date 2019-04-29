@@ -18,6 +18,8 @@ class Shell {
     void parse_settings(YAMLParser::Mapping &val);
     void create_paths();
     void configure_commands();
+    void add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func);
+    void add_alias(int state, std::string new_name, std::string old_name);
  public:
     Shell(const std::string &config_file = "");
     void run();

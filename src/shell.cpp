@@ -21,8 +21,21 @@ Shell::Shell(const std::string &config_file) {
     current_task = -1;
 }
 
+void Shell::add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func) {
+    commands[state].emplace(name, func);
+}
+
+void Shell::add_alias(int state, std::string old_name, std::string new_name) {
+    auto it = commands[state].find(old_name);
+    if (it == commands[state].end())
+        throw std::runtime_error("Unable to add alias for " + old_name);
+    commands[state].emplace(new_name, it->second);
+}
+
 void Shell::configure_commands() {
-    commands[State::GLOBAL].emplace("se", [this](std::vector <std::string> &arg) -> int {
+
+    // Set environment
+    add_command(State::GLOBAL, "se", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs_.size(); ++i) {
@@ -35,21 +48,57 @@ void Shell::configure_commands() {
         throw std::runtime_error("Incorrect environment name");
     });
 
-    commands[State::ENVIRONMENT].emplace("q", [this](std::vector <std::string> &arg) -> int {
-        if (arg.size() != 1)
+    // Create environment
+    add_command(State::GLOBAL, "ce", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        current_env = -1;
-        current_state = State::GLOBAL;
+        for (size_t i = 0; i < envs_.size(); ++i)
+            if (envs_[i].get_name() == arg[1])
+                throw std::runtime_error("Environment named " + arg[1] + " already exists");
+        envs_.push_back(arg[1]);
+        fs::path path = fs::current_path() / ("env_" + arg[1]);
+        if (!fs::exists(path)) {
+            fs::create_directory(path);
+        }
         return 0;
     });
 
-    commands[State::GLOBAL].emplace("q", [this](std::vector <std::string> &arg) -> int {
+    // Delete environment
+    add_command(State::GLOBAL, "de", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        for (size_t i = 0; i < envs_.size(); ++i) {
+            if (envs_[i].get_name() == arg[1]) {
+                envs_.erase(envs_.begin() + i);
+                fs::path path = fs::current_path() / ("env_" + arg[1]);
+                if (fs::exists(path)) {
+                    return !fs::remove_all(path);
+                }
+            }
+        }
+        throw std::runtime_error("Incorrect environment name");
+    });
+
+    // Exit from program
+    add_command(State::GLOBAL, "q", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Exiting..." << std::endl;
         exit(0);
         return 0;
     });
+    add_alias(State::GLOBAL, "q", "exit");
+
+
+    // Exit from environment
+    add_command(State::ENVIRONMENT, "q", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        current_env = -1;
+        current_state = State::GLOBAL;
+        return 0;
+    });
+    add_alias(State::ENVIRONMENT, "q", "exit");
 }
 
 void Shell::parse_settings(YAMLParser::Mapping &config) {
@@ -118,7 +167,7 @@ void Shell::run() {
             try {
                 int verdict = commands[current_state][args[0]](args);
                 if (verdict) {
-                    std::cout << "Command " << args[0] << "returned " << verdict << std::endl;
+                    std::cout << "Command " << args[0] << " returned " << verdict << std::endl;
                 }
             } catch(std::runtime_error &re) {
                 std::cout << "Error: " << re.what() << std::endl;
