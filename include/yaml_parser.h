@@ -23,6 +23,7 @@ class YAMLParser {
         std::string getString(const std::string_view name) const;
         Mapping getMapping(const std::string_view name) const;
         Sequence getSequence(const std::string_view name) const;
+        const std::map <std::string, Value> getMap() const;
         friend class YAMLParser;
     };
     class Value {

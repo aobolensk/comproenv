@@ -29,7 +29,11 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
         }
         envs_.push_back(env);
     }
-    YAMLParser::Mapping glob_settings = config.getValue("global").getMapping();
+    YAMLParser::Mapping global_settings_map = config.getValue("global").getMapping();
+    auto compilers_settings = global_settings_map.getValue("compilers").getMapping().getMap();
+    for (auto &cs : compilers_settings) {
+        global_settings.emplace("compiler_" + cs.first, cs.second.getString());
+    }
 }
 
 void Shell::create_paths() {
@@ -50,11 +54,6 @@ void Shell::create_paths() {
             }
         }
     }
-    
-    std::cout << path << std::endl;
-    std::cout << fs::exists(path) << std::endl;
-    std::cout << path.parent_path() << std::endl;
-    std::cout << "Done" << std::endl;
 }
 
 void Shell::run() {

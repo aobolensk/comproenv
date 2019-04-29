@@ -77,6 +77,10 @@ YAMLParser::Sequence YAMLParser::Mapping::getSequence(const std::string_view nam
     return (*res).second.getSequence();
 }
 
+const std::map <std::string, YAMLParser::Value> YAMLParser::Mapping::getMap() const {
+    return map_;
+}
+
 YAMLParser::Value YAMLParser::parse() {
     int preparing = 2;
     while (preparing) {
