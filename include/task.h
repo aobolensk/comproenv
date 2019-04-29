@@ -9,6 +9,7 @@ class Task {
     std::string name;
  public:
     Task(const std::string &task_name);
+    std::string get_name() const;
 };
 
 #endif  // INCLUDE_TASK_H

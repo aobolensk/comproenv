@@ -7,10 +7,11 @@
 class Shell {
  private:
     std::vector <Environment> envs_;
+    void parse_settings(YAMLParser::Mapping &val);
+    void create_paths();
  public:
     Shell(const std::string &config_file = "");
     void run();
-    void parse_settings(YAMLParser::Mapping &val);
     ~Shell();
 };
 

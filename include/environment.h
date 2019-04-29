@@ -12,6 +12,8 @@ class Environment {
  public:
     Environment(const std::string &env_name);
     void add_task(const Task &task);
+    std::string get_name() const;
+    const std::vector <Task> get_tasks() const;
     void add_setting(const std::string &key, const std::string &value);
 };
 
