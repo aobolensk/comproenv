@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <map>
 #include <vector>
+#include <string_view>
 #include "libyaml/include/yaml.h"
 
 class YAMLParser {
@@ -17,18 +18,19 @@ class YAMLParser {
      private:
         std::map <std::string, Value> map_;
      public:
-        bool hasKey(const std::string &name) const;
-        Value getValue(const std::string &name) const;
-        std::string getString(const std::string &name) const;
-        Mapping getMapping(const std::string &name) const;
-        Sequence getSequence(const std::string &name) const;
+        bool hasKey(const std::string_view name) const;
+        Value getValue(const std::string_view name) const;
+        std::string getString(const std::string_view name) const;
+        Mapping getMapping(const std::string_view name) const;
+        Sequence getSequence(const std::string_view name) const;
         friend class YAMLParser;
     };
     class Value {
-     private:
+     public:
         enum class Type {
             String, Mapping, Sequence
         };
+     private:
         Type type_;
         std::string string_;
         Mapping mapping_;
@@ -41,6 +43,7 @@ class YAMLParser {
         const std::string &getString() const;
         const Mapping &getMapping() const;
         const Sequence &getSequence() const;
+        const Type getType() const;
     };
  private:
     std::string file_name_;
