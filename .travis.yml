@@ -54,7 +54,9 @@ matrix:
     - os: osx
       osx_image: xcode10.2
       name: macOS-clang
-      compiler: clang
+      install:
+        - export CC="gcc-7"
+        - export CXX="g++-7"
       script:
         - brew install gcc@7
         - git submodule update --init --recursive
