@@ -54,7 +54,9 @@ matrix:
     - os: osx
       osx_image: xcode10.2
       name: macOS-clang
+      compiler: clang
       script:
+        - brew install clang
         - git submodule update --init --recursive
         - mkdir build
         - cd build
