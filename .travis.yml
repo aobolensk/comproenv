@@ -1,0 +1,22 @@
+language: cpp
+
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      name: Linux-g++
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      install:
+        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
