@@ -20,3 +20,22 @@ matrix:
         - cd build
         - cmake ..
         - cmake --build . --config Release -- -j2
+    - os: linux
+      dist: xenial
+      name: Linux-clang
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      install:
+        - export CC="clang"
+        - export CXX="clang++"
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
