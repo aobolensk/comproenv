@@ -19,17 +19,19 @@ Shell::Shell(const std::string &config_file) {
     }
     current_env = -1;
     current_task = -1;
+    current_state = State::GLOBAL;
+    current_compiler = "cpp";
 }
 
 void Shell::add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func) {
     commands[state].emplace(name, func);
 }
 
-void Shell::add_alias(int state, std::string old_name, std::string new_name) {
-    auto it = commands[state].find(old_name);
-    if (it == commands[state].end())
+void Shell::add_alias(int old_state, std::string old_name, int new_state, std::string new_name) {
+    auto it = commands[old_state].find(old_name);
+    if (it == commands[old_state].end())
         throw std::runtime_error("Unable to add alias for " + old_name);
-    commands[state].emplace(new_name, it->second);
+    commands[new_state].emplace(new_name, it->second);
 }
 
 void Shell::configure_commands() {
@@ -87,7 +89,7 @@ void Shell::configure_commands() {
         exit(0);
         return 0;
     });
-    add_alias(State::GLOBAL, "q", "exit");
+    add_alias(State::GLOBAL, "q", State::GLOBAL, "exit");
 
     // Set task
     add_command(State::ENVIRONMENT, "st", [this](std::vector <std::string> &arg) -> int {
@@ -142,7 +144,35 @@ void Shell::configure_commands() {
         current_state = State::GLOBAL;
         return 0;
     });
-    add_alias(State::ENVIRONMENT, "q", "exit");
+    add_alias(State::ENVIRONMENT, "q", State::ENVIRONMENT, "exit");
+
+    // Set compiler
+    add_command(State::TASK, "sc", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        for (auto &setting : global_settings) {
+            if (setting.first == "compiler_" + arg[1]) {
+                current_compiler = arg[1];
+                return 0;
+            }
+        }
+        throw std::runtime_error("Incorrect compiler name");
+    });
+
+    // Compile task
+    add_command(State::TASK, "c", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string command = global_settings["compiler_" + current_compiler];
+        size_t pos = std::string::npos;
+        while ((pos = command.find("@name@")) != std::string::npos) {
+            command.replace(pos, sizeof("@name@") - 1,
+                            fs::current_path() / ("env_" + envs_[current_env].get_name()) / 
+                            ("task_" + envs_[current_env].get_tasks()[current_task].get_name()) /
+                            "main");
+        }
+        return system(command.c_str());
+    });
 
     // Exit from task
     add_command(State::TASK, "q", [this](std::vector <std::string> &arg) -> int {
@@ -152,7 +182,7 @@ void Shell::configure_commands() {
         current_state = State::ENVIRONMENT;
         return 0;
     });
-    add_alias(State::TASK, "q", "exit");
+    add_alias(State::TASK, "q", State::TASK, "exit");
 }
 
 void Shell::parse_settings(YAMLParser::Mapping &config) {

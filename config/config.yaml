@@ -1,0 +1,13 @@
+environments:
+  - name: e1
+    tasks:
+      - name: t1
+      - name: t2
+  - name: e2
+    tasks:
+      - name: t3
+
+global:
+  compilers:
+    cpp: g++ @name@.cpp -o @name@
+    c: gcc @name@.c -o @name@
