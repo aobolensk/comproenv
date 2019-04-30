@@ -1,0 +1,65 @@
+language: cpp
+
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      name: Linux-g++
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-8
+      env:
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
+    - os: linux
+      dist: xenial
+      name: Linux-clang
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - clang-7
+      env:
+        - MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
+      - os: windows
+        name: Windows-VS
+        env:
+          - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin"
+        install:
+          - export PATH=$MSBUILD_PATH:$PATH
+        script:
+          - git submodule update --init --recursive
+          - mkdir build
+          - cd build
+          - cmake ..
+          - cmake --build . --config Release -- -j2
+      - os: windows
+        name: Windows-MinGW
+        script:
+          - git submodule update --init --recursive
+          - mkdir build
+          - cd build
+          - cmake .. -G "MinGW Makefiles"
+          - cmake --build . --config Release -- -j2
+      - os: osx
+        osx_image: xcode10.2
+        name: macOS
+        script:
+          - git submodule update --init --recursive
+          - mkdir build
+          - cd build
+          - cmake ..
+          - cmake --build . --config Release
