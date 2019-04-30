@@ -96,14 +96,16 @@ void Shell::configure_commands() {
             indent += 2;
             for (int i = 0; i < indent; ++i)
                 f << " ";
-            f << "tasks:" << std::endl;
-            indent += 2;
-            for (auto &task : env.get_tasks()) {
-                for (int i = 0; i < indent; ++i)
-                    f << " ";
-                f << "- name: " << task.get_name() << std::endl;
+            if (env.get_tasks().size()) {
+                f << "tasks:" << std::endl;
+                indent += 2;
+                for (auto &task : env.get_tasks()) {
+                    for (int i = 0; i < indent; ++i)
+                        f << " ";
+                    f << "- name: " << task.get_name() << std::endl;
+                }
+                indent -= 2;
             }
-            indent -= 2;
             indent -= 2;
         }
         indent -= 2;
@@ -235,11 +237,13 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
         YAMLParser::Mapping map = env_data.getMapping();
         Environment env(map.getValue("name").getString());
         std::cout << "env: " << map.getValue("name").getString() << std::endl;
+        if (map.hasKey("tasks")) {
         std::vector <YAMLParser::Value> tasks = map.getValue("tasks").getSequence();
-        for (auto &task_data : tasks) {
-            YAMLParser::Mapping map = task_data.getMapping();
-            Task task(map.getValue("name").getString());
-            env.add_task(task);
+            for (auto &task_data : tasks) {
+                YAMLParser::Mapping map = task_data.getMapping();
+                Task task(map.getValue("name").getString());
+                env.add_task(task);
+            }
         }
         envs_.push_back(env);
     }
