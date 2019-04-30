@@ -1,6 +1,7 @@
 #ifndef INCLUDE_SHELL_H
 #define INCLUDE_SHELL_H
 #include <vector>
+#include <array>
 #include <unordered_map>
 #include <functional>
 #include "environment.h"

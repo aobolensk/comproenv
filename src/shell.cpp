@@ -212,10 +212,10 @@ void Shell::configure_commands() {
         std::string command = global_settings["compiler_" + current_compiler];
         size_t pos = std::string::npos;
         while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(pos, std::size("@name@") - 1,
-                            fs::current_path() / ("env_" + envs_[current_env].get_name()) / 
+            command.replace(command.begin() + pos, command.begin() + std::size("@name@") - 1,
+                            (fs::current_path() / ("env_" + envs_[current_env].get_name()) / 
                             ("task_" + envs_[current_env].get_tasks()[current_task].get_name()) /
-                            "main");
+                            "main").string());
         }
         return system(command.c_str());
     });
