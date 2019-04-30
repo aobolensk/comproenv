@@ -53,7 +53,7 @@ matrix:
         - cmake --build . --config Release
     - os: osx
       osx_image: xcode10.2
-      name: macOS-clang
+      name: macOS-g++
       install:
         - export CC="gcc-7"
         - export CXX="g++-7"
