@@ -59,3 +59,12 @@ matrix:
         - cd build
         - cmake .. -G "MinGW Makefiles" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
         - cmake --build . --config Release
+    - os: osx
+      osx_image: xcode10.2
+      name: macOS-clang
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
