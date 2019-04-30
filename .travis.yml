@@ -56,7 +56,7 @@ matrix:
       name: macOS-clang
       compiler: clang
       script:
-        - brew install clang
+        - brew install gcc@7
         - git submodule update --init --recursive
         - mkdir build
         - cd build
