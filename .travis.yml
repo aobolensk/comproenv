@@ -1,0 +1,66 @@
+language: cpp
+
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      name: Linux-g++
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      install:
+        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
+    - os: linux
+      dist: xenial
+      name: Linux-clang
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      install:
+        - export CC="clang"
+        - export CXX="clang++"
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
+    - os: windows
+      name: Windows-VS
+      env:
+        - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin"
+      install:
+        - export PATH=$MSBUILD_PATH:$PATH
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release
+    - os: osx
+      osx_image: xcode10.2
+      name: macOS-g++
+      install:
+        - export CC="gcc-7"
+        - export CXX="g++-7"
+      script:
+        - brew install gcc@7
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
