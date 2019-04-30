@@ -9,7 +9,7 @@
 
 namespace fs = std::experimental::filesystem;
 
-Shell::Shell(const std::string &config_file) {
+Shell::Shell(const std::string &file) : config_file(file) {
     configure_commands();
     if (config_file != "") {
         YAMLParser p1(config_file);
@@ -79,6 +79,50 @@ void Shell::configure_commands() {
             }
         }
         throw std::runtime_error("Incorrect environment name");
+    });
+
+    // Save settings
+    add_command(State::GLOBAL, "s", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        int indent = 0;
+        std::ofstream f(config_file, std::ios::out);
+        f << "environments:" << std::endl;
+        indent += 2;
+        for (auto &env : envs_) {
+            for (int i = 0; i < indent; ++i)
+                f << " ";
+            f << "- name: " << env.get_name() << std::endl;
+            indent += 2;
+            for (int i = 0; i < indent; ++i)
+                f << " ";
+            f << "tasks:" << std::endl;
+            indent += 2;
+            for (auto &task : env.get_tasks()) {
+                for (int i = 0; i < indent; ++i)
+                    f << " ";
+                f << "- name: " << task.get_name() << std::endl;
+            }
+            indent -= 2;
+            indent -= 2;
+        }
+        indent -= 2;
+        f << std::endl;
+        f << "global:" << std::endl;
+        indent += 2;
+        for (int i = 0; i < indent; ++i)
+            f << " ";
+        f << "compilers:" << std::endl;
+        indent += 2;
+        for (auto &setting : global_settings) {
+            if (setting.first.compare(0, std::size("compiler_") - 1, "compiler_") == 0) {
+                for (int i = 0; i < indent; ++i)
+                    f << " ";
+                f << setting.first.substr(std::size("compiler_") - 1) << ": " << setting.second << std::endl;
+            }
+        }
+        f.close();
+        return 0;
     });
 
     // Exit from program
@@ -166,7 +210,7 @@ void Shell::configure_commands() {
         std::string command = global_settings["compiler_" + current_compiler];
         size_t pos = std::string::npos;
         while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(pos, sizeof("@name@") - 1,
+            command.replace(pos, std::size("@name@") - 1,
                             fs::current_path() / ("env_" + envs_[current_env].get_name()) / 
                             ("task_" + envs_[current_env].get_tasks()[current_task].get_name()) /
                             "main");

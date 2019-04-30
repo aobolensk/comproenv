@@ -16,13 +16,14 @@ class Shell {
     std::string current_compiler;
     std::vector <Environment> envs_;
     std::unordered_map <std::string, std::string> global_settings;
+    std::string config_file;
     void parse_settings(YAMLParser::Mapping &val);
     void create_paths();
     void configure_commands();
     void add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func);
     void add_alias(int old_state, std::string new_name, int new_state, std::string old_name);
  public:
-    Shell(const std::string &config_file = "");
+    Shell(const std::string &file = "");
     void run();
     ~Shell();
 };
