@@ -6,8 +6,8 @@
 
 class Environment {
  private:
-    std::vector <Task> tasks_;
-    std::unordered_map <std::string, std::string> settings_;
+    std::vector <Task> tasks;
+    std::unordered_map <std::string, std::string> settings;
     std::string name;
  public:
     Environment(const std::string &env_name);

@@ -13,7 +13,7 @@ Shell::Shell(const std::string &file) : config_file(file) {
     configure_commands();
     if (config_file != "") {
         YAMLParser p1(config_file);
-        YAMLParser::Mapping p = p1.parse().getMapping();
+        YAMLParser::Mapping p = p1.parse().get_mapping();
         parse_settings(p);
         create_paths();
     }
@@ -40,8 +40,8 @@ void Shell::configure_commands() {
     add_command(State::GLOBAL, "se", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        for (size_t i = 0; i < envs_.size(); ++i) {
-            if (envs_[i].get_name() == arg[1]) {
+        for (size_t i = 0; i < envs.size(); ++i) {
+            if (envs[i].get_name() == arg[1]) {
                 current_env = i;
                 current_state = State::ENVIRONMENT;
                 return 0;
@@ -54,10 +54,10 @@ void Shell::configure_commands() {
     add_command(State::GLOBAL, "ce", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        for (size_t i = 0; i < envs_.size(); ++i)
-            if (envs_[i].get_name() == arg[1])
+        for (size_t i = 0; i < envs.size(); ++i)
+            if (envs[i].get_name() == arg[1])
                 throw std::runtime_error("Environment named " + arg[1] + " already exists");
-        envs_.push_back(arg[1]);
+        envs.push_back(arg[1]);
         fs::path path = fs::current_path() / ("env_" + arg[1]);
         if (!fs::exists(path)) {
             fs::create_directory(path);
@@ -69,9 +69,9 @@ void Shell::configure_commands() {
     add_command(State::GLOBAL, "de", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        for (size_t i = 0; i < envs_.size(); ++i) {
-            if (envs_[i].get_name() == arg[1]) {
-                envs_.erase(envs_.begin() + i);
+        for (size_t i = 0; i < envs.size(); ++i) {
+            if (envs[i].get_name() == arg[1]) {
+                envs.erase(envs.begin() + i);
                 fs::path path = fs::current_path() / ("env_" + arg[1]);
                 if (fs::exists(path)) {
                     return !fs::remove_all(path);
@@ -89,7 +89,7 @@ void Shell::configure_commands() {
         std::ofstream f(config_file, std::ios::out);
         f << "environments:" << std::endl;
         indent += 2;
-        for (auto &env : envs_) {
+        for (auto &env : envs) {
             for (int i = 0; i < indent; ++i)
                 f << " ";
             f << "- name: " << env.get_name() << std::endl;
@@ -141,8 +141,8 @@ void Shell::configure_commands() {
     add_command(State::ENVIRONMENT, "st", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        for (size_t i = 0; i < envs_[current_env].get_tasks().size(); ++i) {
-            if (envs_[current_env].get_tasks()[i].get_name() == arg[1]) {
+        for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
+            if (envs[current_env].get_tasks()[i].get_name() == arg[1]) {
                 current_task = i;
                 current_state = State::TASK;
                 return 0;
@@ -155,11 +155,11 @@ void Shell::configure_commands() {
     add_command(State::ENVIRONMENT, "ct", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        for (size_t i = 0; i < envs_[current_env].get_tasks().size(); ++i)
-            if (envs_[current_env].get_tasks()[i].get_name() == arg[1])
+        for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i)
+            if (envs[current_env].get_tasks()[i].get_name() == arg[1])
                 throw std::runtime_error("Task named " + arg[1] + " already exists");
-        envs_[current_env].get_tasks().push_back(arg[1]);
-        fs::path path = fs::current_path() / ("env_" + envs_[current_env].get_name()) / ("task_" + arg[1]);
+        envs[current_env].get_tasks().push_back(arg[1]);
+        fs::path path = fs::current_path() / ("env_" + envs[current_env].get_name()) / ("task_" + arg[1]);
         if (!fs::exists(path)) {
             fs::create_directory(path);
         }
@@ -170,10 +170,10 @@ void Shell::configure_commands() {
     add_command(State::ENVIRONMENT, "dt", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        for (size_t i = 0; i < envs_[current_env].get_tasks().size(); ++i) {
-            if (envs_[current_env].get_tasks()[i].get_name() == arg[1]) {
-                envs_[current_env].get_tasks().erase(envs_[current_env].get_tasks().begin() + i);
-                fs::path path = fs::current_path() / ("env_" + envs_[current_env].get_name()) / ("task_" + arg[1]);
+        for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
+            if (envs[current_env].get_tasks()[i].get_name() == arg[1]) {
+                envs[current_env].get_tasks().erase(envs[current_env].get_tasks().begin() + i);
+                fs::path path = fs::current_path() / ("env_" + envs[current_env].get_name()) / ("task_" + arg[1]);
                 if (fs::exists(path)) {
                     return !fs::remove_all(path);
                 }
@@ -213,8 +213,8 @@ void Shell::configure_commands() {
         size_t pos = std::string::npos;
         while ((pos = command.find("@name@")) != std::string::npos) {
             command.replace(command.begin() + pos, command.begin() + std::size("@name@") - 1,
-                            (fs::current_path() / ("env_" + envs_[current_env].get_name()) / 
-                            ("task_" + envs_[current_env].get_tasks()[current_task].get_name()) /
+                            (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+                            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             "main").string());
         }
         return system(command.c_str());
@@ -232,31 +232,31 @@ void Shell::configure_commands() {
 }
 
 void Shell::parse_settings(YAMLParser::Mapping &config) {
-    std::vector <YAMLParser::Value> environments = config.getValue("environments").getSequence();
+    std::vector <YAMLParser::Value> environments = config.get_value("environments").get_sequence();
     for (auto &env_data : environments) {
-        YAMLParser::Mapping map = env_data.getMapping();
-        Environment env(map.getValue("name").getString());
-        std::cout << "env: " << map.getValue("name").getString() << std::endl;
-        if (map.hasKey("tasks")) {
-        std::vector <YAMLParser::Value> tasks = map.getValue("tasks").getSequence();
+        YAMLParser::Mapping map = env_data.get_mapping();
+        Environment env(map.get_value("name").get_string());
+        std::cout << "env: " << map.get_value("name").get_string() << std::endl;
+        if (map.has_key("tasks")) {
+        std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
             for (auto &task_data : tasks) {
-                YAMLParser::Mapping map = task_data.getMapping();
-                Task task(map.getValue("name").getString());
+                YAMLParser::Mapping map = task_data.get_mapping();
+                Task task(map.get_value("name").get_string());
                 env.add_task(task);
             }
         }
-        envs_.push_back(env);
+        envs.push_back(env);
     }
-    YAMLParser::Mapping global_settings_map = config.getValue("global").getMapping();
-    auto compilers_settings = global_settings_map.getValue("compilers").getMapping().getMap();
+    YAMLParser::Mapping global_settings_map = config.get_value("global").get_mapping();
+    auto compilers_settings = global_settings_map.get_value("compilers").get_mapping().get_map();
     for (auto &cs : compilers_settings) {
-        global_settings.emplace("compiler_" + cs.first, cs.second.getString());
+        global_settings.emplace("compiler_" + cs.first, cs.second.get_string());
     }
 }
 
 void Shell::create_paths() {
     fs::path path = fs::current_path();
-    for (auto &env : envs_) {
+    for (auto &env : envs) {
         fs::path env_path = path / ("env_" + env.get_name());
         if (!fs::exists(env_path)) {
             fs::create_directory(env_path);
@@ -280,10 +280,10 @@ void Shell::run() {
     while (true) {
         std::cout << ">";
         if (current_env != -1) {
-            std::cout << "/" << envs_[current_env].get_name();
+            std::cout << "/" << envs[current_env].get_name();
         }
         if (current_task != -1) {
-            std::cout << "/" << envs_[current_env].get_tasks()[current_task].get_name();
+            std::cout << "/" << envs[current_env].get_tasks()[current_task].get_name();
         }
         std::cout << " ";
         std::flush(std::cout);

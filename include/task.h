@@ -5,7 +5,7 @@
 
 class Task {
  private:
-    std::unordered_map <std::string, std::string> settings_;
+    std::unordered_map <std::string, std::string> settings;
     std::string name;
  public:
     Task(const std::string &task_name);

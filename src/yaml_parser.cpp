@@ -2,89 +2,89 @@
 #include "libyaml/include/yaml.h"
 
 YAMLParser::YAMLParser(std::string file_name) :
-    file_name_(file_name),
-    file_(fopen(file_name.c_str(), "r"), &fclose) {
-    if (!file_)
+    file_name(file_name),
+    file(fopen(file_name.c_str(), "r"), &fclose) {
+    if (!file)
         throw std::runtime_error("YAMLParser: File is not found");
-    yaml_parser_initialize(&parser_);
-    yaml_parser_set_input_file(&parser_, file_.get());
+    yaml_parser_initialize(&parser);
+    yaml_parser_set_input_file(&parser, file.get());
 }
 
 YAMLParser::YAMLParser(const YAMLParser &p) :
-    file_name_(p.file_name_),
-    file_(fopen(file_name_.c_str(), "r"), &fclose) {
-    if (!file_)
+    file_name(p.file_name),
+    file(fopen(file_name.c_str(), "r"), &fclose) {
+    if (!file)
         throw std::runtime_error("YAMLParser: File is not found");
-    yaml_parser_initialize(&parser_);
-    yaml_parser_set_input_file(&parser_, file_.get());
+    yaml_parser_initialize(&parser);
+    yaml_parser_set_input_file(&parser, file.get());
 }
 
 YAMLParser::~YAMLParser() {
-    yaml_parser_delete(&parser_);
+    yaml_parser_delete(&parser);
 }
 
-bool YAMLParser::Mapping::hasKey(const std::string_view name) const {
-    return map_.find(name.data()) != map_.end();
+bool YAMLParser::Mapping::has_key(const std::string_view name) const {
+    return map.find(name.data()) != map.end();
 }
 
-const std::string &YAMLParser::Value::getString() const {
-    if (type_ != Type::String)
+const std::string &YAMLParser::Value::get_string() const {
+    if (type != Type::String)
         throw std::runtime_error("Value is not String type");
-    return string_;
+    return string;
 }
 
-const YAMLParser::Mapping &YAMLParser::Value::getMapping() const {
-    if (type_ != Type::Mapping)
+const YAMLParser::Mapping &YAMLParser::Value::get_mapping() const {
+    if (type != Type::Mapping)
         throw std::runtime_error("Value is not Mapping type");
-    return mapping_;
+    return mapping;
 }
 
-const YAMLParser::Sequence &YAMLParser::Value::getSequence() const {
-    if (type_ != Type::Sequence)
+const YAMLParser::Sequence &YAMLParser::Value::get_sequence() const {
+    if (type != Type::Sequence)
         throw std::runtime_error("Value is not Sequence type");
-    return sequence_;
+    return sequence;
 }
 
-const YAMLParser::Value::Type YAMLParser::Value::getType() const {
-    return type_;
+const YAMLParser::Value::Type YAMLParser::Value::get_type() const {
+    return type;
 }
 
-YAMLParser::Value YAMLParser::Mapping::getValue(const std::string_view name) const {
-    auto res = map_.find(name.data());
-    if (res == map_.end())
+YAMLParser::Value YAMLParser::Mapping::get_value(const std::string_view name) const {
+    auto res = map.find(name.data());
+    if (res == map.end())
         throw std::runtime_error("Wrong key");
     return (*res).second;
 }
 
-std::string YAMLParser::Mapping::getString(const std::string_view name) const {
-    auto res = map_.find(name.data());
-    if (res == map_.end())
+std::string YAMLParser::Mapping::get_string(const std::string_view name) const {
+    auto res = map.find(name.data());
+    if (res == map.end())
         throw std::runtime_error("Wrong key");
-    return (*res).second.getString();
+    return (*res).second.get_string();
 }
 
-YAMLParser::Mapping YAMLParser::Mapping::getMapping(const std::string_view name) const {
-    auto res = map_.find(name.data());
-    if (res == map_.end())
+YAMLParser::Mapping YAMLParser::Mapping::get_mapping(const std::string_view name) const {
+    auto res = map.find(name.data());
+    if (res == map.end())
         throw std::runtime_error("Wrong key");
-    return (*res).second.getMapping();
+    return (*res).second.get_mapping();
 }
 
-YAMLParser::Sequence YAMLParser::Mapping::getSequence(const std::string_view name) const {
-    auto res = map_.find(name.data());
-    if (res == map_.end())
+YAMLParser::Sequence YAMLParser::Mapping::get_sequence(const std::string_view name) const {
+    auto res = map.find(name.data());
+    if (res == map.end())
         throw std::runtime_error("Wrong key");
-    return (*res).second.getSequence();
+    return (*res).second.get_sequence();
 }
 
-const std::map <std::string, YAMLParser::Value> YAMLParser::Mapping::getMap() const {
-    return map_;
+const std::map <std::string, YAMLParser::Value> YAMLParser::Mapping::get_map() const {
+    return map;
 }
 
 YAMLParser::Value YAMLParser::parse() {
     int preparing = 2;
     while (preparing) {
-        YAMLEvent event = getNextEvent();
+        YAMLEvent event = get_next_event();
         switch(event.type) {
         case YAML_STREAM_START_EVENT:
             if (preparing != 2)
@@ -100,27 +100,27 @@ YAMLParser::Value YAMLParser::parse() {
             throw std::runtime_error("Unexpected event " + std::to_string(event.type));
         }
     }
-    YAMLEvent event = getNextEvent();
+    YAMLEvent event = get_next_event();
     switch(event.type) {
     case YAML_SCALAR_EVENT:
         return Value(event.value);
         break;
     case YAML_SEQUENCE_START_EVENT:
-        return Value(readSequence());
+        return Value(read_sequence());
         break;
     case YAML_MAPPING_START_EVENT:
-        return Value(readMapping());
+        return Value(read_mapping());
         break;
     default:
         throw std::runtime_error("Unexpected event " + std::to_string(event.type));
     }
 }
 
-YAMLParser::Mapping YAMLParser::readMapping() {
+YAMLParser::Mapping YAMLParser::read_mapping() {
     Mapping mapping;
     while (true) {
         std::string key;
-        YAMLEvent event = getNextEvent();
+        YAMLEvent event = get_next_event();
         // Reading key
         switch(event.type) {
         case YAML_SCALAR_EVENT:
@@ -132,16 +132,16 @@ YAMLParser::Mapping YAMLParser::readMapping() {
         default:
             throw std::runtime_error("Unexpected event " + std::to_string(event.type));
         }
-        event = getNextEvent();
+        event = get_next_event();
         switch(event.type) {
         case YAML_SCALAR_EVENT:
-            mapping.map_.emplace(key, event.value);
+            mapping.map.emplace(key, event.value);
             break;
         case YAML_SEQUENCE_START_EVENT:
-            mapping.map_.emplace(key, readSequence());
+            mapping.map.emplace(key, read_sequence());
             break;
         case YAML_MAPPING_START_EVENT:
-            mapping.map_.emplace(key, readMapping());
+            mapping.map.emplace(key, read_mapping());
             break;
         default:
             throw std::runtime_error("Unexpected event " + std::to_string(event.type));
@@ -149,19 +149,19 @@ YAMLParser::Mapping YAMLParser::readMapping() {
     }
 }
 
-YAMLParser::Sequence YAMLParser::readSequence() {
+YAMLParser::Sequence YAMLParser::read_sequence() {
     Sequence seq;
     while (true) {
-        YAMLEvent event = getNextEvent();
+        YAMLEvent event = get_next_event();
         switch(event.type) {
         case YAML_SCALAR_EVENT:
             seq.emplace_back(event.value);
             break;
         case YAML_SEQUENCE_START_EVENT:
-            seq.emplace_back(Value(readSequence()));
+            seq.emplace_back(Value(read_sequence()));
             break;
         case YAML_MAPPING_START_EVENT:
-            seq.emplace_back(Value(readMapping()));
+            seq.emplace_back(Value(read_mapping()));
             break;
         case YAML_SEQUENCE_END_EVENT:
             return seq;
@@ -177,20 +177,20 @@ std::ostream &operator<<(std::ostream &os, YAMLParser::Value &val) {
 }
 
 void YAMLParser::Value::print(std::ostream &os, int indent) {
-    switch(type_) {
+    switch(type) {
     case Type::String:
         for (int i = 0; i < indent; ++i)
             os << " ";
         os << "Type::String" << std::endl;
         for (int i = 0; i < indent; ++i)
             os << " ";
-        os << string_ << std::endl;
+        os << string << std::endl;
         break;
     case Type::Mapping:
         for (int i = 0; i < indent; ++i)
             os << " ";
         os << "Type::Mapping" << std::endl;
-        for (auto &el : mapping_.map_) {
+        for (auto &el : mapping.map) {
             for (int i = 0; i < indent; ++i)
                 os << " ";
             os << el.first << std::endl;
@@ -201,7 +201,7 @@ void YAMLParser::Value::print(std::ostream &os, int indent) {
         for (int i = 0; i < indent; ++i)
             os << " ";
         os << "Type::Sequence" << std::endl;
-        for (auto &el : sequence_)
+        for (auto &el : sequence)
             el.print(os, indent + 1);
         break;
     }

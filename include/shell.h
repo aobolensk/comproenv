@@ -15,7 +15,7 @@ class Shell {
     std::array <std::unordered_map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     int current_env, current_task, current_state;
     std::string current_compiler;
-    std::vector <Environment> envs_;
+    std::vector <Environment> envs;
     std::unordered_map <std::string, std::string> global_settings;
     std::string config_file;
     void parse_settings(YAMLParser::Mapping &val);

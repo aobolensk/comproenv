@@ -16,14 +16,14 @@ class YAMLParser {
     using Sequence = std::vector <Value>;
     class Mapping {
      private:
-        std::map <std::string, Value> map_;
+        std::map <std::string, Value> map;
      public:
-        bool hasKey(const std::string_view name) const;
-        Value getValue(const std::string_view name) const;
-        std::string getString(const std::string_view name) const;
-        Mapping getMapping(const std::string_view name) const;
-        Sequence getSequence(const std::string_view name) const;
-        const std::map <std::string, Value> getMap() const;
+        bool has_key(const std::string_view name) const;
+        Value get_value(const std::string_view name) const;
+        std::string get_string(const std::string_view name) const;
+        Mapping get_mapping(const std::string_view name) const;
+        Sequence get_sequence(const std::string_view name) const;
+        const std::map <std::string, Value> get_map() const;
         friend class YAMLParser;
     };
     class Value {
@@ -32,24 +32,24 @@ class YAMLParser {
             String, Mapping, Sequence
         };
      private:
-        Type type_;
-        std::string string_;
-        Mapping mapping_;
-        Sequence sequence_;
+        Type type;
+        std::string string;
+        Mapping mapping;
+        Sequence sequence;
      public:
         void print(std::ostream &os, int indent);
-        Value(const std::string &str) : type_(Type::String), string_(str) {}
-        Value(const Mapping &map) : type_(Type::Mapping), mapping_(map) {}
-        Value(const Sequence &seq) : type_(Type::Sequence), sequence_(seq) {}
-        const std::string &getString() const;
-        const Mapping &getMapping() const;
-        const Sequence &getSequence() const;
-        const Type getType() const;
+        Value(const std::string &str) : type(Type::String), string(str) {}
+        Value(const Mapping &map) : type(Type::Mapping), mapping(map) {}
+        Value(const Sequence &seq) : type(Type::Sequence), sequence(seq) {}
+        const std::string &get_string() const;
+        const Mapping &get_mapping() const;
+        const Sequence &get_sequence() const;
+        const Type get_type() const;
     };
  private:
-    std::string file_name_;
-    std::unique_ptr<FILE, decltype(&fclose)> file_;
-    yaml_parser_t parser_;
+    std::string file_name;
+    std::unique_ptr<FILE, decltype(&fclose)> file;
+    yaml_parser_t parser;
     struct YAMLEvent {
         yaml_event_type_t type;
         std::string value;
@@ -57,17 +57,17 @@ class YAMLParser {
             type(event.type),
             value(event.type == YAML_SCALAR_EVENT ? (const char *)event.data.scalar.value : "") {}
     };
-    YAMLEvent getNextEvent() {
+    YAMLEvent get_next_event() {
         yaml_event_t event;
-        if (!yaml_parser_parse(&parser_, &event))
+        if (!yaml_parser_parse(&parser, &event))
             throw std::runtime_error("Error parsing YAML at " +
-                                     std::to_string(parser_.problem_mark.line) +
-                                     std::to_string(parser_.problem_mark.column) +
-                                     parser_.problem);
+                                     std::to_string(parser.problem_mark.line) +
+                                     std::to_string(parser.problem_mark.column) +
+                                     parser.problem);
         return YAMLEvent(event);
     }
-    Mapping readMapping();
-    Sequence readSequence();
+    Mapping read_mapping();
+    Sequence read_sequence();
  public:
     YAMLParser(std::string file_name);
     YAMLParser(const YAMLParser &p);
