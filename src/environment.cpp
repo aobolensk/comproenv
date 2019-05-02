@@ -19,3 +19,8 @@ std::string Environment::get_name() const {
 std::vector <Task> &Environment::get_tasks() {
     return tasks;
 }
+
+
+std::unordered_map <std::string, std::string> &Environment::get_settings() {
+    return settings;
+}

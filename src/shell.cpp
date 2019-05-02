@@ -87,6 +87,30 @@ void Shell::configure_commands() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         int indent = 0;
         std::ofstream f(config_file, std::ios::out);
+        auto serialize_settings = [&](std::unordered_map <std::string, std::string> &settings) {
+            std::vector <std::pair <std::string, std::string>> compilers;
+            for (auto &setting : settings) {
+                if (setting.first.compare(0, std::size("compiler_") - 1, "compiler_") == 0) {
+                    compilers.emplace_back(setting.first.substr(std::size("compiler_") - 1), setting.second);
+                } else {
+                    for (int i = 0; i < indent; ++i)
+                        f << " ";
+                    f << setting.first << ": " << setting.second << std::endl;
+                }
+            }
+            if (compilers.size()) {
+                for (int i = 0; i < indent; ++i)
+                    f << " ";
+                f << "compilers:" << std::endl;
+                indent += 2;
+                for (auto &compiler : compilers) {
+                    for (int i = 0; i < indent; ++i)
+                        f << " ";
+                    f << compiler.first << ": " << compiler.second << std::endl;
+                }
+                indent -= 2;
+            }
+        };
         f << "environments:" << std::endl;
         indent += 2;
         for (auto &env : envs) {
@@ -94,6 +118,7 @@ void Shell::configure_commands() {
                 f << " ";
             f << "- name: " << env.get_name() << std::endl;
             indent += 2;
+            serialize_settings(env.get_settings());
             for (int i = 0; i < indent; ++i)
                 f << " ";
             if (env.get_tasks().size()) {
@@ -103,6 +128,9 @@ void Shell::configure_commands() {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
                     f << "- name: " << task.get_name() << std::endl;
+                    indent += 2;
+                    serialize_settings(task.get_settings());
+                    indent -= 2;
                 }
                 indent -= 2;
             }
@@ -112,17 +140,7 @@ void Shell::configure_commands() {
         f << std::endl;
         f << "global:" << std::endl;
         indent += 2;
-        for (int i = 0; i < indent; ++i)
-            f << " ";
-        f << "compilers:" << std::endl;
-        indent += 2;
-        for (auto &setting : global_settings) {
-            if (setting.first.compare(0, std::size("compiler_") - 1, "compiler_") == 0) {
-                for (int i = 0; i < indent; ++i)
-                    f << " ";
-                f << setting.first.substr(std::size("compiler_") - 1) << ": " << setting.second << std::endl;
-            }
-        }
+        serialize_settings(global_settings);
         f.close();
         return 0;
     });
@@ -182,6 +200,25 @@ void Shell::configure_commands() {
         throw std::runtime_error("Incorrect task name");
     });
 
+    // Configure settings
+    add_command(State::ENVIRONMENT, "set", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() == 2) {
+            envs[current_env].get_settings().erase(arg[1]);
+            return 0;
+        }
+        if (arg.size() >= 3) {
+            std::string second_arg = arg[2];
+            for (unsigned i = 3; i < arg.size(); ++i) {
+                second_arg.push_back(' ');
+                second_arg += arg[i];
+            }
+            envs[current_env].get_settings().erase(arg[1]);
+            envs[current_env].get_settings().emplace(arg[1], second_arg);
+            return 0;
+        }
+        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+    });
+
     // Exit from environment
     add_command(State::ENVIRONMENT, "q", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
@@ -209,15 +246,42 @@ void Shell::configure_commands() {
     add_command(State::TASK, "c", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        std::string command = global_settings["compiler_" + current_compiler];
+        std::string command;
+        if (envs[current_env].get_tasks()[current_task].get_settings().find("compiler_" + current_compiler) !=
+            envs[current_env].get_tasks()[current_task].get_settings().end())
+            command = envs[current_env].get_tasks()[current_task].get_settings()["compiler_" + current_compiler];
+        else if (envs[current_env].get_settings().find("compiler_" + current_compiler) !=
+                envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["compiler_" + current_compiler];
+        else
+            command = global_settings["compiler_" + current_compiler];
         size_t pos = std::string::npos;
         while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + std::size("@name@") - 1,
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
                             (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             "main").string());
         }
         return system(command.c_str());
+    });
+
+    // Configure settings
+    add_command(State::TASK, "set", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() == 2) {
+            envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
+            return 0;
+        }
+        if (arg.size() >= 3) {
+            std::string second_arg = arg[2];
+            for (unsigned i = 3; i < arg.size(); ++i) {
+                second_arg.push_back(' ');
+                second_arg += arg[i];
+            }
+            envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
+            envs[current_env].get_tasks()[current_task].get_settings().emplace(arg[1], second_arg);
+            return 0;
+        }
+        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
     });
 
     // Exit from task
@@ -232,17 +296,42 @@ void Shell::configure_commands() {
 }
 
 void Shell::parse_settings(YAMLParser::Mapping &config) {
+    auto deserialize_compilers = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+        if (map.has_key("compilers")) {
+            std::map <std::string, YAMLParser::Value> compilers = map.get_value("compilers").get_mapping().get_map();
+            for (auto &compiler_data : compilers) {
+                settings.emplace("compiler_" + compiler_data.first, compiler_data.second.get_string());
+            }
+        }
+
+    };
     std::vector <YAMLParser::Value> environments = config.get_value("environments").get_sequence();
     for (auto &env_data : environments) {
         YAMLParser::Mapping map = env_data.get_mapping();
         Environment env(map.get_value("name").get_string());
         std::cout << "env: " << map.get_value("name").get_string() << std::endl;
         if (map.has_key("tasks")) {
-        std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
+            std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
             for (auto &task_data : tasks) {
                 YAMLParser::Mapping map = task_data.get_mapping();
                 Task task(map.get_value("name").get_string());
+                deserialize_compilers(task.get_settings(), map);
+                for (auto &setting : map.get_map()) {
+                    if (setting.first != "name" &&
+                        setting.first != "tasks" &&
+                        setting.first != "compilers") {
+                        task.add_setting(setting.first, setting.second.get_string());
+                    }
+                }
                 env.add_task(task);
+            }
+        }
+        deserialize_compilers(env.get_settings(), map);
+        for (auto &setting : map.get_map()) {
+            if (setting.first != "name" &&
+                setting.first != "tasks" &&
+                setting.first != "compilers") {
+                env.add_setting(setting.first, setting.second.get_string());
             }
         }
         envs.push_back(env);
