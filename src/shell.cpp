@@ -246,10 +246,18 @@ void Shell::configure_commands() {
     add_command(State::TASK, "c", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        std::string command = global_settings["compiler_" + current_compiler];
+        std::string command;
+        if (envs[current_env].get_tasks()[current_task].get_settings().find("compiler_" + current_compiler) !=
+            envs[current_env].get_tasks()[current_task].get_settings().end())
+            command = envs[current_env].get_tasks()[current_task].get_settings()["compiler_" + current_compiler];
+        else if (envs[current_env].get_settings().find("compiler_" + current_compiler) !=
+                envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["compiler_" + current_compiler];
+        else
+            command = global_settings["compiler_" + current_compiler];
         size_t pos = std::string::npos;
         while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + std::size("@name@") - 1,
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
                             (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             "main").string());
