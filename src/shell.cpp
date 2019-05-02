@@ -288,17 +288,42 @@ void Shell::configure_commands() {
 }
 
 void Shell::parse_settings(YAMLParser::Mapping &config) {
+    auto deserialize_compilers = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+        if (map.has_key("compilers")) {
+            std::map <std::string, YAMLParser::Value> compilers = map.get_value("compilers").get_mapping().get_map();
+            for (auto &compiler_data : compilers) {
+                settings.emplace("compiler_" + compiler_data.first, compiler_data.second.get_string());
+            }
+        }
+
+    };
     std::vector <YAMLParser::Value> environments = config.get_value("environments").get_sequence();
     for (auto &env_data : environments) {
         YAMLParser::Mapping map = env_data.get_mapping();
         Environment env(map.get_value("name").get_string());
         std::cout << "env: " << map.get_value("name").get_string() << std::endl;
         if (map.has_key("tasks")) {
-        std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
+            std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
             for (auto &task_data : tasks) {
                 YAMLParser::Mapping map = task_data.get_mapping();
                 Task task(map.get_value("name").get_string());
+                deserialize_compilers(task.get_settings(), map);
+                for (auto &setting : map.get_map()) {
+                    if (setting.first != "name" &&
+                        setting.first != "tasks" &&
+                        setting.first != "compilers") {
+                        task.add_setting(setting.first, setting.second.get_string());
+                    }
+                }
                 env.add_task(task);
+            }
+        }
+        deserialize_compilers(env.get_settings(), map);
+        for (auto &setting : map.get_map()) {
+            if (setting.first != "name" &&
+                setting.first != "tasks" &&
+                setting.first != "compilers") {
+                env.add_setting(setting.first, setting.second.get_string());
             }
         }
         envs.push_back(env);
