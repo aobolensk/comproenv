@@ -2,10 +2,13 @@ environments:
   - name: e1
     tasks:
       - name: t1
+        language: cpp
       - name: t2
+        language: c
   - name: e2
     tasks:
-      - name: t3
+      - name: t1
+        language: cpp
 
 global:
   compilers:
