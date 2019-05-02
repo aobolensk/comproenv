@@ -87,6 +87,30 @@ void Shell::configure_commands() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         int indent = 0;
         std::ofstream f(config_file, std::ios::out);
+        auto serialize_settings = [&](std::unordered_map <std::string, std::string> &settings) {
+            std::vector <std::pair <std::string, std::string>> compilers;
+            for (auto &setting : settings) {
+                if (setting.first.compare(0, std::size("compiler_") - 1, "compiler_") == 0) {
+                    compilers.emplace_back(setting.first.substr(std::size("compiler_") - 1), setting.second);
+                } else {
+                    for (int i = 0; i < indent; ++i)
+                        f << " ";
+                    f << setting.first << ": " << setting.second << std::endl;
+                }
+            }
+            if (compilers.size()) {
+                for (int i = 0; i < indent; ++i)
+                    f << " ";
+                f << "compilers:" << std::endl;
+                indent += 2;
+                for (auto &compiler : compilers) {
+                    for (int i = 0; i < indent; ++i)
+                        f << " ";
+                    f << compiler.first << ": " << compiler.second << std::endl;
+                }
+                indent -= 2;
+            }
+        };
         f << "environments:" << std::endl;
         indent += 2;
         for (auto &env : envs) {
@@ -94,6 +118,7 @@ void Shell::configure_commands() {
                 f << " ";
             f << "- name: " << env.get_name() << std::endl;
             indent += 2;
+            serialize_settings(env.get_settings());
             for (int i = 0; i < indent; ++i)
                 f << " ";
             if (env.get_tasks().size()) {
@@ -103,6 +128,9 @@ void Shell::configure_commands() {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
                     f << "- name: " << task.get_name() << std::endl;
+                    indent += 2;
+                    serialize_settings(task.get_settings());
+                    indent -= 2;
                 }
                 indent -= 2;
             }
@@ -112,17 +140,7 @@ void Shell::configure_commands() {
         f << std::endl;
         f << "global:" << std::endl;
         indent += 2;
-        for (int i = 0; i < indent; ++i)
-            f << " ";
-        f << "compilers:" << std::endl;
-        indent += 2;
-        for (auto &setting : global_settings) {
-            if (setting.first.compare(0, std::size("compiler_") - 1, "compiler_") == 0) {
-                for (int i = 0; i < indent; ++i)
-                    f << " ";
-                f << setting.first.substr(std::size("compiler_") - 1) << ": " << setting.second << std::endl;
-            }
-        }
+        serialize_settings(global_settings);
         f.close();
         return 0;
     });
