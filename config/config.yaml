@@ -11,6 +11,7 @@ environments:
         language: cpp
 
 global:
+  editor: code @name@.@lang@ &
   compilers:
-    cpp: g++ @name@.cpp -o @name@
     c: gcc @name@.c -o @name@
+    cpp: g++ @name@.cpp -o @name@
