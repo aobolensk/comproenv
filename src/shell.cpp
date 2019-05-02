@@ -20,7 +20,6 @@ Shell::Shell(const std::string &file) : config_file(file) {
     current_env = -1;
     current_task = -1;
     current_state = State::GLOBAL;
-    current_compiler = "cpp";
 }
 
 void Shell::add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func) {
@@ -119,9 +118,9 @@ void Shell::configure_commands() {
             f << "- name: " << env.get_name() << std::endl;
             indent += 2;
             serialize_settings(env.get_settings());
-            for (int i = 0; i < indent; ++i)
-                f << " ";
             if (env.get_tasks().size()) {
+                for (int i = 0; i < indent; ++i)
+                    f << " ";
                 f << "tasks:" << std::endl;
                 indent += 2;
                 for (auto &task : env.get_tasks()) {
@@ -171,15 +170,29 @@ void Shell::configure_commands() {
 
     // Create task
     add_command(State::ENVIRONMENT, "ct", [this](std::vector <std::string> &arg) -> int {
-        if (arg.size() != 2)
+        if (arg.size() < 2 || arg.size() > 3)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i)
             if (envs[current_env].get_tasks()[i].get_name() == arg[1])
                 throw std::runtime_error("Task named " + arg[1] + " already exists");
         envs[current_env].get_tasks().push_back(arg[1]);
         fs::path path = fs::current_path() / ("env_" + envs[current_env].get_name()) / ("task_" + arg[1]);
+        if (arg.size() == 2) {
+            std::string lang = "cpp";
+            if (global_settings.find("language") != global_settings.end())
+                lang = global_settings["language"];
+            if (envs[current_env].get_settings().find("language") != envs[current_env].get_settings().end())
+                lang = envs[current_env].get_settings()["language"];
+            envs[current_env].get_tasks().back().get_settings().emplace("language", lang);
+        } else if (arg.size() == 3) {
+            envs[current_env].get_tasks().back().get_settings().emplace("language", arg[2]);
+        }
         if (!fs::exists(path)) {
             fs::create_directory(path);
+        }
+        if (!fs::exists(path / ("main." + envs[current_env].get_tasks().back().get_settings()["language"]))) {
+            std::ofstream f(path / ("main." + envs[current_env].get_tasks().back().get_settings()["language"]), std::ios::out);
+            f.close();
         }
         return 0;
     });
@@ -229,24 +242,12 @@ void Shell::configure_commands() {
     });
     add_alias(State::ENVIRONMENT, "q", State::ENVIRONMENT, "exit");
 
-    // Set compiler
-    add_command(State::TASK, "sc", [this](std::vector <std::string> &arg) -> int {
-        if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        for (auto &setting : global_settings) {
-            if (setting.first == "compiler_" + arg[1]) {
-                current_compiler = arg[1];
-                return 0;
-            }
-        }
-        throw std::runtime_error("Incorrect compiler name");
-    });
-
     // Compile task
     add_command(State::TASK, "c", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command;
+        std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["language"];
         if (envs[current_env].get_tasks()[current_task].get_settings().find("compiler_" + current_compiler) !=
             envs[current_env].get_tasks()[current_task].get_settings().end())
             command = envs[current_env].get_tasks()[current_task].get_settings()["compiler_" + current_compiler];
@@ -355,8 +356,8 @@ void Shell::create_paths() {
             if (!fs::exists(task_path)) {
                 fs::create_directory(task_path);
             }
-            if (!fs::exists(task_path / "main.cpp")) {
-                std::ofstream f(task_path / "main.cpp", std::ios::out);
+            if (!fs::exists(task_path / ("main." + task.get_settings()["language"]))) {
+                std::ofstream f(task_path / ("main." + task.get_settings()["language"]), std::ios::out);
                 f.close();
             }
         }
