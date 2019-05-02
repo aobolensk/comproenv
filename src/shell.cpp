@@ -285,6 +285,32 @@ void Shell::configure_commands() {
         throw std::runtime_error("Incorrect arguments for command " + arg[0]);
     });
 
+    // Edit
+    add_command(State::TASK, "edit", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string command = "";
+        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        if (global_settings.find("editor") != global_settings.end())
+            command = global_settings["editor"];
+        if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["editor"];
+        size_t pos = std::string::npos;
+        while ((pos = command.find("@name@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
+                            (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+                            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+                            "main").string());
+        }
+        pos = std::string::npos;
+        while ((pos = command.find("@lang@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1,
+                            envs[current_env].get_tasks()[current_task].get_settings()["language"]);
+        }
+        std::cout << "cmd: " << command << std::endl;
+        return system(command.c_str());
+    });
+
     // Exit from task
     add_command(State::TASK, "q", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
@@ -341,6 +367,13 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
     auto compilers_settings = global_settings_map.get_value("compilers").get_mapping().get_map();
     for (auto &cs : compilers_settings) {
         global_settings.emplace("compiler_" + cs.first, cs.second.get_string());
+    }
+    for (auto &setting : global_settings_map.get_map()) {
+        if (setting.first != "name" &&
+            setting.first != "tasks" &&
+            setting.first != "compilers") {
+            global_settings.emplace(setting.first, setting.second.get_string());
+        }
     }
 }
 
