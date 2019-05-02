@@ -9,6 +9,7 @@ class Task {
     std::string name;
  public:
     Task(const std::string &task_name);
+    std::unordered_map <std::string, std::string> &get_settings();
     std::string get_name() const;
 };
 

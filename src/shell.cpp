@@ -182,6 +182,25 @@ void Shell::configure_commands() {
         throw std::runtime_error("Incorrect task name");
     });
 
+    // Configure settings
+    add_command(State::ENVIRONMENT, "set", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() == 2) {
+            envs[current_env].get_settings().erase(arg[1]);
+            return 0;
+        }
+        if (arg.size() >= 3) {
+            std::string second_arg = arg[2];
+            for (unsigned i = 3; i < arg.size(); ++i) {
+                second_arg.push_back(' ');
+                second_arg += arg[i];
+            }
+            envs[current_env].get_settings().erase(arg[1]);
+            envs[current_env].get_settings().emplace(arg[1], second_arg);
+            return 0;
+        }
+        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+    });
+
     // Exit from environment
     add_command(State::ENVIRONMENT, "q", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
@@ -218,6 +237,25 @@ void Shell::configure_commands() {
                             "main").string());
         }
         return system(command.c_str());
+    });
+
+    // Configure settings
+    add_command(State::TASK, "set", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() == 2) {
+            envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
+            return 0;
+        }
+        if (arg.size() >= 3) {
+            std::string second_arg = arg[2];
+            for (unsigned i = 3; i < arg.size(); ++i) {
+                second_arg.push_back(' ');
+                second_arg += arg[i];
+            }
+            envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
+            envs[current_env].get_tasks()[current_task].get_settings().emplace(arg[1], second_arg);
+            return 0;
+        }
+        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
     });
 
     // Exit from task
