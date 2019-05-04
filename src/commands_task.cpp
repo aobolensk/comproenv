@@ -1,0 +1,86 @@
+#include <fstream>
+#include <experimental/filesystem>
+#include "shell.h"
+
+namespace fs = std::experimental::filesystem;
+
+void Shell::configure_commands_task() {
+    // Compile task
+    add_command(State::TASK, "c", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string command;
+        std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["language"];
+        if (envs[current_env].get_tasks()[current_task].get_settings().find("compiler_" + current_compiler) !=
+            envs[current_env].get_tasks()[current_task].get_settings().end())
+            command = envs[current_env].get_tasks()[current_task].get_settings()["compiler_" + current_compiler];
+        else if (envs[current_env].get_settings().find("compiler_" + current_compiler) !=
+                envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["compiler_" + current_compiler];
+        else
+            command = global_settings["compiler_" + current_compiler];
+        size_t pos = std::string::npos;
+        while ((pos = command.find("@name@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
+                            (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+                            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+                            "main").string());
+        }
+        return system(command.c_str());
+    });
+
+    // Configure settings
+    add_command(State::TASK, "set", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() == 2) {
+            envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
+            return 0;
+        }
+        if (arg.size() >= 3) {
+            std::string second_arg = arg[2];
+            for (unsigned i = 3; i < arg.size(); ++i) {
+                second_arg.push_back(' ');
+                second_arg += arg[i];
+            }
+            envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
+            envs[current_env].get_tasks()[current_task].get_settings().emplace(arg[1], second_arg);
+            return 0;
+        }
+        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+    });
+
+    // Edit
+    add_command(State::TASK, "edit", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string command = "";
+        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        if (global_settings.find("editor") != global_settings.end())
+            command = global_settings["editor"];
+        if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["editor"];
+        size_t pos = std::string::npos;
+        while ((pos = command.find("@name@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
+                            (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+                            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+                            "main").string());
+        }
+        pos = std::string::npos;
+        while ((pos = command.find("@lang@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1,
+                            envs[current_env].get_tasks()[current_task].get_settings()["language"]);
+        }
+        std::cout << "cmd: " << command << std::endl;
+        return system(command.c_str());
+    });
+
+    // Exit from task
+    add_command(State::TASK, "q", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        current_task = -1;
+        current_state = State::ENVIRONMENT;
+        return 0;
+    });
+    add_alias(State::TASK, "q", State::TASK, "exit");
+}

@@ -20,6 +20,9 @@ class Shell {
     void parse_settings(YAMLParser::Mapping &val);
     void create_paths();
     void configure_commands();
+    void configure_commands_global();
+    void configure_commands_environment();
+    void configure_commands_task();
     void add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func);
     void add_alias(int old_state, std::string new_name, int new_state, std::string old_name);
  public:
