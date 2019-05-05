@@ -66,7 +66,12 @@ matrix:
     - os: osx
       osx_image: xcode10.2
       name: macOS-clang
-      compiler: clang
+      install:
+        - brew install llvm
+        - export CC="/usr/local/opt/llvm/bin/clang"
+        - export CXX="/usr/local/opt/llvm/bin/clang++"
+        - export LDFLAGS="-L/usr/local/opt/llvm/lib"
+        - export CPPFLAGS="-I/usr/local/opt/llmv/include"
       script:
         - git submodule update --init --recursive
         - mkdir build
