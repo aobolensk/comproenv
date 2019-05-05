@@ -66,8 +66,11 @@ matrix:
     - os: osx
       osx_image: xcode10.2
       name: macOS-clang
+      addons:
+        homebrew:
+          packages:
+            - llvm
       install:
-        - brew install llvm
         - export CC="/usr/local/opt/llvm/bin/clang"
         - export CXX="/usr/local/opt/llvm/bin/clang++"
         - export LDFLAGS="-L/usr/local/opt/llvm/lib"
