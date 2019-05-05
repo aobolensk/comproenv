@@ -55,10 +55,9 @@ matrix:
       osx_image: xcode10.2
       name: macOS-g++
       install:
-        - export CC="gcc-7"
-        - export CXX="g++-7"
+        - export CC="gcc-8"
+        - export CXX="g++-8"
       script:
-        - brew install gcc@7
         - git submodule update --init --recursive
         - mkdir build
         - cd build
