@@ -63,3 +63,14 @@ matrix:
         - cd build
         - cmake ..
         - cmake --build . --config Release -- -j2
+    - os: osx
+      osx_image: xcode10.2
+      name: macOS-clang
+      compiler: clang
+      script:
+        - git submodule update --init --recursive
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cmake --build . --config Release -- -j2
+
