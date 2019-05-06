@@ -4,6 +4,8 @@
 #include "shell.h"
 #include "task.h"
 
+namespace fs = std::experimental::filesystem;
+
 Task::Task(const std::string &task_name) : name(task_name) {
 
 }
@@ -42,6 +44,20 @@ void Shell::configure_commands_task() {
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             "main").string());
         }
+        return system(command.c_str());
+    });
+
+    // Run task
+    add_command(State::TASK, "r", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string command = (("env_" + envs[current_env].get_name()) + "/" +
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) + "/" "main");
+        #ifdef _WIN32
+        command += ".exe";
+        #else
+        command = "./" + command;
+        #endif  // _WIN32
         return system(command.c_str());
     });
 
