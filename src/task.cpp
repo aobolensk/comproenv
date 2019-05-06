@@ -51,12 +51,13 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "r", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        std::string command = (("env_" + envs[current_env].get_name()) + "/" +
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) + "/" "main");
+        std::string command;
         #ifdef _WIN32
-        command += ".exe";
+        command = "env_" + envs[current_env].get_name() + "\\" +
+            "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" "main" ".exe";
         #else
-        command = "./" + command;
+        command = "./" + "env_" + envs[current_env].get_name()) + "/" +
+            "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" "main";
         #endif  // _WIN32
         return system(command.c_str());
     });
