@@ -56,7 +56,7 @@ void Shell::configure_commands_task() {
         command = "env_" + envs[current_env].get_name() + "\\" +
             "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" "main" ".exe";
         #else
-        command = "./" + "env_" + envs[current_env].get_name()) + "/" +
+        command = std::string("./") + "env_" + envs[current_env].get_name() + "/" +
             "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" "main";
         #endif  // _WIN32
         return system(command.c_str());
