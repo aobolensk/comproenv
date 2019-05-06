@@ -133,6 +133,8 @@ void Shell::run() {
         for (auto &el : args)
             std::cout << el << " ";
         std::cout << std::endl;
+        if (args.size() == 0)
+            continue;
         if (commands[current_state].find(args[0]) == commands[current_state].end()) {
             std::cout << "Unknown command " << args[0] << std::endl;
         } else {
