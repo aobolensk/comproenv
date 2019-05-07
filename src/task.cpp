@@ -1,5 +1,6 @@
 #include <string>
 #include <fstream>
+#include <thread>
 #include <experimental/filesystem>
 #include "shell.h"
 #include "task.h"
@@ -237,7 +238,20 @@ void Shell::configure_commands_task() {
                             envs[current_env].get_tasks()[current_task].get_settings()["language"]);
         }
         std::cout << "cmd: " << command << std::endl;
+        #ifdef _WIN32
+        if (command.find("&") != std::string::npos) {
+            std::thread thr([&](const std::string command) -> void {
+                int res = system(command.c_str());
+                (void)res;
+            }, command);
+            thr.detach();
+            return 0;
+        } else {
+            return system(command.c_str());
+        }
+        #else
         return system(command.c_str());
+        #endif  // _WIN32
     });
 
     // Exit from task
