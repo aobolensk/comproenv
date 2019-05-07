@@ -96,17 +96,17 @@ void Shell::configure_commands_task() {
             std::cout << "\x1B[35m-- Result:" << "\033[0m" << std::endl;
             #ifdef _WIN32
             command = path + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + std::string(in_file);
+                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string();
             #else
             command = std::string("./") + path + "/" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + std::string(in_file);
+                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string();
             #endif  // _WIN32
             error_code = system(command.c_str());
             if (error_code) {
                 std::cout << "\x1B[31m-- Runtime error!\033[0m" << std::endl;
                 ++errors;
             }
-            std::string out_file = in_file;
+            std::string out_file = in_file.string();
             for (int i = 0; i < 2; ++i)
                 out_file.pop_back();
             out_file.append("out");
