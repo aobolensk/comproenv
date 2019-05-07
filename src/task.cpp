@@ -80,23 +80,40 @@ void Shell::configure_commands_task() {
             std::cout << it << std::endl;
         #ifdef _WIN32
         path = std::string("env_") + envs[current_env].get_name() + "\\" +
-            "task_" + envs[current_env].get_tasks()[current_task].get_name();int errors = 0;
-        for (auto &in_file : in_files) {
-            command = path + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + std::string(in_file);
-            errors += !!system(command.c_str());
-        }
+            "task_" + envs[current_env].get_tasks()[current_task].get_name();
         #else
         path = "env_" + envs[current_env].get_name() + "/" +
             "task_" + envs[current_env].get_tasks()[current_task].get_name();
-        int errors = 0;
+        #endif  // _WIN32
+        int errors = 0, error_code = 0;
         for (auto &in_file : in_files) {
+            std::cout << "\x1B[33m-- Test " << in_file << "\033[0m" << std::endl;
+            // TODO: print .in file
+            std::cout << "\x1B[35m-- Result:" << "\033[0m" << std::endl;
+            #ifdef _WIN32
+            command = path + "\\" +
+                envs[current_env].get_tasks()[current_task].get_name() + " < " + std::string(in_file);
+            #else
             command = std::string("./") + path + "/" +
                 envs[current_env].get_tasks()[current_task].get_name() + " < " + std::string(in_file);
-            errors += !!system(command.c_str());
+            #endif  // _WIN32
+            error_code = !!system(command.c_str());
+            if (error_code) {
+                std::cout << "\x1B[31m-- Runtime error!\033[0m" << std::endl;
+                ++errors;
+            }
+            std::string out_file = in_file;
+            for (int i = 0; i < 2; ++i)
+                out_file.pop_back();
+            out_file.append("out");
+            std::ifstream exp(out_file);
+            if (exp.is_open()) {
+                std::cout << "\x1B[35m-- Expected:" << "\033[0m" << std::endl;
+                // TODO: print .out file
+                exp.close();
+            }
+            std::cout << "\x1B[33m-- End of test " << in_file << "\033[0m" << std::endl;
         }
-        #endif  // _WIN32
-        std::cout << "Test: " << errors << " errors" << std::endl;
         return errors;
     });
 
