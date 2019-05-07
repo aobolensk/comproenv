@@ -86,11 +86,14 @@ void Shell::configure_commands_task() {
             "task_" + envs[current_env].get_tasks()[current_task].get_name();
         #endif  // _WIN32
         int errors = 0, error_code = 0;
+        std::cout << "\033[32m" << "-- Test command" << "\033[0m" << std::endl;
         for (auto &in_file : in_files) {
             std::cout << "\033[33m" << "-- Test " << in_file << "\033[0m" << std::endl;
             std::cout << "\033[35m" << "-- Input:" << "\033[0m" << std::endl;
             std::string buf;
             std::ifstream f(in_file);
+            if (!f.is_open())
+                return -1;
             while (std::getline(f, buf))
                 std::cout << buf << std::endl;
             f.close();
@@ -121,6 +124,27 @@ void Shell::configure_commands_task() {
             std::cout << "\033[33m" << "-- End of test " << in_file << "\033[0m" << std::endl;
         }
         return errors;
+    });
+
+    // Create test
+    add_command(State::TASK, "ct", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".in");
+        std::string buf;
+        std::ofstream f(file_path, std::ios::trunc);
+        if (!f.is_open())
+            return 1;
+        while (true) {
+            std::getline(std::cin, buf);
+            if (buf.size() == 0)
+                break;
+            f << buf << std::endl;
+        }
+        f.close();
+        return 0;
     });
 
     // Configure settings
