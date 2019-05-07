@@ -3,15 +3,9 @@ environments:
     tasks:
       - name: t1
         language: cpp
-      - name: t2
-        language: c
-  - name: e2
-    tasks:
-      - name: t1
-        language: cpp
 
 global:
-  editor: code @name@.@lang@ &
+  editor: vim @name@.@lang@
   compilers:
     c: gcc @name@.c -o @name@
     cpp: g++ @name@.cpp -o @name@

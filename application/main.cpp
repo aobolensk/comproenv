@@ -2,7 +2,11 @@
 #include "shell.h"
 
 int main(int argc, char *argv[]) {
-    Shell shell(argc < 2 ? "config/config.yaml" : argv[1]);
+    #ifdef _WIN32
+    Shell shell(argc < 2 ? "config/windows_sample.yaml" : argv[1]);
+    #else
+    Shell shell(argc < 2 ? "config/linux_sample.yaml" : argv[1]);
+    #endif  // _WIN32
     shell.run();
     return 0;
 }

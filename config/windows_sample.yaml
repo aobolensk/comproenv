@@ -1,0 +1,11 @@
+environments:
+  - name: e1
+    tasks:
+      - name: t1
+        language: cpp
+
+global:
+  editor: notepad @name@.@lang@
+  compilers:
+    c: gcc @name@.c -o @name@
+    cpp: g++ @name@.cpp -o @name@
