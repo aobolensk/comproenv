@@ -64,6 +64,42 @@ void Shell::configure_commands_task() {
         return system(command.c_str());
     });
 
+    // Test task
+    add_command(State::TASK, "t", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string command;
+        std::string path;
+        std::vector <fs::path> in_files;
+        fs::recursive_directory_iterator it_begin(fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
+            return fs::is_regular_file(path) && path.extension() == ".in";
+        });
+        for (auto &it : in_files)
+            std::cout << it << std::endl;
+        #ifdef _WIN32
+        path = std::string("env_") + envs[current_env].get_name() + "\\" +
+            "task_" + envs[current_env].get_tasks()[current_task].get_name();int errors = 0;
+        for (auto &in_file : in_files) {
+            command = path + "\\" +
+                envs[current_env].get_tasks()[current_task].get_name() + " < " + std::string(in_file);
+            errors += !!system(command.c_str());
+        }
+        #else
+        path = "env_" + envs[current_env].get_name() + "/" +
+            "task_" + envs[current_env].get_tasks()[current_task].get_name();
+        int errors = 0;
+        for (auto &in_file : in_files) {
+            command = std::string("./") + path + "/" +
+                envs[current_env].get_tasks()[current_task].get_name() + " < " + std::string(in_file);
+            errors += !!system(command.c_str());
+        }
+        #endif  // _WIN32
+        std::cout << "Test: " << errors << " errors" << std::endl;
+        return errors;
+    });
+
     // Configure settings
     add_command(State::TASK, "set", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {

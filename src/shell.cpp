@@ -110,6 +110,9 @@ void Shell::create_paths() {
                 std::ofstream f(task_path / (task.get_name() + "." + task.get_settings()["language"]), std::ios::out);
                 f.close();
             }
+            if (!fs::exists(task_path / "tests")) {
+                fs::create_directory(task_path / "tests");
+            }
         }
     }
 }
