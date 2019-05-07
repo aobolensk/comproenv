@@ -147,6 +147,25 @@ void Shell::configure_commands_task() {
         return 0;
     });
 
+    // Remove test
+    add_command(State::TASK, "rt", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".in");
+        if (fs::exists(file_path)) {
+            fs::remove(file_path);
+        }
+        file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".out");
+        if (fs::exists(file_path)) {
+            fs::remove(file_path);
+        }
+        return 0;
+    });
+
     // Configure settings
     add_command(State::TASK, "set", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
