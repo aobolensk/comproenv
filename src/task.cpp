@@ -42,7 +42,7 @@ void Shell::configure_commands_task() {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
                             (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
-                            "main").string());
+                            envs[current_env].get_tasks()[current_task].get_name()).string());
         }
         return system(command.c_str());
     });
@@ -54,10 +54,12 @@ void Shell::configure_commands_task() {
         std::string command;
         #ifdef _WIN32
         command = "env_" + envs[current_env].get_name() + "\\" +
-            "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" "main" ".exe";
+            "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
+            envs[current_env].get_tasks()[current_task].get_name() + ".exe";
         #else
         command = std::string("./") + "env_" + envs[current_env].get_name() + "/" +
-            "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" "main";
+            "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" +
+            envs[current_env].get_tasks()[current_task].get_name();
         #endif  // _WIN32
         return system(command.c_str());
     });
@@ -96,7 +98,7 @@ void Shell::configure_commands_task() {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
                             (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
-                            "main").string());
+                            envs[current_env].get_tasks()[current_task].get_name()).string());
         }
         pos = std::string::npos;
         while ((pos = command.find("@lang@")) != std::string::npos) {

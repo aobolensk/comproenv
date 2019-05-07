@@ -106,8 +106,8 @@ void Shell::create_paths() {
             if (!fs::exists(task_path)) {
                 fs::create_directory(task_path);
             }
-            if (!fs::exists(task_path / ("main." + task.get_settings()["language"]))) {
-                std::ofstream f(task_path / ("main." + task.get_settings()["language"]), std::ios::out);
+            if (!fs::exists(task_path / (task.get_name() + "." + task.get_settings()["language"]))) {
+                std::ofstream f(task_path / (task.get_name() + "." + task.get_settings()["language"]), std::ios::out);
                 f.close();
             }
         }
