@@ -67,8 +67,8 @@ void Shell::configure_commands_environment() {
         if (!fs::exists(path)) {
             fs::create_directory(path);
         }
-        if (!fs::exists(path / ("main." + envs[current_env].get_tasks().back().get_settings()["language"]))) {
-            std::ofstream f(path / ("main." + envs[current_env].get_tasks().back().get_settings()["language"]), std::ios::out);
+        if (!fs::exists(path / (arg[1] + "." + envs[current_env].get_tasks().back().get_settings()["language"]))) {
+            std::ofstream f(path / (arg[1] + "." + envs[current_env].get_tasks().back().get_settings()["language"]), std::ios::out);
             f.close();
         }
         return 0;

@@ -5,7 +5,7 @@ environments:
         language: cpp
 
 global:
-  editor: notepad @name@.@lang@
+  editor: notepad @name@.@lang@ &
   compilers:
     c: gcc @name@.c -o @name@
     cpp: g++ @name@.cpp -o @name@
