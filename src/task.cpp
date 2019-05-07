@@ -166,6 +166,35 @@ void Shell::configure_commands_task() {
         return 0;
     });
 
+    // Edit test
+    add_command(State::TASK, "et", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / arg[1];
+        if (fs::exists(file_path)) {
+            return -1;
+        }
+        std::string command = "";
+        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        if (global_settings.find("editor") != global_settings.end())
+            command = global_settings["editor"];
+        if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["editor"];
+        size_t pos = std::string::npos;
+        while ((pos = command.find("@name@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1, file_path.string());
+        }
+        pos = std::string::npos;
+        while ((pos = command.find("@lang@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, "in");
+        }
+        std::cout << "cmd: " << command << std::endl;
+        return system(command.c_str());
+        return 0;
+    });
+
     // Configure settings
     add_command(State::TASK, "set", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
