@@ -88,7 +88,11 @@ void Shell::configure_commands_task() {
         int errors = 0, error_code = 0;
         for (auto &in_file : in_files) {
             std::cout << "\x1B[33m-- Test " << in_file << "\033[0m" << std::endl;
-            // TODO: print .in file
+            std::string buf;
+            std::ifstream f(in_file);
+            while (std::getline(f, buf))
+                std::cout << buf << std::endl;
+            f.close();
             std::cout << "\x1B[35m-- Result:" << "\033[0m" << std::endl;
             #ifdef _WIN32
             command = path + "\\" +
@@ -97,7 +101,7 @@ void Shell::configure_commands_task() {
             command = std::string("./") + path + "/" +
                 envs[current_env].get_tasks()[current_task].get_name() + " < " + std::string(in_file);
             #endif  // _WIN32
-            error_code = !!system(command.c_str());
+            error_code = system(command.c_str());
             if (error_code) {
                 std::cout << "\x1B[31m-- Runtime error!\033[0m" << std::endl;
                 ++errors;
@@ -106,11 +110,12 @@ void Shell::configure_commands_task() {
             for (int i = 0; i < 2; ++i)
                 out_file.pop_back();
             out_file.append("out");
-            std::ifstream exp(out_file);
-            if (exp.is_open()) {
+            f.open(out_file);
+            if (f.is_open()) {
                 std::cout << "\x1B[35m-- Expected:" << "\033[0m" << std::endl;
-                // TODO: print .out file
-                exp.close();
+                while (std::getline(f, buf))
+                    std::cout << buf << std::endl;
+                f.close();
             }
             std::cout << "\x1B[33m-- End of test " << in_file << "\033[0m" << std::endl;
         }
