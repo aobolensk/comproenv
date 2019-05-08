@@ -1,6 +1,7 @@
 #include <string>
 #include <fstream>
 #include <thread>
+#include <chrono>
 #include <experimental/filesystem>
 #include "shell.h"
 #include "task.h"
@@ -45,7 +46,15 @@ void Shell::configure_commands_task() {
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         }
-        return system(command.c_str());
+        std::cout << "\033[35m" << "-- Compile task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
+            "\033[0m" << std::endl;
+        auto time_start = std::chrono::high_resolution_clock::now();
+        int ret_code = system(command.c_str());
+        auto time_finish = std::chrono::high_resolution_clock::now();
+        std::cout << "\033[35m" << std::endl << "-- Time elapsed:" <<
+            std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
+            "\033[0m" << std::endl;
+        return ret_code;
     });
 
     // Run task
@@ -62,7 +71,15 @@ void Shell::configure_commands_task() {
             "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" +
             envs[current_env].get_tasks()[current_task].get_name();
         #endif  // _WIN32
-        return system(command.c_str());
+        std::cout << "\033[35m" << "-- Run task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
+            "\033[0m" << std::endl;
+        auto time_start = std::chrono::high_resolution_clock::now();
+        int ret_code = system(command.c_str());
+        auto time_finish = std::chrono::high_resolution_clock::now();
+        std::cout << "\033[35m" << std::endl << "-- Time elapsed:" <<
+            std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
+            "\033[0m" << std::endl;
+        return ret_code;
     });
 
     // Test task
@@ -77,6 +94,7 @@ void Shell::configure_commands_task() {
         std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
             return fs::is_regular_file(path) && path.extension() == ".in";
         });
+        std::sort(in_files.begin(), in_files.end());
         for (auto &it : in_files)
             std::cout << it << std::endl;
         #ifdef _WIN32
@@ -106,7 +124,9 @@ void Shell::configure_commands_task() {
             command = std::string("./") + path + "/" +
                 envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string();
             #endif  // _WIN32
+            auto time_start = std::chrono::high_resolution_clock::now();
             error_code = system(command.c_str());
+            auto time_finish = std::chrono::high_resolution_clock::now();
             if (error_code) {
                 std::cout << "\033[31m" << "-- Runtime error!" << "\033[0m" << std::endl;
                 ++errors;
@@ -122,6 +142,9 @@ void Shell::configure_commands_task() {
                     std::cout << buf << std::endl;
                 f.close();
             }
+            std::cout << "\033[35m" << std::endl << "-- Time elapsed:" <<
+                std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
+                "\033[0m" << std::endl;
             std::cout << "\033[33m" << "-- End of test " << in_file << "\033[0m" << std::endl;
         }
         return errors;
@@ -135,7 +158,7 @@ void Shell::configure_commands_task() {
             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".in");
         std::string buf;
-        std::ofstream f(file_path, std::ios::trunc);
+        std::ofstream f(file_path);
         if (!f.is_open())
             return 1;
         while (true) {
@@ -260,7 +283,8 @@ void Shell::configure_commands_task() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_task = -1;
         current_state = State::ENVIRONMENT;
-        return 0;
+        std::vector <std::string> save_args = {"s"};
+        return commands[State::GLOBAL][save_args.front()](save_args);
     });
     add_alias(State::TASK, "q", State::TASK, "exit");
 }

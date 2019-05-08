@@ -264,10 +264,13 @@ void Shell::configure_commands_global() {
     });
 
     // Exit from program
-    add_command(State::GLOBAL, "q", [](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "q", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Exiting..." << std::endl;
+        std::vector <std::string> save_args = {"s"};
+        int res = commands[State::GLOBAL][save_args.front()](save_args);
+        (void)res;
         exit(0);
         return 0;
     });
