@@ -51,7 +51,7 @@ void Shell::configure_commands_task() {
         auto time_start = std::chrono::high_resolution_clock::now();
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
-        std::cout << "\033[35m" << std::endl << "-- Time elapsed:" <<
+        std::cout << "\033[35m" << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
             "\033[0m" << std::endl;
         return ret_code;
@@ -88,6 +88,7 @@ void Shell::configure_commands_task() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command;
         std::string path;
+        std::string temp_file_path;
         std::vector <fs::path> in_files;
         fs::recursive_directory_iterator it_begin(fs::current_path() / ("env_" + envs[current_env].get_name()) /
             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
@@ -100,9 +101,11 @@ void Shell::configure_commands_task() {
         #ifdef _WIN32
         path = std::string("env_") + envs[current_env].get_name() + "\\" +
             "task_" + envs[current_env].get_tasks()[current_task].get_name();
+        temp_file_path = path + "\\" + "\\temp.txt";
         #else
         path = "env_" + envs[current_env].get_name() + "/" +
             "task_" + envs[current_env].get_tasks()[current_task].get_name();
+        temp_file_path = path + "/" + "/temp.txt";
         #endif  // _WIN32
         int errors = 0, error_code = 0;
         std::cout << "\033[32m" << "-- Test command" << "\033[0m" << std::endl;
@@ -119,14 +122,20 @@ void Shell::configure_commands_task() {
             std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
             #ifdef _WIN32
             command = path + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string();
+                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
             #else
             command = std::string("./") + path + "/" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string();
+                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
             #endif  // _WIN32
             auto time_start = std::chrono::high_resolution_clock::now();
             error_code = system(command.c_str());
             auto time_finish = std::chrono::high_resolution_clock::now();
+            f.open(temp_file_path);
+            if (f.is_open()) {
+                while (std::getline(f, buf))
+                    std::cout << buf << std::endl;
+                f.close();
+            }
             if (error_code) {
                 std::cout << "\033[31m" << "-- Runtime error!" << "\033[0m" << std::endl;
                 ++errors;
@@ -141,8 +150,22 @@ void Shell::configure_commands_task() {
                 while (std::getline(f, buf))
                     std::cout << buf << std::endl;
                 f.close();
+                std::vector <std::string> res_in, res_out;
+                f.open(temp_file_path, std::ios::in);
+                while (f >> buf) {
+                    res_in.emplace_back(buf);
+                }
+                f.close();
+                f.open(out_file, std::ios::in);
+                while (f >> buf) {
+                    res_out.emplace_back(buf);
+                }
+                f.close();
+                if (res_in != res_out) {
+                    std::cout << "\033[33;1m" << "-- Warning: Mismatch of result and expected!" << "\033[0m" << std::endl;
+                }
             }
-            std::cout << "\033[35m" << std::endl << "-- Time elapsed:" <<
+            std::cout << "\033[35m" << "-- Time elapsed:" <<
                 std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
                 "\033[0m" << std::endl;
             std::cout << "\033[33m" << "-- End of test " << in_file << "\033[0m" << std::endl;
@@ -216,7 +239,68 @@ void Shell::configure_commands_task() {
         }
         std::cout << "cmd: " << command << std::endl;
         return system(command.c_str());
+    });
+
+    // Create output
+    add_command(State::TASK, "co", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".out");
+        std::string buf;
+        std::ofstream f(file_path);
+        if (!f.is_open())
+            return 1;
+        while (true) {
+            std::getline(std::cin, buf);
+            if (buf.size() == 0)
+                break;
+            f << buf << std::endl;
+        }
+        f.close();
         return 0;
+    });
+
+    // Remove output
+    add_command(State::TASK, "ro", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".out");
+        if (fs::exists(file_path)) {
+            fs::remove(file_path);
+        }
+        return 0;
+    });
+
+    // Edit output
+    add_command(State::TASK, "eo", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / arg[1];
+        if (fs::exists(file_path)) {
+            return -1;
+        }
+        std::string command = "";
+        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        if (global_settings.find("editor") != global_settings.end())
+            command = global_settings["editor"];
+        if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["editor"];
+        size_t pos = std::string::npos;
+        while ((pos = command.find("@name@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1, file_path.string());
+        }
+        pos = std::string::npos;
+        while ((pos = command.find("@lang@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, "out");
+        }
+        std::cout << "cmd: " << command << std::endl;
+        return system(command.c_str());
     });
 
     // Configure settings

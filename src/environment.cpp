@@ -77,8 +77,8 @@ void Shell::configure_commands_environment() {
         return 0;
     });
 
-    // Delete task
-    add_command(State::ENVIRONMENT, "dt", [this](std::vector <std::string> &arg) -> int {
+    // Remove task
+    add_command(State::ENVIRONMENT, "rt", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
