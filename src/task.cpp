@@ -147,10 +147,12 @@ void Shell::configure_commands_task() {
             std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
             if (envs[current_env].get_tasks()[current_task].get_settings().find("runner_" + current_runner) !=
                 envs[current_env].get_tasks()[current_task].get_settings().end())
-                command = envs[current_env].get_tasks()[current_task].get_settings()["runner_" + current_runner] + " < " + in_file.string() + " > " + temp_file_path;
+                command = envs[current_env].get_tasks()[current_task].get_settings()["runner_" + current_runner] +
+                    " < " + in_file.string() + " > " + temp_file_path;
             else if (envs[current_env].get_settings().find("runner_" + current_runner) !=
                     envs[current_env].get_settings().end())
-                command = envs[current_env].get_settings()["runner_" + current_runner] + " < " + in_file.string() + " > " + temp_file_path;
+                command = envs[current_env].get_settings()["runner_" + current_runner] +
+                    " < " + in_file.string() + " > " + temp_file_path;
             else if (global_settings.find("runner_" + current_runner) != global_settings.end())
                 command = global_settings["runner_" + current_runner] + " < " + in_file.string() + " > " + temp_file_path;
             else {
@@ -387,8 +389,11 @@ void Shell::configure_commands_task() {
                             envs[current_env].get_tasks()[current_task].get_settings()["language"]);
         }
         std::cout << "cmd: " << command << std::endl;
+        auto ampersand_pos = command.find("&");
         #ifdef _WIN32
-        if (command.find("&") != std::string::npos) {
+        if (ampersand_pos != std::string::npos) {
+            command.erase(ampersand_pos);
+            command += " > NUL";
             std::thread thr([&](const std::string command) -> void {
                 int res = system(command.c_str());
                 (void)res;
@@ -399,6 +404,9 @@ void Shell::configure_commands_task() {
             return system(command.c_str());
         }
         #else
+        if (ampersand_pos != std::string::npos) {
+            command.insert(std::max(0ul, ampersand_pos - 1), " &> /dev/null ");
+        }
         return system(command.c_str());
         #endif  // _WIN32
     });
