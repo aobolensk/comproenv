@@ -12,7 +12,9 @@ namespace fs = std::experimental::filesystem;
 
 Shell::Shell(const std::string &file) : config_file(file) {
     signal(SIGINT, SIG_IGN);
+    #ifndef _WIN32
     signal(SIGTSTP, SIG_IGN);
+    #endif  // _WIN32
     configure_commands();
     if (config_file != "") {
         YAMLParser p1(config_file);
@@ -151,6 +153,10 @@ void Shell::run() {
         }
         std::cout << " ";
         std::flush(std::cout);
+        while (std::cin.eof()) {
+            std::cin.clear();
+            std::cin.ignore(32767, '\n');
+        }
         std::getline(std::cin, command);
         split(args, command);
         std::cout << "DBG: ";

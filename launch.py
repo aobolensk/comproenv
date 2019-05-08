@@ -41,12 +41,14 @@ def main():
             ret_code = build()
         if arg == "run":
             signal.signal(signal.SIGINT, signal.SIG_IGN)
-            signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+            if os.name == "posix":
+                signal.signal(signal.SIGTSTP, signal.SIG_IGN)
             ret_code = subprocess.call(
                 os.path.join(os.getcwd(), "build", "bin", executable("comproenv") + ' ' +
                             (' '.join(args.args) if args.args is not None else "")), shell=True)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
-            signal.signal(signal.SIGTSTP, signal.SIG_DFL)
+            if os.name == "posix":
+                signal.signal(signal.SIGTSTP, signal.SIG_DFL)
         print("Function " + arg + " returned exit code " + str(ret_code))
         if (ret_code != 0):
             exit(1)
