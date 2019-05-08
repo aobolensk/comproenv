@@ -37,8 +37,13 @@ void Shell::configure_commands_task() {
         else if (envs[current_env].get_settings().find("compiler_" + current_compiler) !=
                 envs[current_env].get_settings().end())
             command = envs[current_env].get_settings()["compiler_" + current_compiler];
-        else
+        else if (global_settings.find("compiler_" + current_compiler) != global_settings.end())
             command = global_settings["compiler_" + current_compiler];
+        else {
+            std::cout << "There is no compiler rule for language " <<
+                envs[current_env].get_tasks()[current_task].get_settings()["language"] << std::endl;
+            return -1;
+        }
         size_t pos = std::string::npos;
         while ((pos = command.find("@name@")) != std::string::npos) {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
@@ -62,15 +67,34 @@ void Shell::configure_commands_task() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command;
-        #ifdef _WIN32
-        command = "env_" + envs[current_env].get_name() + "\\" +
-            "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
-            envs[current_env].get_tasks()[current_task].get_name() + ".exe";
-        #else
-        command = std::string("./") + "env_" + envs[current_env].get_name() + "/" +
-            "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" +
-            envs[current_env].get_tasks()[current_task].get_name();
-        #endif  // _WIN32
+        std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
+        if (envs[current_env].get_tasks()[current_task].get_settings().find("runner_" + current_runner) !=
+            envs[current_env].get_tasks()[current_task].get_settings().end())
+            command = envs[current_env].get_tasks()[current_task].get_settings()["runner_" + current_runner];
+        else if (envs[current_env].get_settings().find("runner_" + current_runner) !=
+                envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["runner_" + current_runner];
+        else if (global_settings.find("runner_" + current_runner) != global_settings.end())
+            command = global_settings["runner_" + current_runner];
+        else {
+            #ifdef _WIN32
+            command = "env_" + envs[current_env].get_name() + "\\" +
+                "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
+                envs[current_env].get_tasks()[current_task].get_name() + ".exe";
+            #else
+            command = std::string("./") + "env_" + envs[current_env].get_name() + "/" +
+                "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" +
+                envs[current_env].get_tasks()[current_task].get_name();
+            #endif  // _WIN32
+        }
+        std::cout << "cmd: " << command << std::endl;
+        size_t pos = std::string::npos;
+        while ((pos = command.find("@name@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
+                            (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+                            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+                            envs[current_env].get_tasks()[current_task].get_name()).string());
+        }
         std::cout << "\033[35m" << "-- Run task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
             "\033[0m" << std::endl;
         auto time_start = std::chrono::high_resolution_clock::now();
@@ -101,11 +125,11 @@ void Shell::configure_commands_task() {
         #ifdef _WIN32
         path = std::string("env_") + envs[current_env].get_name() + "\\" +
             "task_" + envs[current_env].get_tasks()[current_task].get_name();
-        temp_file_path = path + "\\" + "\\temp.txt";
+        temp_file_path = path + "\\" + "temp.txt";
         #else
         path = "env_" + envs[current_env].get_name() + "/" +
             "task_" + envs[current_env].get_tasks()[current_task].get_name();
-        temp_file_path = path + "/" + "/temp.txt";
+        temp_file_path = path + "/" + "temp.txt";
         #endif  // _WIN32
         int errors = 0, error_code = 0;
         std::cout << "\033[32m" << "-- Test command" << "\033[0m" << std::endl;
@@ -120,13 +144,31 @@ void Shell::configure_commands_task() {
                 std::cout << buf << std::endl;
             f.close();
             std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
-            #ifdef _WIN32
-            command = path + "\\" +
+            std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
+            if (envs[current_env].get_tasks()[current_task].get_settings().find("runner_" + current_runner) !=
+                envs[current_env].get_tasks()[current_task].get_settings().end())
+                command = envs[current_env].get_tasks()[current_task].get_settings()["runner_" + current_runner] + " < " + in_file.string() + " > " + temp_file_path;
+            else if (envs[current_env].get_settings().find("runner_" + current_runner) !=
+                    envs[current_env].get_settings().end())
+                command = envs[current_env].get_settings()["runner_" + current_runner] + " < " + in_file.string() + " > " + temp_file_path;
+            else if (global_settings.find("runner_" + current_runner) != global_settings.end())
+                command = global_settings["runner_" + current_runner] + " < " + in_file.string() + " > " + temp_file_path;
+            else {
+                #ifdef _WIN32
+                command = path + "\\" +
                 envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
-            #else
-            command = std::string("./") + path + "/" +
+                #else
+                command = std::string("./") + path + "/" +
                 envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
-            #endif  // _WIN32
+                #endif  // _WIN32
+            }
+            size_t pos = std::string::npos;
+            while ((pos = command.find("@name@")) != std::string::npos) {
+                command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
+                                (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+                                ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+                                envs[current_env].get_tasks()[current_task].get_name()).string());
+            }
             auto time_start = std::chrono::high_resolution_clock::now();
             error_code = system(command.c_str());
             auto time_finish = std::chrono::high_resolution_clock::now();
