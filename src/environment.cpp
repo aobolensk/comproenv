@@ -71,6 +71,9 @@ void Shell::configure_commands_environment() {
             std::ofstream f(path / (arg[1] + "." + envs[current_env].get_tasks().back().get_settings()["language"]), std::ios::out);
             f.close();
         }
+        if (!fs::exists(path / "tests")) {
+            fs::create_directory(path / "tests");
+        }
         return 0;
     });
 
@@ -115,7 +118,8 @@ void Shell::configure_commands_environment() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_env = -1;
         current_state = State::GLOBAL;
-        return 0;
+        std::vector <std::string> save_args = {"s"};
+        return commands[State::GLOBAL][save_args.front()](save_args);
     });
     add_alias(State::ENVIRONMENT, "q", State::ENVIRONMENT, "exit");
 }
