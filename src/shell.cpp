@@ -183,8 +183,8 @@ void Shell::configure_commands_global() {
         return 0;
     });
 
-    // Delete environment
-    add_command(State::GLOBAL, "de", [this](std::vector <std::string> &arg) -> int {
+    // Remove environment
+    add_command(State::GLOBAL, "re", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i) {

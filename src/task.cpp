@@ -137,7 +137,7 @@ void Shell::configure_commands_task() {
             out_file.append("out");
             f.open(out_file);
             if (f.is_open()) {
-                std::cout << "\033[35m" << "-- Expected:" << "\033[0m" << std::endl;
+                std::cout << "\033[35m" << std::endl << "-- Expected:" << "\033[0m" << std::endl;
                 while (std::getline(f, buf))
                     std::cout << buf << std::endl;
                 f.close();
@@ -216,7 +216,68 @@ void Shell::configure_commands_task() {
         }
         std::cout << "cmd: " << command << std::endl;
         return system(command.c_str());
+    });
+
+    // Create output
+    add_command(State::TASK, "co", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".out");
+        std::string buf;
+        std::ofstream f(file_path);
+        if (!f.is_open())
+            return 1;
+        while (true) {
+            std::getline(std::cin, buf);
+            if (buf.size() == 0)
+                break;
+            f << buf << std::endl;
+        }
+        f.close();
         return 0;
+    });
+
+    // Remove output
+    add_command(State::TASK, "ro", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".out");
+        if (fs::exists(file_path)) {
+            fs::remove(file_path);
+        }
+        return 0;
+    });
+
+    // Edit output
+    add_command(State::TASK, "eo", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / arg[1];
+        if (fs::exists(file_path)) {
+            return -1;
+        }
+        std::string command = "";
+        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        if (global_settings.find("editor") != global_settings.end())
+            command = global_settings["editor"];
+        if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
+            command = envs[current_env].get_settings()["editor"];
+        size_t pos = std::string::npos;
+        while ((pos = command.find("@name@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1, file_path.string());
+        }
+        pos = std::string::npos;
+        while ((pos = command.find("@lang@")) != std::string::npos) {
+            command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, "out");
+        }
+        std::cout << "cmd: " << command << std::endl;
+        return system(command.c_str());
     });
 
     // Configure settings
