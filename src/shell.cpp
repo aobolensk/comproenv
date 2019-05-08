@@ -2,6 +2,7 @@
 #include <vector>
 #include <experimental/filesystem>
 #include <stdexcept>
+#include <csignal>
 #include "environment.h"
 #include "yaml_parser.h"
 #include "shell.h"
@@ -10,6 +11,8 @@
 namespace fs = std::experimental::filesystem;
 
 Shell::Shell(const std::string &file) : config_file(file) {
+    signal(SIGINT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
     configure_commands();
     if (config_file != "") {
         YAMLParser p1(config_file);
