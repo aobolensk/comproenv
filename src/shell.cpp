@@ -47,7 +47,14 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
                 settings.emplace("compiler_" + compiler_data.first, compiler_data.second.get_string());
             }
         }
-
+    };
+    auto deserialize_runners = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+        if (map.has_key("runners")) {
+            std::map <std::string, YAMLParser::Value> runners = map.get_value("runners").get_mapping().get_map();
+            for (auto &runner_data : runners) {
+                settings.emplace("runner_" + runner_data.first, runner_data.second.get_string());
+            }
+        }
     };
     std::vector <YAMLParser::Value> environments = config.get_value("environments").get_sequence();
     for (auto &env_data : environments) {
@@ -60,10 +67,12 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
                 YAMLParser::Mapping map = task_data.get_mapping();
                 Task task(map.get_value("name").get_string());
                 deserialize_compilers(task.get_settings(), map);
+                deserialize_runners(task.get_settings(), map);
                 for (auto &setting : map.get_map()) {
                     if (setting.first != "name" &&
                         setting.first != "tasks" &&
-                        setting.first != "compilers") {
+                        setting.first != "compilers" &&
+                        setting.first != "runners") {
                         task.add_setting(setting.first, setting.second.get_string());
                     }
                 }
@@ -71,10 +80,12 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
             }
         }
         deserialize_compilers(env.get_settings(), map);
+        deserialize_runners(env.get_settings(), map);
         for (auto &setting : map.get_map()) {
             if (setting.first != "name" &&
                 setting.first != "tasks" &&
-                setting.first != "compilers") {
+                setting.first != "compilers" &&
+                setting.first != "runners") {
                 env.add_setting(setting.first, setting.second.get_string());
             }
         }
@@ -85,10 +96,17 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
     for (auto &cs : compilers_settings) {
         global_settings.emplace("compiler_" + cs.first, cs.second.get_string());
     }
+    if (global_settings_map.has_key("runners")) {
+        auto runners_settings = global_settings_map.get_value("runners").get_mapping().get_map();
+        for (auto &rs : runners_settings) {
+            global_settings.emplace("runner_" + rs.first, rs.second.get_string());
+        }
+    }
     for (auto &setting : global_settings_map.get_map()) {
         if (setting.first != "name" &&
             setting.first != "tasks" &&
-            setting.first != "compilers") {
+            setting.first != "compilers" &&
+            setting.first != "runners") {
             global_settings.emplace(setting.first, setting.second.get_string());
         }
     }
@@ -206,10 +224,12 @@ void Shell::configure_commands_global() {
         int indent = 0;
         std::ofstream f(config_file, std::ios::out);
         auto serialize_settings = [&](std::unordered_map <std::string, std::string> &settings) {
-            std::vector <std::pair <std::string, std::string>> compilers;
+            std::vector <std::pair <std::string, std::string>> compilers, runners;
             for (auto &setting : settings) {
                 if (setting.first.compare(0, std::size("compiler_") - 1, "compiler_") == 0) {
                     compilers.emplace_back(setting.first.substr(std::size("compiler_") - 1), setting.second);
+                } else if (setting.first.compare(0, std::size("runner_") - 1, "runner_") == 0) {
+                    runners.emplace_back(setting.first.substr(std::size("runner_") - 1), setting.second);
                 } else {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
@@ -222,6 +242,18 @@ void Shell::configure_commands_global() {
                 f << "compilers:" << std::endl;
                 indent += 2;
                 for (auto &compiler : compilers) {
+                    for (int i = 0; i < indent; ++i)
+                        f << " ";
+                    f << compiler.first << ": " << compiler.second << std::endl;
+                }
+                indent -= 2;
+            }
+            if (runners.size()) {
+                for (int i = 0; i < indent; ++i)
+                    f << " ";
+                f << "runners:" << std::endl;
+                indent += 2;
+                for (auto &compiler : runners) {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
                     f << compiler.first << ": " << compiler.second << std::endl;

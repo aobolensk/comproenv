@@ -9,3 +9,5 @@ global:
   compilers:
     c: gcc @name@.c -o @name@
     cpp: g++ @name@.cpp -o @name@
+  runners:
+    py: python @name@.py
