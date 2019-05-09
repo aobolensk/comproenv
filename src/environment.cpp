@@ -54,21 +54,43 @@ void Shell::configure_commands_environment() {
                 throw std::runtime_error("Task named " + arg[1] + " already exists");
         envs[current_env].get_tasks().push_back(arg[1]);
         fs::path path = fs::current_path() / ("env_" + envs[current_env].get_name()) / ("task_" + arg[1]);
+        std::string lang = "cpp";
         if (arg.size() == 2) {
-            std::string lang = "cpp";
-            if (global_settings.find("language") != global_settings.end())
-                lang = global_settings["language"];
             if (envs[current_env].get_settings().find("language") != envs[current_env].get_settings().end())
                 lang = envs[current_env].get_settings()["language"];
+            else if (global_settings.find("language") != global_settings.end())
+                lang = global_settings["language"];
             envs[current_env].get_tasks().back().get_settings().emplace("language", lang);
         } else if (arg.size() == 3) {
-            envs[current_env].get_tasks().back().get_settings().emplace("language", arg[2]);
+            lang = arg[2];
+            envs[current_env].get_tasks().back().get_settings().emplace("language", lang);
         }
         if (!fs::exists(path)) {
             fs::create_directory(path);
         }
-        if (!fs::exists(path / (arg[1] + "." + envs[current_env].get_tasks().back().get_settings()["language"]))) {
-            std::ofstream f(path / (arg[1] + "." + envs[current_env].get_tasks().back().get_settings()["language"]), std::ios::out);
+        if (!fs::exists(path / (arg[1] + "." + lang))) {
+            std::ofstream f(path / (arg[1] + "." + lang), std::ios::out);
+            if (envs[current_env].get_settings().find("template_" + lang) != envs[current_env].get_settings().end()) {
+                std::ifstream t(envs[current_env].get_settings()["template_" + lang]);
+                if (t.is_open()) {
+                    std::string buf;
+                    while (std::getline(t, buf))
+                        f << buf << std::endl;
+                    t.close();
+                } else {
+                    std::cout << "Unable to open template file" << std::endl;
+                }
+            } else if (global_settings.find("template_" + lang) != global_settings.end()) {
+                std::ifstream t(global_settings["template_" + lang]);
+                if (t.is_open()) {
+                    std::string buf;
+                    while (std::getline(t, buf))
+                        f << buf << std::endl;
+                    t.close();
+                } else {
+                    std::cout << "Unable to open template file" << std::endl;
+                }
+            }
             f.close();
         }
         if (!fs::exists(path / "tests")) {
