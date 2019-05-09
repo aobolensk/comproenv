@@ -5,6 +5,7 @@ environments:
         language: cpp
 
 global:
+  python_interpreter: python
   editor: notepad @name@.@lang@ &
   compilers:
     c: gcc @name@.c -o @name@

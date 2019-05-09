@@ -214,6 +214,13 @@ void Shell::configure_commands_task() {
                 "\033[0m" << std::endl;
             std::cout << "\033[33m" << "-- End of test " << in_file << "\033[0m" << std::endl;
         }
+        if (errors == 0) {
+            std::cout << "\033[32;1m" << "-- Test command: All " << std::size(in_files) <<
+                " tests successfully passed!" << "\033[0m" << std::endl;
+        } else {
+            std::cout << "\033[31;1m" << "-- Test command: Warning! " << errors <<
+                "/" << std::size(in_files) << " tests failed!" << "\033[0m" << std::endl;
+        }
         return errors;
     });
 
@@ -321,6 +328,21 @@ void Shell::configure_commands_task() {
             }
         }
         return 0;
+    });
+
+    // Parse page with tests
+    add_command(State::TASK, "parse", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string command = global_settings["python_interpreter"] +
+            " scripts/parser.py" + " run " +
+            // Path to tests directory
+            (fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests").string() + " " +
+            // Link to page with tests
+            arg[1];
+        return system(command.c_str());
     });
 
     // Create output
