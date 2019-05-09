@@ -226,6 +226,25 @@ void Shell::configure_commands_global() {
         throw std::runtime_error("Incorrect environment name");
     });
 
+    // List of environments
+    add_command(State::GLOBAL, "le", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::cout << "List of environments in global:\n";
+        for (size_t i = 0; i < envs.size(); ++i) {
+            std::cout << "|-> " << envs[i].get_name() << "\n";
+            for (size_t j = 0; j < std::min(size_t(3), envs[i].get_tasks().size()); ++j) {
+                std::cout << "    |-> " << envs[i].get_tasks()[j].get_name() << ": " <<
+                    envs[i].get_tasks()[j].get_settings()["language"] << "\n";
+            }
+            if (envs[i].get_tasks().size() > 3) {
+                std::cout << "    (and " << envs[i].get_tasks().size() - 3ul << " more...)" "\n";
+            }
+        }
+        std::cout << std::flush;
+        return 0;
+    });
+
     // Save settings
     add_command(State::GLOBAL, "s", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
