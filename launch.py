@@ -5,12 +5,20 @@ def executable(filename):
         return filename + ".exe"
     return filename
 
+args = None
+
+def enumerate_args(args):
+    if args is None:
+        return ''
+    return ' '.join(args)
+
 def build():
     subprocess.call("git submodule update --init --recursive", shell=True)
     if not os.path.exists("build"):
         os.mkdir("build")
     os.chdir("build")
-    ret_code = subprocess.call("cmake ..", shell=True)
+    ret_code = subprocess.call("cmake .. " +
+                enumerate_args(args.build_args), shell=True)
     if ret_code != 0:
         print("Failed build (cmake)")
         return 1
@@ -28,12 +36,14 @@ def build():
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--function", nargs='*', help="Provide function name")
-    parser.add_argument("--args", nargs='*', help="Args")
+    parser.add_argument("--build_args", nargs='*', help="Args for build system")
+    parser.add_argument("--run_args", nargs='*', help="Args for application")
     args = parser.parse_args()
     print(args)
     return args
 
 def main():
+    global args
     args = parse_args()
     ret_code = 0
     for arg in args.function:
@@ -44,8 +54,9 @@ def main():
             if os.name == "posix":
                 signal.signal(signal.SIGTSTP, signal.SIG_IGN)
             ret_code = subprocess.call(
-                os.path.join(os.getcwd(), "build", "bin", executable("comproenv") + ' ' +
-                            (' '.join(args.args) if args.args is not None else "")), shell=True)
+                os.path.join(os.getcwd(), "build", "bin",
+                            executable("comproenv") + ' ' +
+                            enumerate_args(args.run_args)), shell=True)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             if os.name == "posix":
                 signal.signal(signal.SIGTSTP, signal.SIG_DFL)
