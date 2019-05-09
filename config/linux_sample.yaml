@@ -5,6 +5,7 @@ environments:
         language: cpp
 
 global:
+  python_interpreter: python3
   editor: vim @name@.@lang@
   compilers:
     c: gcc @name@.c -o @name@

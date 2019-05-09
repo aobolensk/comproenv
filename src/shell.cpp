@@ -108,6 +108,9 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
     deserialize_runners(global_settings, global_settings_map);
     deserialize_templates(global_settings, global_settings_map);
     deserialize_rest_settings(global_settings, global_settings_map);
+    if (global_settings.find("python_interpreter") == global_settings.end()) {
+        global_settings.emplace("python_interpreter", "python");
+    }
 }
 
 void Shell::create_paths() {
