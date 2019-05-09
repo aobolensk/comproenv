@@ -245,42 +245,38 @@ void Shell::configure_commands_global() {
         int indent = 0;
         std::ofstream f(config_file, std::ios::out);
         auto serialize_settings = [&](std::unordered_map <std::string, std::string> &settings) {
-            std::vector <std::pair <std::string, std::string>> compilers, runners;
+            std::vector <std::pair <std::string, std::string>> compilers, runners, templates;
+            auto export_instances = [&](const std::vector <std::pair <std::string, std::string>>& instances,
+                                        const std::string instances_name) -> void {
+                if (instances.size()) {
+                    for (int i = 0; i < indent; ++i)
+                        f << " ";
+                    f << instances_name << ":" << std::endl;
+                    indent += 2;
+                    for (auto &instance : instances) {
+                        for (int i = 0; i < indent; ++i)
+                            f << " ";
+                        f << instance.first << ": " << instance.second << std::endl;
+                    }
+                    indent -= 2;
+                }
+            };
             for (auto &setting : settings) {
                 if (setting.first.compare(0, std::size("compiler_") - 1, "compiler_") == 0) {
                     compilers.emplace_back(setting.first.substr(std::size("compiler_") - 1), setting.second);
                 } else if (setting.first.compare(0, std::size("runner_") - 1, "runner_") == 0) {
                     runners.emplace_back(setting.first.substr(std::size("runner_") - 1), setting.second);
+                } else if (setting.first.compare(0, std::size("template_") - 1, "template_") == 0) {
+                    templates.emplace_back(setting.first.substr(std::size("template_") - 1), setting.second);
                 } else {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
                     f << setting.first << ": " << setting.second << std::endl;
                 }
             }
-            if (compilers.size()) {
-                for (int i = 0; i < indent; ++i)
-                    f << " ";
-                f << "compilers:" << std::endl;
-                indent += 2;
-                for (auto &compiler : compilers) {
-                    for (int i = 0; i < indent; ++i)
-                        f << " ";
-                    f << compiler.first << ": " << compiler.second << std::endl;
-                }
-                indent -= 2;
-            }
-            if (runners.size()) {
-                for (int i = 0; i < indent; ++i)
-                    f << " ";
-                f << "runners:" << std::endl;
-                indent += 2;
-                for (auto &compiler : runners) {
-                    for (int i = 0; i < indent; ++i)
-                        f << " ";
-                    f << compiler.first << ": " << compiler.second << std::endl;
-                }
-                indent -= 2;
-            }
+            export_instances(compilers, "compilers");
+            export_instances(runners, "runners");
+            export_instances(templates, "templates");
         };
         f << "environments:" << std::endl;
         indent += 2;
