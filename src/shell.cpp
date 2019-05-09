@@ -315,6 +315,15 @@ void Shell::configure_commands_global() {
         return 0;
     });
 
+    // Launch Python shell
+    add_command(State::GLOBAL, "py-shell", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        return system(global_settings["python_interpreter"].c_str());
+    });
+    add_alias(State::GLOBAL, "py-shell", State::ENVIRONMENT, "py-shell");
+    add_alias(State::GLOBAL, "py-shell", State::TASK, "py-shell");
+
     // Exit from program
     add_command(State::GLOBAL, "q", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
