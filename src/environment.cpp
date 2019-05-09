@@ -93,6 +93,19 @@ void Shell::configure_commands_environment() {
         throw std::runtime_error("Incorrect task name");
     });
 
+    // List of tasks
+    add_command(State::ENVIRONMENT, "lt", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::cout << "List of tasks in environment " << envs[current_env].get_name() << "\n";
+        for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
+            std::cout << "    |-> " << envs[current_env].get_tasks()[i].get_name() << ": " <<
+                envs[current_env].get_tasks()[i].get_settings()["language"] << "\n";
+        }
+        std::cout << std::flush;
+        return 0;
+    });
+
     // Configure settings
     add_command(State::ENVIRONMENT, "set", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
