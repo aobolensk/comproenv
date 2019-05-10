@@ -19,6 +19,58 @@ def run():
                 f.write(inputs[i].contents[-1].contents[0])
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".out", "w") as f:
                 f.write(outputs[i].contents[-1].contents[0])
+    elif link.startswith("https://acmp.ru/"):
+        page = requests.get(link).text
+        soup = BeautifulSoup(page, "html.parser")
+        tables = soup.find_all("table", {"class" : "main",
+                                        "cellpadding" : "2",
+                                        "cellspacing" : "1"})
+        for table in tables:
+            rows = table.find_all("tr")
+            cells = rows[0].find_all("th")
+            check = 2
+            for cell in cells:
+                if cell.contents[0].find("INPUT.TXT") != -1:
+                    check -= 1
+                elif cell.contents[0].find("OUTPUT.TXT") != -1:
+                    check -= 1
+            if (check == 0):
+                for i in range(1, len(rows)):
+                    cells = rows[i].find_all("td")
+                    with open(os.path.join(path, "acmp_sample_" + str(i)) + ".in", "w") as f:
+                        for x in cells[1].contents:
+                            if (isinstance(x, str)):
+                                f.write(x)
+                            else:
+                                f.write('\n')
+                    with open(os.path.join(path, "acmp_sample_" + str(i)) + ".out", "w") as f:
+                        for x in cells[2].contents:
+                            if (isinstance(x, str)):
+                                f.write(x)
+                            else:
+                                f.write('\n')
+    elif (link.startswith("http://acm.timus.ru/") or
+        link.startswith("https://acm.timus.ru/") or
+        link.startswith("https://timus.online/")):
+        page = requests.get(link).text
+        soup = BeautifulSoup(page, "html.parser")
+        tables = soup.find_all("table", class_="sample")
+        for table in tables:
+            rows = table.find_all("tr")
+            cells = rows[0].find_all("th")
+            check = 2
+            for cell in cells:
+                if cell.contents[0].find("input") != -1:
+                    check -= 1
+                elif cell.contents[0].find("output") != -1:
+                    check -= 1
+            if (check == 0):
+                for i in range(1, len(rows)):
+                    cells = rows[i].find_all("td")
+                    with open(os.path.join(path, "timus_sample_" + str(i)) + ".in", "w") as f:
+                        f.write(cells[0].get_text())
+                    with open(os.path.join(path, "timus_sample_" + str(i)) + ".out", "w") as f:
+                        f.write(cells[1].get_text())
     else:
         print("Couldn't parse contents of this page")
         exit(-1)
@@ -41,4 +93,3 @@ if __name__ == "__main__":
         print("Not enough args")
         exit(-1)
     parse_args()
-    
