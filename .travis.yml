@@ -74,7 +74,7 @@ matrix:
         - export CC="/usr/local/opt/llvm/bin/clang"
         - export CXX="/usr/local/opt/llvm/bin/clang++"
         - export LDFLAGS="-L/usr/local/opt/llvm/lib"
-        - export CPPFLAGS="-I/usr/local/opt/llmv/include"
+        - export CPPFLAGS="-I/usr/local/opt/llvm/include"
       script:
         - git submodule update --init --recursive
         - mkdir build
