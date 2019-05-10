@@ -341,7 +341,7 @@ void Shell::configure_commands_task() {
             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests").string() + " " +
             // Link to page with tests
-            arg[1];
+            "\"" + arg[1] + "\"";
         return system(command.c_str());
     });
 
