@@ -330,6 +330,85 @@ void Shell::configure_commands_task() {
         return 0;
     });
 
+    // Create generator
+    add_command(State::TASK, "cg", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() > 2 || arg.size() < 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        if (envs[current_env].get_tasks()[current_task].get_settings().find("generator") !=
+            envs[current_env].get_tasks()[current_task].get_settings().end()) {
+            throw std::runtime_error("Generator is already created");
+        }
+        std::string lang;
+        if (arg.size() == 2)
+            lang = arg[1];
+        else
+            lang = "cpp";
+        envs[current_env].get_tasks()[current_task].get_settings()["generator"] = lang;
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / ("generator." + lang);
+        std::string buf;
+        std::ofstream f(file_path, std::ios::out);
+        if (!f.is_open()) {
+            return -1;
+        }
+        if (envs[current_env].get_settings().find("template_" + lang) != envs[current_env].get_settings().end()) {
+            std::ifstream t(envs[current_env].get_settings()["template_" + lang]);
+            if (t.is_open()) {
+                std::string buf;
+                while (std::getline(t, buf))
+                    f << buf << std::endl;
+                t.close();
+            } else {
+                std::cout << "Unable to open template file" << std::endl;
+            }
+        } else if (global_settings.find("template_" + lang) != global_settings.end()) {
+            std::ifstream t(global_settings["template_" + lang]);
+            if (t.is_open()) {
+                std::string buf;
+                while (std::getline(t, buf))
+                    f << buf << std::endl;
+                t.close();
+            } else {
+                std::cout << "Unable to open template file" << std::endl;
+            }
+        }
+        f.close();
+        return 0;
+    });
+
+    // Remove generator
+    add_command(State::TASK, "rg", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        auto it = envs[current_env].get_tasks()[current_task].get_settings().find("generator");
+        if (it == envs[current_env].get_tasks()[current_task].get_settings().end())
+            throw std::runtime_error("Generator doesn't exist");
+        std::string lang = (*it).second;
+        envs[current_env].get_tasks()[current_task].get_settings().erase(it);
+        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / ("generator." + lang);
+        if (fs::exists(file_path)) {
+            fs::remove(file_path);
+        }
+        return 0;
+    });
+
+    // Set generator
+    add_command(State::TASK, "sg", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        if (envs[current_env].get_tasks()[current_task].get_settings().find("generator") !=
+            envs[current_env].get_tasks()[current_task].get_settings().end()) {
+            current_state = State::GENERATOR;
+        } else {
+            throw std::runtime_error("Generator doesn't exist");
+        }
+        return 0;
+    });
+
+    // Compile & Run
     add_command(State::TASK, "cr", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
@@ -344,6 +423,7 @@ void Shell::configure_commands_task() {
         return res;
     });
 
+    // Compile & Test
     add_command(State::TASK, "cat", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
@@ -358,6 +438,7 @@ void Shell::configure_commands_task() {
         return res;
     });
 
+    // Compile, Test & Run
     add_command(State::TASK, "ctr", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);

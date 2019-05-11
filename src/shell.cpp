@@ -40,6 +40,7 @@ void Shell::configure_commands() {
     configure_commands_global();
     configure_commands_environment();
     configure_commands_task();
+    configure_commands_generator();
 }
 
 void Shell::parse_settings(YAMLParser::Mapping &config) {
@@ -147,6 +148,9 @@ void Shell::run() {
         }
         if (current_task != -1) {
             std::cout << "/" << envs[current_env].get_tasks()[current_task].get_name();
+        }
+        if (current_state == State::GENERATOR) {
+            std::cout << "/gen";
         }
         std::cout << " ";
         std::flush(std::cout);
@@ -324,6 +328,7 @@ void Shell::configure_commands_global() {
     });
     add_alias(State::GLOBAL, "py-shell", State::ENVIRONMENT, "py-shell");
     add_alias(State::GLOBAL, "py-shell", State::TASK, "py-shell");
+    add_alias(State::GLOBAL, "py-shell", State::GENERATOR, "py-shell");
 
     // Toggle autosave
     add_command(State::GLOBAL, "autosave", [this](std::vector <std::string> &arg) -> int {
@@ -347,6 +352,7 @@ void Shell::configure_commands_global() {
     });
     add_alias(State::GLOBAL, "autosave", State::ENVIRONMENT, "autosave");
     add_alias(State::GLOBAL, "autosave", State::TASK, "autosave");
+    add_alias(State::GLOBAL, "autosave", State::GENERATOR, "autosave");
 
     // Hot reload settings from config file 
     add_command(State::GLOBAL, "reload-settings", [this](std::vector <std::string> &arg) -> int {
@@ -365,6 +371,7 @@ void Shell::configure_commands_global() {
     });
     add_alias(State::GLOBAL, "reload-settings", State::ENVIRONMENT, "reload-settings");
     add_alias(State::GLOBAL, "reload-settings", State::TASK, "reload-settings");
+    add_alias(State::GLOBAL, "reload-settings", State::GENERATOR, "reload-settings");
 
     // Exit from program
     add_command(State::GLOBAL, "q", [this](std::vector <std::string> &arg) -> int {

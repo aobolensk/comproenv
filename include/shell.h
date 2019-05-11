@@ -10,7 +10,7 @@
 class Shell {
  private:
     enum State {
-        GLOBAL, ENVIRONMENT, TASK, INVALID
+        GLOBAL, ENVIRONMENT, TASK, GENERATOR, INVALID
     };
     std::array <std::unordered_map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     int current_env, current_task, current_state;
@@ -23,6 +23,7 @@ class Shell {
     void configure_commands_global();
     void configure_commands_environment();
     void configure_commands_task();
+    void configure_commands_generator();
     void add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func);
     void add_alias(int old_state, std::string new_name, int new_state, std::string old_name);
  public:
