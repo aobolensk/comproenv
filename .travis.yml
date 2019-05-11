@@ -15,11 +15,7 @@ matrix:
       install:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
       script:
-        - git submodule update --init --recursive
-        - mkdir build
-        - cd build
-        - cmake ..
-        - cmake --build . --config Release -- -j2
+        - python3 launch.py --f build
     - os: linux
       dist: xenial
       name: Linux-clang
@@ -34,11 +30,7 @@ matrix:
         - export CC="clang"
         - export CXX="clang++"
       script:
-        - git submodule update --init --recursive
-        - mkdir build
-        - cd build
-        - cmake ..
-        - cmake --build . --config Release -- -j2
+        - python3 launch.py --f build
     - os: windows
       name: Windows-VS
       env:
@@ -46,11 +38,7 @@ matrix:
       install:
         - export PATH=$MSBUILD_PATH:$PATH
       script:
-        - git submodule update --init --recursive
-        - mkdir build
-        - cd build
-        - cmake ..
-        - cmake --build . --config Release
+        - python launch.py --f build
     - os: osx
       osx_image: xcode10.2
       name: macOS-g++
@@ -58,11 +46,7 @@ matrix:
         - export CC="gcc-8"
         - export CXX="g++-8"
       script:
-        - git submodule update --init --recursive
-        - mkdir build
-        - cd build
-        - cmake ..
-        - cmake --build . --config Release -- -j2
+        - python launch.py --f build
     - os: osx
       osx_image: xcode10.2
       name: macOS-clang
@@ -76,9 +60,4 @@ matrix:
         - export LDFLAGS="-L/usr/local/opt/llvm/lib"
         - export CPPFLAGS="-I/usr/local/opt/llvm/include"
       script:
-        - git submodule update --init --recursive
-        - mkdir build
-        - cd build
-        - cmake ..
-        - cmake --build . --config Release -- -j2
-
+        - python launch.py --f build
