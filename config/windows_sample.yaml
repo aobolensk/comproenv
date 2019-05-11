@@ -6,6 +6,7 @@ environments:
 
 global:
   python_interpreter: python
+  autosave: on
   editor: notepad @name@.@lang@ &
   compilers:
     c: gcc @name@.c -o @name@

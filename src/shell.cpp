@@ -111,6 +111,9 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
     if (global_settings.find("python_interpreter") == global_settings.end()) {
         global_settings.emplace("python_interpreter", "python");
     }
+    if (global_settings.find("autosave") == global_settings.end()) {
+        global_settings.emplace("autosave", "on");
+    }
 }
 
 void Shell::create_paths() {
@@ -324,14 +327,39 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "py-shell", State::ENVIRONMENT, "py-shell");
     add_alias(State::GLOBAL, "py-shell", State::TASK, "py-shell");
 
+    // Launch Python shell
+    add_command(State::GLOBAL, "autosave", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string state = "on";
+        auto it = global_settings.find("autosave");
+        if (it != global_settings.end()) {
+            state = (*it).second;
+            global_settings.erase(it);
+        }
+        if (state == "on")
+            state = "off";
+        else if (state == "off")
+            state = "on";
+        else
+            throw std::runtime_error("Unknown state for autosave");
+        global_settings["autosave"] = state;
+        std::cout << "Set autosave to " << state << std::endl;
+        return 0;
+    });
+    add_alias(State::GLOBAL, "autosave", State::ENVIRONMENT, "autosave");
+    add_alias(State::GLOBAL, "autosave", State::TASK, "autosave");
+
     // Exit from program
     add_command(State::GLOBAL, "q", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Exiting..." << std::endl;
-        std::vector <std::string> save_args = {"s"};
-        int res = commands[State::GLOBAL][save_args.front()](save_args);
-        (void)res;
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            int res = commands[State::GLOBAL][save_args.front()](save_args);
+            (void)res;
+        }
         exit(0);
         return 0;
     });
