@@ -1,5 +1,6 @@
 #include <string>
 #include <fstream>
+#include <thread>
 #include <experimental/filesystem>
 #include "shell.h"
 #include "task.h"
@@ -113,7 +114,26 @@ void Shell::configure_commands_generator() {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, lang);
         }
         std::cout << "cmd: " << command << std::endl;
+        auto ampersand_pos = command.find("&");
+        #ifdef _WIN32
+        if (ampersand_pos != std::string::npos) {
+            command.erase(ampersand_pos);
+            command += " > NUL";
+            std::thread thr([&](const std::string command) -> void {
+                int res = system(command.c_str());
+                (void)res;
+            }, command);
+            thr.detach();
+            return 0;
+        } else {
+            return system(command.c_str());
+        }
+        #else
+        if (ampersand_pos != std::string::npos) {
+            command.insert(std::max(0ul, ampersand_pos - 1), " &> /dev/null ");
+        }
         return system(command.c_str());
+        #endif  // _WIN32
     });
 
     // Exit from generator
