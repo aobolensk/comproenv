@@ -16,12 +16,10 @@ Shell::Shell(const std::string &file) : config_file(file) {
     signal(SIGTSTP, SIG_IGN);
     #endif  // _WIN32
     configure_commands();
-    if (config_file != "") {
-        YAMLParser p1(config_file);
-        YAMLParser::Mapping p = p1.parse().get_mapping();
-        parse_settings(p);
-        create_paths();
-    }
+    YAMLParser p1(config_file);
+    YAMLParser::Mapping p = p1.parse().get_mapping();
+    parse_settings(p);
+    create_paths();
     current_env = -1;
     current_task = -1;
     current_state = State::GLOBAL;
@@ -327,7 +325,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "py-shell", State::ENVIRONMENT, "py-shell");
     add_alias(State::GLOBAL, "py-shell", State::TASK, "py-shell");
 
-    // Launch Python shell
+    // Toggle autosave
     add_command(State::GLOBAL, "autosave", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
@@ -349,6 +347,24 @@ void Shell::configure_commands_global() {
     });
     add_alias(State::GLOBAL, "autosave", State::ENVIRONMENT, "autosave");
     add_alias(State::GLOBAL, "autosave", State::TASK, "autosave");
+
+    // Hot reload settings from config file 
+    add_command(State::GLOBAL, "reload-settings", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        YAMLParser p1(config_file);
+        YAMLParser::Mapping p = p1.parse().get_mapping();
+        global_settings.clear();
+        envs.clear();
+        parse_settings(p);
+        create_paths();
+        current_env = -1;
+        current_task = -1;
+        current_state = State::GLOBAL;
+        return 0;
+    });
+    add_alias(State::GLOBAL, "reload-settings", State::ENVIRONMENT, "reload-settings");
+    add_alias(State::GLOBAL, "reload-settings", State::TASK, "reload-settings");
 
     // Exit from program
     add_command(State::GLOBAL, "q", [this](std::vector <std::string> &arg) -> int {
