@@ -207,6 +207,7 @@ void Shell::configure_commands_task() {
                 f.close();
                 if (res_in != res_out) {
                     std::cout << "\033[33;1m" << "-- Warning: Mismatch of result and expected!" << "\033[0m" << std::endl;
+                    ++errors;
                 }
             }
             std::cout << "\033[35m" << "-- Time elapsed:" <<
