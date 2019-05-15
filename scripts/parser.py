@@ -3,6 +3,23 @@ from bs4 import BeautifulSoup
 import requests
 import os
 
+def remove_empty_lines(s):
+    i = 0
+    while i < len(s) and s[i] == '\n':
+        i += 1
+    s = s[i:]
+    i = len(s) - 1
+    while i >= 0 and s[i] == '\n':
+        i -= 1
+    s = s[:i+1]
+    i = len(s)
+    while True:
+        s = s.replace('\n\n', '\n')
+        if i == len(s):
+            break
+        i = len(s)
+    return s
+
 def run():
     path = sys.argv[2]
     link = sys.argv[3]
@@ -17,18 +34,24 @@ def run():
         for i in range(len(inputs)):
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".in", "w") as f:
                 content = inputs[i].contents[-1].contents
+                result = ""
                 for x in content:
                     if isinstance(x, str):
-                        f.write(x)
+                        result += x
                     else:
-                        f.write('\n')
+                        result += '\n'
+                result = remove_empty_lines(result)
+                f.write(result)
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".out", "w") as f:
                 content = outputs[i].contents[-1].contents
+                result = ""
                 for x in content:
                     if isinstance(x, str):
-                        f.write(x)
+                        result += x
                     else:
-                        f.write('\n')
+                        result += '\n'
+                result = remove_empty_lines(result)
+                f.write(result)
     elif link.startswith("https://acmp.ru/"):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
@@ -48,17 +71,23 @@ def run():
                 for i in range(1, len(rows)):
                     cells = rows[i].find_all("td")
                     with open(os.path.join(path, "acmp_sample_" + str(i)) + ".in", "w") as f:
+                        result = ""
                         for x in cells[1].contents:
                             if (isinstance(x, str)):
-                                f.write(x)
+                                result += x
                             else:
-                                f.write('\n')
+                                result += '\n'
+                        result = remove_empty_lines(result)
+                        f.write(result)
                     with open(os.path.join(path, "acmp_sample_" + str(i)) + ".out", "w") as f:
+                        result = ""
                         for x in cells[2].contents:
                             if (isinstance(x, str)):
-                                f.write(x)
+                                result += x
                             else:
-                                f.write('\n')
+                                result += '\n'
+                        result = remove_empty_lines(result)
+                        f.write(result)
     elif (link.startswith("http://acm.timus.ru/") or
         link.startswith("https://acm.timus.ru/") or
         link.startswith("https://timus.online/")):
