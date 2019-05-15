@@ -23,7 +23,8 @@ def remove_empty_lines(s):
 def run():
     path = sys.argv[2]
     link = sys.argv[3]
-    if link.startswith("https://codeforces.com/"):
+    if (link.startswith("http://codeforces.com/") or
+        link.startswith("https://codeforces.com/")):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
         inputs = soup.find_all("div", class_="input")
@@ -52,7 +53,8 @@ def run():
                         result += '\n'
                 result = remove_empty_lines(result)
                 f.write(result)
-    elif link.startswith("https://acmp.ru/"):
+    elif (link.startswith("http://acmp.ru/") or
+        link.startswith("https://acmp.ru/")):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
         tables = soup.find_all("table", {"class" : "main",
@@ -90,6 +92,7 @@ def run():
                         f.write(result)
     elif (link.startswith("http://acm.timus.ru/") or
         link.startswith("https://acm.timus.ru/") or
+        link.startswith("http://timus.online/") or
         link.startswith("https://timus.online/")):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
