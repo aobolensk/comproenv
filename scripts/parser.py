@@ -16,9 +16,19 @@ def run():
             exit(-1)
         for i in range(len(inputs)):
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".in", "w") as f:
-                f.write(inputs[i].contents[-1].contents[0])
+                content = inputs[i].contents[-1].contents
+                for x in content:
+                    if isinstance(x, str):
+                        f.write(x)
+                    else:
+                        f.write('\n')
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".out", "w") as f:
-                f.write(outputs[i].contents[-1].contents[0])
+                content = outputs[i].contents[-1].contents
+                for x in content:
+                    if isinstance(x, str):
+                        f.write(x)
+                    else:
+                        f.write('\n')
     elif link.startswith("https://acmp.ru/"):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
