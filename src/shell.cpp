@@ -16,9 +16,24 @@ Shell::Shell(const std::string &file) : config_file(file) {
     signal(SIGTSTP, SIG_IGN);
     #endif  // _WIN32
     configure_commands();
-    YAMLParser p1(config_file);
-    YAMLParser::Mapping p = p1.parse().get_mapping();
-    parse_settings(p);
+    if (config_file != "") {
+        YAMLParser p1(config_file);
+        YAMLParser::Mapping p = p1.parse().get_mapping();
+        parse_settings(p);
+    } else {
+        config_file = "config.yaml";
+        if (fs::exists(config_file)) {
+            YAMLParser p1(config_file);
+            YAMLParser::Mapping p = p1.parse().get_mapping();
+            parse_settings(p);
+        }
+    }
+    if (global_settings.find("python_interpreter") == global_settings.end()) {
+        global_settings.emplace("python_interpreter", "python");
+    }
+    if (global_settings.find("autosave") == global_settings.end()) {
+        global_settings.emplace("autosave", "on");
+    }
     create_paths();
     current_env = -1;
     current_task = -1;
@@ -79,39 +94,37 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
             }
         }
     };
-    std::vector <YAMLParser::Value> environments = config.get_value("environments").get_sequence();
-    for (auto &env_data : environments) {
-        YAMLParser::Mapping map = env_data.get_mapping();
-        Environment env(map.get_value("name").get_string());
-        std::cout << "env: " << map.get_value("name").get_string() << std::endl;
-        if (map.has_key("tasks")) {
-            std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
-            for (auto &task_data : tasks) {
-                YAMLParser::Mapping map = task_data.get_mapping();
-                Task task(map.get_value("name").get_string());
-                deserialize_compilers(task.get_settings(), map);
-                deserialize_runners(task.get_settings(), map);
-                deserialize_templates(task.get_settings(), map);
-                deserialize_rest_settings(task.get_settings(), map);
-                env.add_task(task);
+    if (config.has_key("environments")) {
+        std::vector <YAMLParser::Value> environments = config.get_value("environments").get_sequence();
+        for (auto &env_data : environments) {
+            YAMLParser::Mapping map = env_data.get_mapping();
+            Environment env(map.get_value("name").get_string());
+            std::cout << "env: " << map.get_value("name").get_string() << std::endl;
+            if (map.has_key("tasks")) {
+                std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
+                for (auto &task_data : tasks) {
+                    YAMLParser::Mapping map = task_data.get_mapping();
+                    Task task(map.get_value("name").get_string());
+                    deserialize_compilers(task.get_settings(), map);
+                    deserialize_runners(task.get_settings(), map);
+                    deserialize_templates(task.get_settings(), map);
+                    deserialize_rest_settings(task.get_settings(), map);
+                    env.add_task(task);
+                }
             }
+            deserialize_compilers(env.get_settings(), map);
+            deserialize_runners(env.get_settings(), map);
+            deserialize_templates(env.get_settings(), map);
+            deserialize_rest_settings(env.get_settings(), map);
+            envs.push_back(env);
         }
-        deserialize_compilers(env.get_settings(), map);
-        deserialize_runners(env.get_settings(), map);
-        deserialize_templates(env.get_settings(), map);
-        deserialize_rest_settings(env.get_settings(), map);
-        envs.push_back(env);
     }
-    YAMLParser::Mapping global_settings_map = config.get_value("global").get_mapping();
-    deserialize_compilers(global_settings, global_settings_map);
-    deserialize_runners(global_settings, global_settings_map);
-    deserialize_templates(global_settings, global_settings_map);
-    deserialize_rest_settings(global_settings, global_settings_map);
-    if (global_settings.find("python_interpreter") == global_settings.end()) {
-        global_settings.emplace("python_interpreter", "python");
-    }
-    if (global_settings.find("autosave") == global_settings.end()) {
-        global_settings.emplace("autosave", "on");
+    if (config.has_key("global")) {
+        YAMLParser::Mapping global_settings_map = config.get_value("global").get_mapping();
+        deserialize_compilers(global_settings, global_settings_map);
+        deserialize_runners(global_settings, global_settings_map);
+        deserialize_templates(global_settings, global_settings_map);
+        deserialize_rest_settings(global_settings, global_settings_map);
     }
 }
 
@@ -286,36 +299,41 @@ void Shell::configure_commands_global() {
             export_instances(runners, "runners");
             export_instances(templates, "templates");
         };
-        f << "environments:" << std::endl;
-        indent += 2;
-        for (auto &env : envs) {
-            for (int i = 0; i < indent; ++i)
-                f << " ";
-            f << "- name: " << env.get_name() << std::endl;
+        if (envs.size()) {
+            f << "environments:" << std::endl;
             indent += 2;
-            serialize_settings(env.get_settings());
-            if (env.get_tasks().size()) {
+            for (auto &env : envs) {
                 for (int i = 0; i < indent; ++i)
                     f << " ";
-                f << "tasks:" << std::endl;
+                f << "- name: " << env.get_name() << std::endl;
                 indent += 2;
-                for (auto &task : env.get_tasks()) {
+                serialize_settings(env.get_settings());
+                if (env.get_tasks().size()) {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
-                    f << "- name: " << task.get_name() << std::endl;
+                    f << "tasks:" << std::endl;
                     indent += 2;
-                    serialize_settings(task.get_settings());
+                    for (auto &task : env.get_tasks()) {
+                        for (int i = 0; i < indent; ++i)
+                            f << " ";
+                        f << "- name: " << task.get_name() << std::endl;
+                        indent += 2;
+                        serialize_settings(task.get_settings());
+                        indent -= 2;
+                    }
                     indent -= 2;
                 }
                 indent -= 2;
             }
             indent -= 2;
+            f << std::endl;
         }
-        indent -= 2;
-        f << std::endl;
-        f << "global:" << std::endl;
-        indent += 2;
-        serialize_settings(global_settings);
+        if (global_settings.size()) {
+            f << "global:" << std::endl;
+            indent += 2;
+            serialize_settings(global_settings);
+            indent -= 2;
+        }
         f.close();
         return 0;
     });
