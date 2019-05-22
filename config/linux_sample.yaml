@@ -1,9 +1,3 @@
-environments:
-  - name: e1
-    tasks:
-      - name: t1
-        language: cpp
-
 global:
   python_interpreter: python3
   editor: vim @name@.@lang@
