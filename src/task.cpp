@@ -233,9 +233,46 @@ void Shell::configure_commands_task() {
             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".in");
         std::string buf;
+        std::cout << "Write test (send empty line at the end of text):" << std::endl;
         std::ofstream f(file_path);
         if (!f.is_open())
             return 1;
+        while (true) {
+            std::getline(std::cin, buf);
+            if (buf.size() == 0)
+                break;
+            f << buf << std::endl;
+        }
+        f.close();
+        return 0;
+    });
+
+    // Create test with expected result
+    add_command(State::TASK, "cte", [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        fs::path in_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".in");
+        fs::path out_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            "tests" / (arg[1] + ".out");
+        std::string buf;
+        std::cout << "Write test (send empty line at the end of text):" << std::endl;
+        std::ofstream f(in_path);
+        if (!f.is_open())
+            return 1;
+        while (true) {
+            std::getline(std::cin, buf);
+            if (buf.size() == 0)
+                break;
+            f << buf << std::endl;
+        }
+        f.close();
+        std::cout << "Expected result (send empty line at the end of text):" << std::endl;
+        f.open(out_path);
+        if (!f.is_open())
+            return 2;
         while (true) {
             std::getline(std::cin, buf);
             if (buf.size() == 0)
