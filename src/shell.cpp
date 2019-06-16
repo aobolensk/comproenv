@@ -414,10 +414,27 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        std::cout << "Help:" << std::endl;
+        std::cout << "Help:" << "\n";
+        size_t max_name_length = 0, max_desc_length = 0;
         for (std::pair <const std::string, std::string> &help_info : help[current_state]) {
-            std::cout << help_info.first << " - " << help_info.second << std::endl;
+            max_name_length = std::max(max_name_length, help_info.first.size());
+            max_desc_length = std::max(max_desc_length, help_info.second.size());
         }
+        for (std::pair <const std::string, std::string> &help_info : help[current_state]) {
+            // Line
+            for (size_t i = 0; i < max_name_length - help_info.first.size(); ++i)
+                std::cout << ' ';
+            std::cout << help_info.first;
+            std::cout << " | " << help_info.second << "\n";
+            // Separator
+            for (size_t i = 0; i < max_name_length + 1; ++i)
+                std::cout << '-';
+            std::cout << '|';
+            for (size_t i = 0; i < max_desc_length; ++i)
+                std::cout << '-';
+            std::cout << '\n';
+        }
+        std::cout << std::flush;
         return 0;
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
