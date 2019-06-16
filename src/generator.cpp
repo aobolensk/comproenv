@@ -24,7 +24,7 @@ void Shell::configure_commands_generator() {
             command = global_settings["compiler_" + current_compiler];
         else {
             std::cout << "There is no compiler rule for language " <<
-                envs[current_env].get_tasks()[current_task].get_settings()["language"] << std::endl;
+                envs[current_env].get_tasks()[current_task].get_settings()["language"] << '\n';
             return -1;
         }
         size_t pos = std::string::npos;
@@ -36,13 +36,13 @@ void Shell::configure_commands_generator() {
         }
         std::cout << "\033[35m" << "-- Compile generator for " <<
             envs[current_env].get_tasks()[current_task].get_name() << ":" <<
-            "\033[0m" << std::endl;
+            "\033[0m\n";
         auto time_start = std::chrono::high_resolution_clock::now();
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
         std::cout << "\033[35m" << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
-            "\033[0m" << std::endl;
+            "\033[0m\n";
         return ret_code;
     });
 
@@ -71,7 +71,7 @@ void Shell::configure_commands_generator() {
                 "tests" + "/" + "generator";
             #endif  // _WIN32
         }
-        std::cout << "cmd: " << command << std::endl;
+        std::cout << "cmd: " << command << '\n';
         size_t pos = std::string::npos;
         while ((pos = command.find("@name@")) != std::string::npos) {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
@@ -81,13 +81,13 @@ void Shell::configure_commands_generator() {
         }
         std::cout << "\033[35m" << "-- Run generator for " <<
             envs[current_env].get_tasks()[current_task].get_name() << ":" <<
-            "\033[0m" << std::endl;
+            "\033[0m\n";
         auto time_start = std::chrono::high_resolution_clock::now();
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
-        std::cout << "\033[35m" << std::endl << "-- Time elapsed:" <<
+        std::cout << "\033[35m\n" << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
-            "\033[0m" << std::endl;
+            "\033[0m\n";
         return ret_code;
     });
 
@@ -100,7 +100,7 @@ void Shell::configure_commands_generator() {
             "tests" / "generator";
         std::string lang = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
         std::string command = "";
-        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        std::cout << "gce: " << global_settings["editor"] << '\n';
         if (global_settings.find("editor") != global_settings.end())
             command = global_settings["editor"];
         if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
@@ -113,7 +113,7 @@ void Shell::configure_commands_generator() {
         while ((pos = command.find("@lang@")) != std::string::npos) {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, lang);
         }
-        std::cout << "cmd: " << command << std::endl;
+        std::cout << "cmd: " << command << '\n';
         auto ampersand_pos = command.find("&");
         #ifdef _WIN32
         if (ampersand_pos != std::string::npos) {
