@@ -1,6 +1,7 @@
 #ifndef INCLUDE_SHELL_H
 #define INCLUDE_SHELL_H
 #include <vector>
+#include <set>
 #include <array>
 #include <unordered_map>
 #include <functional>
@@ -13,7 +14,7 @@ class Shell {
         GLOBAL, ENVIRONMENT, TASK, GENERATOR, INVALID
     };
     std::array <std::unordered_map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
-    std::array <std::map <std::string, std::string>, (size_t)State::INVALID> help;
+    std::array <std::map <std::string, std::set<std::string>>, (size_t)State::INVALID> help;
     int current_env, current_task, current_state;
     std::vector <Environment> envs;
     std::unordered_map <std::string, std::string> global_settings;
