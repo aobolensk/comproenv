@@ -31,8 +31,8 @@ std::unordered_map <std::string, std::string> &Environment::get_settings() {
 }
 
 void Shell::configure_commands_environment() {
-    // Set task
-    add_command(State::ENVIRONMENT, "st", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::ENVIRONMENT, "st", "Set task",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
@@ -45,8 +45,8 @@ void Shell::configure_commands_environment() {
         throw std::runtime_error("Incorrect task name");
     });
 
-    // Create task
-    add_command(State::ENVIRONMENT, "ct", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::ENVIRONMENT, "ct", "Create task",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() < 2 || arg.size() > 3)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i)
@@ -99,8 +99,8 @@ void Shell::configure_commands_environment() {
         return 0;
     });
 
-    // Remove task
-    add_command(State::ENVIRONMENT, "rt", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::ENVIRONMENT, "rt", "Remove task",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
@@ -115,8 +115,8 @@ void Shell::configure_commands_environment() {
         throw std::runtime_error("Incorrect task name");
     });
 
-    // List of tasks
-    add_command(State::ENVIRONMENT, "lt", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::ENVIRONMENT, "lt", "List of tasks",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "List of tasks in environment " << envs[current_env].get_name() << "\n";
@@ -128,8 +128,8 @@ void Shell::configure_commands_environment() {
         return 0;
     });
 
-    // Configure settings
-    add_command(State::ENVIRONMENT, "set", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::ENVIRONMENT, "set", "Configure settings",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_settings().erase(arg[1]);
             return 0;
@@ -147,8 +147,8 @@ void Shell::configure_commands_environment() {
         throw std::runtime_error("Incorrect arguments for command " + arg[0]);
     });
 
-    // Exit from environment
-    add_command(State::ENVIRONMENT, "q", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::ENVIRONMENT, "q", "Exit from environment",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_env = -1;
@@ -161,4 +161,7 @@ void Shell::configure_commands_environment() {
         }
     });
     add_alias(State::ENVIRONMENT, "q", State::ENVIRONMENT, "exit");
+
+    add_alias(State::GLOBAL, "help", State::ENVIRONMENT, "help");
+    add_alias(State::GLOBAL, "help", State::ENVIRONMENT, "?");
 }
