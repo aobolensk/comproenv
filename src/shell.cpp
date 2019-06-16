@@ -44,14 +44,20 @@ void Shell::add_command(int state, std::string name,
                         std::string help_info,
                         std::function<int(std::vector <std::string> &)> func) {
     commands[state].emplace(name, func);
-    help[state][name] = help_info;
+    help[state][help_info].insert(name);
 }
 
 void Shell::add_alias(int old_state, std::string old_name, int new_state, std::string new_name) {
-    auto it = commands[old_state].find(old_name);
-    if (it == commands[old_state].end())
+    auto old_command = commands[old_state].find(old_name);
+    if (old_command == commands[old_state].end())
         throw std::runtime_error("Unable to add alias for " + old_name);
-    commands[new_state].emplace(new_name, it->second);
+    commands[new_state].emplace(new_name, old_command->second);
+    for (auto &help_info : help[old_state]) {
+        if (help_info.second.find(old_name) != help_info.second.end()) {
+            help[new_state][help_info.first].insert("new_name");
+            break;
+        }
+    }
 }
 
 void Shell::configure_commands() {
@@ -416,16 +422,27 @@ void Shell::configure_commands_global() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Help:" << "\n";
         size_t max_name_length = 0, max_desc_length = 0;
-        for (std::pair <const std::string, std::string> &help_info : help[current_state]) {
-            max_name_length = std::max(max_name_length, help_info.first.size());
-            max_desc_length = std::max(max_desc_length, help_info.second.size());
+        for (auto &help_info : help[current_state]) {
+            for (const std::string &command : help_info.second)
+                max_name_length = std::max(max_name_length, command.size());
+            max_desc_length = std::max(max_desc_length, help_info.first.size());
         }
-        for (std::pair <const std::string, std::string> &help_info : help[current_state]) {
+        // std::cout << max_name_length << " " << max_desc_length << std::endl;
+        // exit(0);
+        for (auto &help_info : help[current_state]) {
             // Line
-            for (size_t i = 0; i < max_name_length - help_info.first.size(); ++i)
-                std::cout << ' ';
-            std::cout << help_info.first;
-            std::cout << " | " << help_info.second << "\n";
+            bool flag = false;
+            for (const std::string &command : help_info.second) {
+                for (size_t i = 0; i < max_name_length - command.size(); ++i)
+                    std::cout << ' ';
+                std::cout << command << " |";
+                if (!flag) {
+                    std::cout << ' ' << help_info.first << "\n";
+                    flag = true;
+                } else {
+                    std::cout << "\n";
+                }
+            }
             // Separator
             for (size_t i = 0; i < max_name_length + 1; ++i)
                 std::cout << '-';
