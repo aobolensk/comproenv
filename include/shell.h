@@ -13,6 +13,7 @@ class Shell {
         GLOBAL, ENVIRONMENT, TASK, GENERATOR, INVALID
     };
     std::array <std::unordered_map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
+    std::array <std::map <std::string, std::string>, (size_t)State::INVALID> help;
     int current_env, current_task, current_state;
     std::vector <Environment> envs;
     std::unordered_map <std::string, std::string> global_settings;
@@ -24,7 +25,9 @@ class Shell {
     void configure_commands_environment();
     void configure_commands_task();
     void configure_commands_generator();
-    void add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func);
+    void add_command(int state, std::string name,
+                    std::string help_info,
+                    std::function<int(std::vector <std::string> &)> func);
     void add_alias(int old_state, std::string new_name, int new_state, std::string old_name);
  public:
     Shell(const std::string &file = "");

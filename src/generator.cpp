@@ -8,8 +8,8 @@
 namespace fs = std::experimental::filesystem;
 
 void Shell::configure_commands_generator() {
-    // Compile generator
-    add_command(State::GENERATOR, "cg", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GENERATOR, "cg", "Compile generator",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command;
@@ -46,8 +46,8 @@ void Shell::configure_commands_generator() {
         return ret_code;
     });
 
-    // Run generator
-    add_command(State::GENERATOR, "rg", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GENERATOR, "rg", "Run generator",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command;
@@ -91,8 +91,8 @@ void Shell::configure_commands_generator() {
         return ret_code;
     });
 
-    // Edit generator
-    add_command(State::GENERATOR, "eg", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GENERATOR, "eg", "Edit generator",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
@@ -136,8 +136,8 @@ void Shell::configure_commands_generator() {
         #endif  // _WIN32
     });
 
-    // Exit from generator
-    add_command(State::GENERATOR, "q", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GENERATOR, "q", "Exit from generator",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_state = State::TASK;
@@ -149,4 +149,7 @@ void Shell::configure_commands_generator() {
         }
     });
     add_alias(State::TASK, "q", State::TASK, "exit");
+
+    add_alias(State::GLOBAL, "help", State::GENERATOR, "help");
+    add_alias(State::GLOBAL, "help", State::GENERATOR, "?");
 }

@@ -40,8 +40,11 @@ Shell::Shell(const std::string &file) : config_file(file) {
     current_state = State::GLOBAL;
 }
 
-void Shell::add_command(int state, std::string name, std::function<int(std::vector <std::string> &)> func) {
+void Shell::add_command(int state, std::string name,
+                        std::string help_info,
+                        std::function<int(std::vector <std::string> &)> func) {
     commands[state].emplace(name, func);
+    help[state][name] = help_info;
 }
 
 void Shell::add_alias(int old_state, std::string old_name, int new_state, std::string new_name) {
@@ -195,8 +198,8 @@ void Shell::run() {
 }
 
 void Shell::configure_commands_global() {
-    // Set environment
-    add_command(State::GLOBAL, "se", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "se", "Set environment",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i) {
@@ -209,8 +212,8 @@ void Shell::configure_commands_global() {
         throw std::runtime_error("Incorrect environment name");
     });
 
-    // Create environment
-    add_command(State::GLOBAL, "ce", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "ce", "Create environment",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i)
@@ -224,8 +227,8 @@ void Shell::configure_commands_global() {
         return 0;
     });
 
-    // Remove environment
-    add_command(State::GLOBAL, "re", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "re", "Remove environment",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i) {
@@ -240,8 +243,8 @@ void Shell::configure_commands_global() {
         throw std::runtime_error("Incorrect environment name");
     });
 
-    // List of environments
-    add_command(State::GLOBAL, "le", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "le", "List of environments",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "List of environments in global:\n";
@@ -259,8 +262,8 @@ void Shell::configure_commands_global() {
         return 0;
     });
 
-    // Save settings
-    add_command(State::GLOBAL, "s", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "s", "Save settings",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         int indent = 0;
@@ -338,8 +341,8 @@ void Shell::configure_commands_global() {
         return 0;
     });
 
-    // Launch Python shell
-    add_command(State::GLOBAL, "py-shell", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "py-shell", "Launch Python shell",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         return system(global_settings["python_interpreter"].c_str());
@@ -348,8 +351,8 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "py-shell", State::TASK, "py-shell");
     add_alias(State::GLOBAL, "py-shell", State::GENERATOR, "py-shell");
 
-    // Toggle autosave
-    add_command(State::GLOBAL, "autosave", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "autosave", "Toggle autosave",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string state = "on";
@@ -372,8 +375,8 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "autosave", State::TASK, "autosave");
     add_alias(State::GLOBAL, "autosave", State::GENERATOR, "autosave");
 
-    // Hot reload settings from config file 
-    add_command(State::GLOBAL, "reload-settings", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "reload-settings", "Hot reload settings from config file ",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         YAMLParser p1(config_file);
@@ -391,8 +394,8 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "reload-settings", State::TASK, "reload-settings");
     add_alias(State::GLOBAL, "reload-settings", State::GENERATOR, "reload-settings");
 
-    // Exit from program
-    add_command(State::GLOBAL, "q", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::GLOBAL, "q", "Exit from program",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Exiting..." << std::endl;
@@ -405,6 +408,19 @@ void Shell::configure_commands_global() {
         return 0;
     });
     add_alias(State::GLOBAL, "q", State::GLOBAL, "exit");
+
+    
+    add_command(State::GLOBAL, "help", "Help",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::cout << "Help:" << std::endl;
+        for (std::pair <const std::string, std::string> &help_info : help[current_state]) {
+            std::cout << help_info.first << " - " << help_info.second << std::endl;
+        }
+        return 0;
+    });
+    add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
 }
 
 Shell::~Shell() {
