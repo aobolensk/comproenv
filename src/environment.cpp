@@ -75,20 +75,20 @@ void Shell::configure_commands_environment() {
                 if (t.is_open()) {
                     std::string buf;
                     while (std::getline(t, buf))
-                        f << buf << std::endl;
+                        f << buf << '\n';
                     t.close();
                 } else {
-                    std::cout << "Unable to open template file" << std::endl;
+                    std::cout << "Unable to open template file\n";
                 }
             } else if (global_settings.find("template_" + lang) != global_settings.end()) {
                 std::ifstream t(global_settings["template_" + lang]);
                 if (t.is_open()) {
                     std::string buf;
                     while (std::getline(t, buf))
-                        f << buf << std::endl;
+                        f << buf << '\n';
                     t.close();
                 } else {
-                    std::cout << "Unable to open template file" << std::endl;
+                    std::cout << "Unable to open template file\n";
                 }
             }
             f.close();

@@ -189,17 +189,18 @@ void Shell::run() {
         if (args.size() == 0)
             continue;
         if (commands[current_state].find(args[0]) == commands[current_state].end()) {
-            std::cout << "Unknown command " << args[0] << std::endl;
+            std::cout << "Unknown command " << args[0] << '\n';
         } else {
             try {
                 int verdict = commands[current_state][args[0]](args);
                 if (verdict) {
-                    std::cout << "Command " << args[0] << " returned " << verdict << std::endl;
+                    std::cout << "Command " << args[0] << " returned " << verdict << '\n';
                 }
             } catch(std::runtime_error &re) {
-                std::cout << "Error: " << re.what() << std::endl;
+                std::cout << "Error: " << re.what() << '\n';
             }
         }
+        std::cout << std::flush;
     }
 }
 

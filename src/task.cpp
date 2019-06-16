@@ -41,7 +41,7 @@ void Shell::configure_commands_task() {
             command = global_settings["compiler_" + current_compiler];
         else {
             std::cout << "There is no compiler rule for language " <<
-                envs[current_env].get_tasks()[current_task].get_settings()["language"] << std::endl;
+                envs[current_env].get_tasks()[current_task].get_settings()["language"] << '\n';
             return -1;
         }
         size_t pos = std::string::npos;
@@ -52,13 +52,13 @@ void Shell::configure_commands_task() {
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         }
         std::cout << "\033[35m" << "-- Compile task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
-            "\033[0m" << std::endl;
+            "\033[0m\n";
         auto time_start = std::chrono::high_resolution_clock::now();
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
         std::cout << "\033[35m" << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
-            "\033[0m" << std::endl;
+            "\033[0m\n";
         return ret_code;
     });
 
@@ -87,7 +87,7 @@ void Shell::configure_commands_task() {
                 envs[current_env].get_tasks()[current_task].get_name();
             #endif  // _WIN32
         }
-        std::cout << "cmd: " << command << std::endl;
+        std::cout << "cmd: " << command << '\n';
         size_t pos = std::string::npos;
         while ((pos = command.find("@name@")) != std::string::npos) {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
@@ -100,7 +100,7 @@ void Shell::configure_commands_task() {
         auto time_start = std::chrono::high_resolution_clock::now();
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
-        std::cout << "\033[35m" << std::endl << "-- Time elapsed:" <<
+        std::cout << "\033[35m" << '\n' << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
             "\033[0m" << std::endl;
         return ret_code;
@@ -121,7 +121,7 @@ void Shell::configure_commands_task() {
         });
         std::sort(in_files.begin(), in_files.end());
         for (auto &it : in_files)
-            std::cout << it << std::endl;
+            std::cout << it << '\n';
         #ifdef _WIN32
         path = std::string("env_") + envs[current_env].get_name() + "\\" +
             "task_" + envs[current_env].get_tasks()[current_task].get_name();
@@ -132,16 +132,16 @@ void Shell::configure_commands_task() {
         temp_file_path = path + "/" + "temp.txt";
         #endif  // _WIN32
         int errors = 0, error_code = 0;
-        std::cout << "\033[32m" << "-- Test command" << "\033[0m" << std::endl;
+        std::cout << "\033[32m" << "-- Test command" << "\033[0m" << '\n';
         for (auto &in_file : in_files) {
-            std::cout << "\033[33m" << "-- Test " << in_file << "\033[0m" << std::endl;
-            std::cout << "\033[35m" << "-- Input:" << "\033[0m" << std::endl;
+            std::cout << "\033[33m" << "-- Test " << in_file << "\033[0m" << '\n';
+            std::cout << "\033[35m" << "-- Input:" << "\033[0m" << '\n';
             std::string buf;
             std::ifstream f(in_file);
             if (!f.is_open())
                 return -1;
             while (std::getline(f, buf))
-                std::cout << buf << std::endl;
+                std::cout << buf << '\n';
             f.close();
             std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
             std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
@@ -177,7 +177,7 @@ void Shell::configure_commands_task() {
             f.open(temp_file_path);
             if (f.is_open()) {
                 while (std::getline(f, buf))
-                    std::cout << buf << std::endl;
+                    std::cout << buf << '\n';
                 f.close();
             }
             if (error_code) {
@@ -190,9 +190,9 @@ void Shell::configure_commands_task() {
             out_file.append("out");
             f.open(out_file);
             if (f.is_open()) {
-                std::cout << "\033[35m" << "-- Expected:" << "\033[0m" << std::endl;
+                std::cout << "\033[35m" << "-- Expected:" << "\033[0m" << '\n';
                 while (std::getline(f, buf))
-                    std::cout << buf << std::endl;
+                    std::cout << buf << '\n';
                 f.close();
                 std::vector <std::string> res_in, res_out;
                 f.open(temp_file_path, std::ios::in);
@@ -217,10 +217,10 @@ void Shell::configure_commands_task() {
         }
         if (errors == 0) {
             std::cout << "\033[32;1m" << "-- Test command: All " << std::size(in_files) <<
-                " tests successfully passed!" << "\033[0m" << std::endl;
+                " tests successfully passed!" << "\033[0m\n";
         } else {
             std::cout << "\033[31;1m" << "-- Test command: Warning! " << errors <<
-                "/" << std::size(in_files) << " tests failed!" << "\033[0m" << std::endl;
+                "/" << std::size(in_files) << " tests failed!" << "\033[0m\n";
         }
         return errors;
     });
@@ -233,7 +233,7 @@ void Shell::configure_commands_task() {
             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".in");
         std::string buf;
-        std::cout << "Write test (send empty line at the end of text):" << std::endl;
+        std::cout << "Write test (send empty line at the end of text):\n";
         std::ofstream f(file_path);
         if (!f.is_open())
             return 1;
@@ -241,7 +241,7 @@ void Shell::configure_commands_task() {
             std::getline(std::cin, buf);
             if (buf.size() == 0)
                 break;
-            f << buf << std::endl;
+            f << buf << '\n';
         }
         f.close();
         return 0;
@@ -258,7 +258,7 @@ void Shell::configure_commands_task() {
             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".out");
         std::string buf;
-        std::cout << "Write test (send empty line at the end of text):" << std::endl;
+        std::cout << "Write test (send empty line at the end of text):\n";
         std::ofstream f(in_path);
         if (!f.is_open())
             return 1;
@@ -266,10 +266,10 @@ void Shell::configure_commands_task() {
             std::getline(std::cin, buf);
             if (buf.size() == 0)
                 break;
-            f << buf << std::endl;
+            f << buf << '\n';
         }
         f.close();
-        std::cout << "Expected result (send empty line at the end of text):" << std::endl;
+        std::cout << "Expected result (send empty line at the end of text):\n";
         f.open(out_path);
         if (!f.is_open())
             return 2;
@@ -277,7 +277,7 @@ void Shell::configure_commands_task() {
             std::getline(std::cin, buf);
             if (buf.size() == 0)
                 break;
-            f << buf << std::endl;
+            f << buf << '\n';
         }
         f.close();
         return 0;
@@ -313,7 +313,7 @@ void Shell::configure_commands_task() {
             return -1;
         }
         std::string command = "";
-        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        std::cout << "gce: " << global_settings["editor"] << '\n';
         if (global_settings.find("editor") != global_settings.end())
             command = global_settings["editor"];
         if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
@@ -326,7 +326,7 @@ void Shell::configure_commands_task() {
         while ((pos = command.find("@lang@")) != std::string::npos) {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, "in");
         }
-        std::cout << "cmd: " << command << std::endl;
+        std::cout << "cmd: " << command << '\n';
         return system(command.c_str());
     });
 
@@ -342,16 +342,16 @@ void Shell::configure_commands_task() {
         });
         std::sort(in_files.begin(), in_files.end());
         std::cout << "\033[32m" << "List of tests for task " <<
-            envs[current_env].get_tasks()[current_task].get_name() << "\033[0m" << std::endl;
+            envs[current_env].get_tasks()[current_task].get_name() << "\033[0m" << '\n';
         for (auto &in_file : in_files) {
-            std::cout << "\033[33m" << "Test " << in_file << "\033[0m" << std::endl;
-            std::cout << "\033[35m" << "-- Input:" << "\033[0m" << std::endl;
+            std::cout << "\033[33m" << "Test " << in_file << "\033[0m" << '\n';
+            std::cout << "\033[35m" << "-- Input:" << "\033[0m" << '\n';
             std::string buf;
             std::ifstream f(in_file);
             if (!f.is_open())
                 return -1;
             while (std::getline(f, buf))
-                std::cout << buf << std::endl;
+                std::cout << buf << '\n';
             f.close();
             std::string out_file = in_file.string();
             out_file.pop_back();
@@ -359,9 +359,9 @@ void Shell::configure_commands_task() {
             out_file += "out";
             f.open(out_file);
             if (f.is_open()) {
-                std::cout << "\033[35m" << "-- Output:" << "\033[0m" << std::endl;
+                std::cout << "\033[35m" << "-- Output:" << "\033[0m" << '\n';
                 while (std::getline(f, buf))
-                    std::cout << buf << std::endl;
+                    std::cout << buf << '\n';
                 f.close();
             }
         }
@@ -395,20 +395,20 @@ void Shell::configure_commands_task() {
             if (t.is_open()) {
                 std::string buf;
                 while (std::getline(t, buf))
-                    f << buf << std::endl;
+                    f << buf << '\n';
                 t.close();
             } else {
-                std::cout << "Unable to open template file" << std::endl;
+                std::cout << "Unable to open template file\n";
             }
         } else if (global_settings.find("template_" + lang) != global_settings.end()) {
             std::ifstream t(global_settings["template_" + lang]);
             if (t.is_open()) {
                 std::string buf;
                 while (std::getline(t, buf))
-                    f << buf << std::endl;
+                    f << buf << '\n';
                 t.close();
             } else {
-                std::cout << "Unable to open template file" << std::endl;
+                std::cout << "Unable to open template file\n";
             }
         }
         f.close();
@@ -526,7 +526,7 @@ void Shell::configure_commands_task() {
             std::getline(std::cin, buf);
             if (buf.size() == 0)
                 break;
-            f << buf << std::endl;
+            f << buf << '\n';
         }
         f.close();
         return 0;
@@ -556,7 +556,7 @@ void Shell::configure_commands_task() {
             return -1;
         }
         std::string command = "";
-        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        std::cout << "gce: " << global_settings["editor"] << '\n';
         if (global_settings.find("editor") != global_settings.end())
             command = global_settings["editor"];
         if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
@@ -569,7 +569,7 @@ void Shell::configure_commands_task() {
         while ((pos = command.find("@lang@")) != std::string::npos) {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, "out");
         }
-        std::cout << "cmd: " << command << std::endl;
+        std::cout << "cmd: " << command << '\n';
         return system(command.c_str());
     });
 
@@ -597,7 +597,7 @@ void Shell::configure_commands_task() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command = "";
-        std::cout << "gce: " << global_settings["editor"] << std::endl;
+        std::cout << "gce: " << global_settings["editor"] << '\n';
         if (global_settings.find("editor") != global_settings.end())
             command = global_settings["editor"];
         if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
@@ -614,7 +614,7 @@ void Shell::configure_commands_task() {
             command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1,
                             envs[current_env].get_tasks()[current_task].get_settings()["language"]);
         }
-        std::cout << "cmd: " << command << std::endl;
+        std::cout << "cmd: " << command << '\n';
         auto ampersand_pos = command.find("&");
         #ifdef _WIN32
         if (ampersand_pos != std::string::npos) {
