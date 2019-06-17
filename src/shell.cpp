@@ -15,19 +15,37 @@ Shell::Shell(const std::string &file) : config_file(file) {
     #ifndef _WIN32
     signal(SIGTSTP, SIG_IGN);
     #endif  // _WIN32
+    YAMLParser::Mapping config, environments;
     configure_commands();
     if (config_file != "") {
         YAMLParser p1(config_file);
-        YAMLParser::Mapping p = p1.parse().get_mapping();
-        parse_settings(p);
+        config = p1.parse().get_mapping();
     } else {
         config_file = "config.yaml";
         if (fs::exists(config_file)) {
             YAMLParser p1(config_file);
-            YAMLParser::Mapping p = p1.parse().get_mapping();
-            parse_settings(p);
+            config = p1.parse().get_mapping();
         }
     }
+    if (environments_file != "") {
+        YAMLParser p1(environments_file);
+        try {
+            environments = p1.parse().get_mapping();
+        } catch (std::runtime_error &re) {
+            std::cout << "No environments found" << std::endl;
+        }
+    } else {
+        environments_file = "environments.yaml";
+        if (fs::exists(environments_file)) {
+            YAMLParser p1(environments_file);
+            try {
+                environments = p1.parse().get_mapping();
+            } catch (std::runtime_error &re) {
+                std::cout << "No environments found" << std::endl;
+            }
+        }
+    }
+    parse_settings(config, environments);
     if (global_settings.find("python_interpreter") == global_settings.end()) {
         global_settings.emplace("python_interpreter", "python");
     }
@@ -67,7 +85,7 @@ void Shell::configure_commands() {
     configure_commands_generator();
 }
 
-void Shell::parse_settings(YAMLParser::Mapping &config) {
+void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &environments) {
     auto deserialize_compilers = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
         if (map.has_key("compilers")) {
             std::map <std::string, YAMLParser::Value> compilers = map.get_value("compilers").get_mapping().get_map();
@@ -103,9 +121,9 @@ void Shell::parse_settings(YAMLParser::Mapping &config) {
             }
         }
     };
-    if (config.has_key("environments")) {
-        std::vector <YAMLParser::Value> environments = config.get_value("environments").get_sequence();
-        for (auto &env_data : environments) {
+    if (environments.has_key("environments")) {
+        std::vector <YAMLParser::Value> environments_content = environments.get_value("environments").get_sequence();
+        for (auto &env_data : environments_content) {
             YAMLParser::Mapping map = env_data.get_mapping();
             Environment env(map.get_value("name").get_string());
             std::cout << "env: " << map.get_value("name").get_string() << std::endl;
@@ -309,6 +327,14 @@ void Shell::configure_commands_global() {
             export_instances(runners, "runners");
             export_instances(templates, "templates");
         };
+        if (global_settings.size()) {
+            f << "global:" << std::endl;
+            indent += 2;
+            serialize_settings(global_settings);
+            indent -= 2;
+        }
+        f.close();
+        f.open(environments_file, std::ios::out);
         if (envs.size()) {
             f << "environments:" << std::endl;
             indent += 2;
@@ -337,12 +363,6 @@ void Shell::configure_commands_global() {
             }
             indent -= 2;
             f << std::endl;
-        }
-        if (global_settings.size()) {
-            f << "global:" << std::endl;
-            indent += 2;
-            serialize_settings(global_settings);
-            indent -= 2;
         }
         f.close();
         return 0;
@@ -386,11 +406,13 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        YAMLParser p1(config_file);
-        YAMLParser::Mapping p = p1.parse().get_mapping();
+        YAMLParser config_parser(config_file);
+        YAMLParser::Mapping config = config_parser.parse().get_mapping();
+        YAMLParser environments_parser(config_file);
+        YAMLParser::Mapping environments = environments_parser.parse().get_mapping();
         global_settings.clear();
         envs.clear();
-        parse_settings(p);
+        parse_settings(config, environments);
         create_paths();
         current_env = -1;
         current_task = -1;

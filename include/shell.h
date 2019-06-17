@@ -19,7 +19,8 @@ class Shell {
     std::vector <Environment> envs;
     std::unordered_map <std::string, std::string> global_settings;
     std::string config_file;
-    void parse_settings(YAMLParser::Mapping &val);
+    std::string environments_file;
+    void parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &environments);
     void create_paths();
     void configure_commands();
     void configure_commands_global();
