@@ -55,15 +55,15 @@ Shell::Shell(const std::string_view config_file_path,
     auto it = global_settings.find("python_interpreter");
     if (it != global_settings.end()) {
         std::string command = it->second + " --version 2>&1";
-        FILE *stream = popen(command.c_str(), "r");
+        #ifdef _WIN32
+        std::unique_ptr<FILE, decltype(&_pclose)> stream(_popen(command.c_str(), "r"), _pclose);
+        #else
+        std::unique_ptr<FILE, decltype(&pclose)> stream(popen(command.c_str(), "r"), pclose);
+        #endif
         char buffer[256];
         std::string result;
-        if (stream) {
-            while (!feof(stream)) {
-                if (fgets(buffer, 256, stream))
-                    result += buffer;
-            }
-            pclose(stream);
+        while (fgets(buffer, 256, stream.get())) {
+            result += buffer;
         }
         std::vector <std::string> s_result;
         split(s_result, result);
