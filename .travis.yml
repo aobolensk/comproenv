@@ -16,6 +16,7 @@ matrix:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
       script:
         - python3 launch.py --f build
+        - echo q | ./build/bin/comproenv
     - os: linux
       dist: xenial
       name: Linux-clang
@@ -31,6 +32,7 @@ matrix:
         - export CXX="clang++"
       script:
         - python3 launch.py --f build
+        - echo q | ./build/bin/comproenv
     - os: windows
       name: Windows-VS
       env:
@@ -39,6 +41,7 @@ matrix:
         - export PATH=$MSBUILD_PATH:$PATH
       script:
         - python launch.py --f build
+        # TODO: add launch test
     - os: osx
       osx_image: xcode10.2
       name: macOS-g++
@@ -47,6 +50,7 @@ matrix:
         - export CXX="g++-8"
       script:
         - python launch.py --f build
+        - echo q | ./build/bin/comproenv
     - os: osx
       osx_image: xcode10.2
       name: macOS-clang
@@ -61,3 +65,4 @@ matrix:
         - export CPPFLAGS="-I/usr/local/opt/llvm/include"
       script:
         - python launch.py --f build
+        - echo q | ./build/bin/comproenv
