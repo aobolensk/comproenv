@@ -34,7 +34,7 @@ Shell::Shell(const std::string_view config_file_path,
         YAMLParser p1(environments_file);
         try {
             environments = p1.parse().get_mapping();
-        } catch (std::runtime_error &re) {
+        } catch (std::runtime_error &) {
             std::cout << "No environments found" << std::endl;
         }
     } else {
@@ -43,7 +43,7 @@ Shell::Shell(const std::string_view config_file_path,
             YAMLParser p1(environments_file);
             try {
                 environments = p1.parse().get_mapping();
-            } catch (std::runtime_error &re) {
+            } catch (std::runtime_error &) {
                 std::cout << "No environments found" << std::endl;
             }
         }
