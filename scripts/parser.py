@@ -1,9 +1,10 @@
 import os
 import sys
-import test_parser
 
 import requests
 from bs4 import BeautifulSoup
+
+import test_parser
 
 
 def remove_empty_lines(s):

@@ -1,10 +1,11 @@
-import parser
-import tempfile
-import shutil
-import os
 import base64
+import os
+import shutil
+import tempfile
+
 from termcolor import colored
 
+import parser
 
 def assert_eq(expected, result):
     if expected == result:
