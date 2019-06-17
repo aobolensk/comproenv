@@ -19,7 +19,8 @@ class Shell {
     std::vector <Environment> envs;
     std::unordered_map <std::string, std::string> global_settings;
     std::string config_file;
-    void parse_settings(YAMLParser::Mapping &val);
+    std::string environments_file;
+    void parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &environments);
     void create_paths();
     void configure_commands();
     void configure_commands_global();
@@ -31,7 +32,7 @@ class Shell {
                     std::function<int(std::vector <std::string> &)> func);
     void add_alias(int old_state, std::string new_name, int new_state, std::string old_name);
  public:
-    Shell(const std::string &file = "");
+    Shell(const std::string_view config_file_path = "", const std::string_view environments_file_path = "");
     void run();
     ~Shell();
 };
