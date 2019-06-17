@@ -10,7 +10,10 @@
 
 namespace fs = std::experimental::filesystem;
 
-Shell::Shell(const std::string &file) : config_file(file) {
+Shell::Shell(const std::string_view config_file_path,
+             const std::string_view environments_file_path) :
+             config_file(config_file_path),
+             environments_file(environments_file_path) {
     signal(SIGINT, SIG_IGN);
     #ifndef _WIN32
     signal(SIGTSTP, SIG_IGN);

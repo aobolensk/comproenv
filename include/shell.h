@@ -32,7 +32,7 @@ class Shell {
                     std::function<int(std::vector <std::string> &)> func);
     void add_alias(int old_state, std::string new_name, int new_state, std::string old_name);
  public:
-    Shell(const std::string &file = "");
+    Shell(const std::string_view config_file_path = "", const std::string_view environments_file_path = "");
     void run();
     ~Shell();
 };
