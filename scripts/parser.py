@@ -1,7 +1,10 @@
-import sys
-from bs4 import BeautifulSoup
-import requests
 import os
+import sys
+import test_parser
+
+import requests
+from bs4 import BeautifulSoup
+
 
 def remove_empty_lines(s):
     i = 0
@@ -20,9 +23,7 @@ def remove_empty_lines(s):
         i = len(s)
     return s
 
-def run():
-    path = sys.argv[2]
-    link = sys.argv[3]
+def run(path, link):
     if (link.startswith("http://codeforces.com/") or
         link.startswith("https://codeforces.com/")):
         page = requests.get(link).text
@@ -33,25 +34,25 @@ def run():
             print("Numbers of inputs and outputs are not equal")
             exit(-1)
         for i in range(len(inputs)):
+            content = inputs[i].contents[-1].contents
+            result = ""
+            for x in content:
+                if isinstance(x, str):
+                    result += x
+                else:
+                    result += '\n'
+            result = remove_empty_lines(result)
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".in", "w") as f:
-                content = inputs[i].contents[-1].contents
-                result = ""
-                for x in content:
-                    if isinstance(x, str):
-                        result += x
-                    else:
-                        result += '\n'
-                result = remove_empty_lines(result)
                 f.write(result)
+            content = outputs[i].contents[-1].contents
+            result = ""
+            for x in content:
+                if isinstance(x, str):
+                    result += x
+                else:
+                    result += '\n'
+            result = remove_empty_lines(result)
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".out", "w") as f:
-                content = outputs[i].contents[-1].contents
-                result = ""
-                for x in content:
-                    if isinstance(x, str):
-                        result += x
-                    else:
-                        result += '\n'
-                result = remove_empty_lines(result)
                 f.write(result)
     elif (link.startswith("http://acmp.ru/") or
         link.startswith("https://acmp.ru/")):
@@ -72,23 +73,23 @@ def run():
             if (check == 0):
                 for i in range(1, len(rows)):
                     cells = rows[i].find_all("td")
+                    result = ""
+                    for x in cells[1].contents:
+                        if (isinstance(x, str)):
+                            result += x
+                        else:
+                            result += '\n'
+                    result = remove_empty_lines(result)
                     with open(os.path.join(path, "acmp_sample_" + str(i)) + ".in", "w") as f:
-                        result = ""
-                        for x in cells[1].contents:
-                            if (isinstance(x, str)):
-                                result += x
-                            else:
-                                result += '\n'
-                        result = remove_empty_lines(result)
                         f.write(result)
+                    result = ""
+                    for x in cells[2].contents:
+                        if (isinstance(x, str)):
+                            result += x
+                        else:
+                            result += '\n'
+                    result = remove_empty_lines(result)
                     with open(os.path.join(path, "acmp_sample_" + str(i)) + ".out", "w") as f:
-                        result = ""
-                        for x in cells[2].contents:
-                            if (isinstance(x, str)):
-                                result += x
-                            else:
-                                result += '\n'
-                        result = remove_empty_lines(result)
                         f.write(result)
     elif (link.startswith("http://acm.timus.ru/") or
         link.startswith("https://acm.timus.ru/") or
@@ -109,25 +110,24 @@ def run():
             if (check == 0):
                 for i in range(1, len(rows)):
                     cells = rows[i].find_all("td")
+                    result = cells[0].get_text()
                     with open(os.path.join(path, "timus_sample_" + str(i)) + ".in", "w") as f:
-                        f.write(cells[0].get_text())
+                        f.write(result)
+                    result = cells[1].get_text()
                     with open(os.path.join(path, "timus_sample_" + str(i)) + ".out", "w") as f:
-                        f.write(cells[1].get_text())
+                        f.write(result)
     else:
         print("Couldn't parse contents of this page")
         exit(-1)
-
-def test():
-    raise NotImplementedError
 
 def parse_args():
     if sys.argv[1] == "run":
         if len(sys.argv) <= 3:
             print("Not enough args to execute 'run'")
             exit(-1)
-        run()
+        run(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "test":
-        test()
+        test_parser.test()
 
 if __name__ == "__main__":
     print(sys.argv)
