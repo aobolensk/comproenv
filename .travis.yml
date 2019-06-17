@@ -41,7 +41,8 @@ matrix:
         - export PATH=$MSBUILD_PATH:$PATH
       script:
         - python launch.py --f build
-        # TODO: add launch test
+        - echo q > launch.txt
+        - build\\bin\\comproenv.exe < launch.txt
     - os: osx
       osx_image: xcode10.2
       name: macOS-g++
