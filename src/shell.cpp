@@ -52,6 +52,30 @@ Shell::Shell(const std::string_view config_file_path,
     if (global_settings.find("python_interpreter") == global_settings.end()) {
         global_settings.emplace("python_interpreter", "python");
     }
+    auto it = global_settings.find("python_interpreter");
+    if (it != global_settings.end()) {
+        std::string command = it->second + " --version 2>&1";
+        #ifdef _WIN32
+        std::unique_ptr<FILE, decltype(&_pclose)> stream(_popen(command.c_str(), "r"), _pclose);
+        #else
+        std::unique_ptr<FILE, decltype(&pclose)> stream(popen(command.c_str(), "r"), pclose);
+        #endif
+        char buffer[256];
+        std::string result;
+        while (fgets(buffer, 256, stream.get())) {
+            result += buffer;
+        }
+        std::vector <std::string> s_result;
+        split(s_result, result);
+        if ((s_result[0] == "Python") && (s_result[1][0] - '0' >= '3')) {
+            std::cout << "Found: " + result << std::endl;
+        } else if ((s_result[0] == "Python") && (s_result[1][0] - '0' < '3')) {
+            std::cout << "Warning: Python with version that less than 3 is not supported, "
+                "so some features like parsing websites may be unavailable" << std::endl;
+        } else {
+            std::cout << "Warning: Python interpreter is not found!" << std::endl;
+        }
+    }
     if (global_settings.find("autosave") == global_settings.end()) {
         global_settings.emplace("autosave", "on");
     }
