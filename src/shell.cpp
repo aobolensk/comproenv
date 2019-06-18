@@ -450,6 +450,25 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "reload-settings", State::TASK, "reload-settings");
     add_alias(State::GLOBAL, "reload-settings", State::GENERATOR, "reload-settings");
 
+    add_command(State::GLOBAL, "set", "Configure global settings",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() == 2) {
+            global_settings.erase(arg[1]);
+            return 0;
+        }
+        if (arg.size() >= 3) {
+            std::string second_arg = arg[2];
+            for (unsigned i = 3; i < arg.size(); ++i) {
+                second_arg.push_back(' ');
+                second_arg += arg[i];
+            }
+            global_settings.erase(arg[1]);
+            global_settings.emplace(arg[1], second_arg);
+            return 0;
+        }
+        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+    });
+
     add_command(State::GLOBAL, "q", "Exit from program",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
@@ -465,7 +484,6 @@ void Shell::configure_commands_global() {
     });
     add_alias(State::GLOBAL, "q", State::GLOBAL, "exit");
 
-    
     add_command(State::GLOBAL, "help", "Help",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)

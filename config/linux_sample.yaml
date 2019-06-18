@@ -1,6 +1,6 @@
 global:
   python_interpreter: python3
-  editor: vim @name@.@lang@
+  editor: vim "@name@.@lang@"
   autosave: on
   compilers:
     c: gcc @name@.c -o @name@

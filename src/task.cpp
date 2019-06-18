@@ -573,7 +573,7 @@ void Shell::configure_commands_task() {
         return system(command.c_str());
     });
 
-    add_command(State::TASK, "set", "Configure settings",
+    add_command(State::TASK, "set", "Configure task settings",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);

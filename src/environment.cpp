@@ -128,7 +128,7 @@ void Shell::configure_commands_environment() {
         return 0;
     });
 
-    add_command(State::ENVIRONMENT, "set", "Configure settings",
+    add_command(State::ENVIRONMENT, "set", "Configure environment settings",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_settings().erase(arg[1]);
