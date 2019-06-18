@@ -96,6 +96,10 @@ void Shell::configure_commands_environment() {
         if (!fs::exists(path / "tests")) {
             fs::create_directory(path / "tests");
         }
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
+        }
         return 0;
     });
 
@@ -107,6 +111,10 @@ void Shell::configure_commands_environment() {
             if (envs[current_env].get_tasks()[i].get_name() == arg[1]) {
                 envs[current_env].get_tasks().erase(envs[current_env].get_tasks().begin() + i);
                 fs::path path = fs::current_path() / ("env_" + envs[current_env].get_name()) / ("task_" + arg[1]);
+                if (global_settings["autosave"] == "on") {
+                    std::vector <std::string> save_args = {"s"};
+                    commands[State::GLOBAL][save_args.front()](save_args);
+                }
                 if (fs::exists(path)) {
                     return !fs::remove_all(path);
                 }
@@ -124,7 +132,6 @@ void Shell::configure_commands_environment() {
             std::cout << "    |-> " << envs[current_env].get_tasks()[i].get_name() << ": " <<
                 envs[current_env].get_tasks()[i].get_settings()["language"] << "\n";
         }
-        std::cout << std::flush;
         return 0;
     });
 
@@ -132,7 +139,6 @@ void Shell::configure_commands_environment() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_settings().erase(arg[1]);
-            return 0;
         }
         if (arg.size() >= 3) {
             std::string second_arg = arg[2];
@@ -142,9 +148,14 @@ void Shell::configure_commands_environment() {
             }
             envs[current_env].get_settings().erase(arg[1]);
             envs[current_env].get_settings().emplace(arg[1], second_arg);
-            return 0;
+        } else {
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         }
-        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
+        }
+        return 0;
     });
 
     add_command(State::ENVIRONMENT, "q", "Exit from environment",
@@ -153,12 +164,7 @@ void Shell::configure_commands_environment() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_env = -1;
         current_state = State::GLOBAL;
-        if (global_settings["autosave"] == "on") {
-            std::vector <std::string> save_args = {"s"};
-            return commands[State::GLOBAL][save_args.front()](save_args);
-        } else {
-            return 0;
-        }
+        return 0;
     });
     add_alias(State::ENVIRONMENT, "q", State::ENVIRONMENT, "exit");
 

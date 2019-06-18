@@ -276,6 +276,10 @@ void Shell::configure_commands_global() {
         if (!fs::exists(path)) {
             fs::create_directory(path);
         }
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
+        }
         return 0;
     });
 
@@ -287,6 +291,10 @@ void Shell::configure_commands_global() {
             if (envs[i].get_name() == arg[1]) {
                 envs.erase(envs.begin() + i);
                 fs::path path = fs::current_path() / ("env_" + arg[1]);
+                if (global_settings["autosave"] == "on") {
+                    std::vector <std::string> save_args = {"s"};
+                    commands[State::GLOBAL][save_args.front()](save_args);
+                }
                 if (fs::exists(path)) {
                     return !fs::remove_all(path);
                 }
@@ -454,9 +462,7 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             global_settings.erase(arg[1]);
-            return 0;
-        }
-        if (arg.size() >= 3) {
+        } else if (arg.size() >= 3) {
             std::string second_arg = arg[2];
             for (unsigned i = 3; i < arg.size(); ++i) {
                 second_arg.push_back(' ');
@@ -464,9 +470,14 @@ void Shell::configure_commands_global() {
             }
             global_settings.erase(arg[1]);
             global_settings.emplace(arg[1], second_arg);
-            return 0;
+        } else {
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         }
-        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
+        }
+        return 0;
     });
 
     add_command(State::GLOBAL, "q", "Exit from program",
@@ -477,9 +488,10 @@ void Shell::configure_commands_global() {
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
             int res = commands[State::GLOBAL][save_args.front()](save_args);
-            (void)res;
+            exit(res);
+        } else {
+            exit(0);
         }
-        exit(0);
         return 0;
     });
     add_alias(State::GLOBAL, "q", State::GLOBAL, "exit");
@@ -523,7 +535,6 @@ void Shell::configure_commands_global() {
                 std::cout << '-';
             std::cout << '\n';
         }
-        std::cout << std::flush;
         return 0;
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");

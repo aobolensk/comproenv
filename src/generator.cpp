@@ -142,12 +142,7 @@ void Shell::configure_commands_generator() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_state = State::TASK;
-        if (global_settings["autosave"] == "on") {
-            std::vector <std::string> save_args = {"s"};
-            return commands[State::GLOBAL][save_args.front()](save_args);
-        } else {
-            return 0;
-        }
+        return 0;
     });
     add_alias(State::GENERATOR, "q", State::GENERATOR, "exit");
 
