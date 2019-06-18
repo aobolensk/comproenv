@@ -24,7 +24,7 @@ def build():
         return 1
     if os.name == "posix":
         ret_code = subprocess.call("cmake --build . --config Release -- -j" +
-                                    str(multiprocessing.cpu_count()), shell=True)
+                str(multiprocessing.cpu_count()), shell=True)
     elif os.name == "nt":
         ret_code = subprocess.call("cmake --build . --config Release")
     if ret_code != 0:
@@ -32,6 +32,18 @@ def build():
         return 1
     os.chdir("..")
     return 0
+
+def run():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    if os.name == "posix":
+        signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+    ret_code = subprocess.call(
+        os.path.join(".", "build", "bin", executable("comproenv") + ' ' +
+                enumerate_args(args.run_args)), shell=True)
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    if os.name == "posix":
+        signal.signal(signal.SIGTSTP, signal.SIG_DFL)
+    return ret_code
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -49,17 +61,11 @@ def main():
     for arg in args.function:
         if arg == "build":
             ret_code = build()
-        if arg == "run":
-            signal.signal(signal.SIGINT, signal.SIG_IGN)
-            if os.name == "posix":
-                signal.signal(signal.SIGTSTP, signal.SIG_IGN)
-            ret_code = subprocess.call(
-                os.path.join(os.getcwd(), "build", "bin",
-                            executable("comproenv") + ' ' +
-                            enumerate_args(args.run_args)), shell=True)
-            signal.signal(signal.SIGINT, signal.SIG_DFL)
-            if os.name == "posix":
-                signal.signal(signal.SIGTSTP, signal.SIG_DFL)
+        elif arg == "run":
+            ret_code = run()
+        else:
+            print("Unknown function argument: " + arg)
+            continue
         print("Function " + arg + " returned exit code " + str(ret_code))
         if (ret_code != 0):
             exit(1)
