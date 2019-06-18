@@ -99,7 +99,7 @@ void Shell::add_alias(int old_state, std::string old_name, int new_state, std::s
     commands[new_state].emplace(new_name, old_command->second);
     for (auto &help_info : help[old_state]) {
         if (help_info.second.find(old_name) != help_info.second.end()) {
-            help[new_state][help_info.first].insert("new_name");
+            help[new_state][help_info.first].insert(new_name);
             break;
         }
     }
@@ -477,8 +477,12 @@ void Shell::configure_commands_global() {
                 max_name_length = std::max(max_name_length, command.size());
             max_desc_length = std::max(max_desc_length, help_info.first.size());
         }
-        // std::cout << max_name_length << " " << max_desc_length << std::endl;
-        // exit(0);
+        for (size_t i = 0; i < max_name_length + 1; ++i)
+            std::cout << '-';
+        std::cout << '|';
+        for (size_t i = 0; i < max_desc_length; ++i)
+            std::cout << '-';
+        std::cout << '\n';
         for (auto &help_info : help[current_state]) {
             // Line
             bool flag = false;
