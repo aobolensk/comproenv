@@ -412,6 +412,10 @@ void Shell::configure_commands_task() {
             }
         }
         f.close();
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
+        }
         return 0;
     });
 
@@ -429,6 +433,10 @@ void Shell::configure_commands_task() {
             "tests" / ("generator." + lang);
         if (fs::exists(file_path)) {
             fs::remove(file_path);
+        }
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
         }
         return 0;
     });
@@ -577,9 +585,7 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
-            return 0;
-        }
-        if (arg.size() >= 3) {
+        } else if (arg.size() >= 3) {
             std::string second_arg = arg[2];
             for (unsigned i = 3; i < arg.size(); ++i) {
                 second_arg.push_back(' ');
@@ -587,9 +593,14 @@ void Shell::configure_commands_task() {
             }
             envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
             envs[current_env].get_tasks()[current_task].get_settings().emplace(arg[1], second_arg);
-            return 0;
+        } else {
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         }
-        throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
+        }
+        return 0;
     });
 
     add_command(State::TASK, "edit", "Edit task in text editor",
@@ -642,12 +653,7 @@ void Shell::configure_commands_task() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_task = -1;
         current_state = State::ENVIRONMENT;
-        if (global_settings["autosave"] == "on") {
-            std::vector <std::string> save_args = {"s"};
-            return commands[State::GLOBAL][save_args.front()](save_args);
-        } else {
-            return 0;
-        }
+        return 0;
     });
     add_alias(State::TASK, "q", State::TASK, "exit");
 
