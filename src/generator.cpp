@@ -135,6 +135,7 @@ void Shell::configure_commands_generator() {
         return system(command.c_str());
         #endif  // _WIN32
     });
+    add_alias(State::GENERATOR, "eg", State::GENERATOR, "edit");
 
     add_command(State::GENERATOR, "q", "Exit from generator",
     [this](std::vector <std::string> &arg) -> int {
@@ -148,7 +149,7 @@ void Shell::configure_commands_generator() {
             return 0;
         }
     });
-    add_alias(State::TASK, "q", State::TASK, "exit");
+    add_alias(State::GENERATOR, "q", State::GENERATOR, "exit");
 
     add_alias(State::GLOBAL, "help", State::GENERATOR, "help");
     add_alias(State::GLOBAL, "help", State::GENERATOR, "?");
