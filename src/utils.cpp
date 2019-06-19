@@ -7,3 +7,10 @@ void split(std::vector <std::string> &out, const std::string &str, char delim) {
     while(std::getline(ss, tmp, delim))
         out.push_back(tmp);
 }
+
+void replace_all(std::string &str, const std::string_view old_value, const std::string_view new_value) {
+    size_t pos = std::string::npos;
+    while ((pos = str.find(old_value)) != std::string::npos) {
+        str.replace(str.begin() + pos, str.begin() + pos + std::size(old_value), new_value);
+    }
+}
