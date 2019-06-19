@@ -108,18 +108,32 @@ void Shell::configure_commands_task() {
 
     add_command(State::TASK, "t", "Test task",
     [this](std::vector <std::string> &arg) -> int {
-        if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command;
         std::string path;
         std::string temp_file_path;
         std::vector <fs::path> in_files;
-        fs::recursive_directory_iterator it_begin(fs::current_path() / ("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
-        std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
-            return fs::is_regular_file(path) && path.extension() == ".in";
-        });
-        std::sort(in_files.begin(), in_files.end());
+        // Select tests
+        if (arg.size() == 1) { // Run all tests
+            fs::recursive_directory_iterator it_begin(fs::current_path() / ("env_" + envs[current_env].get_name()) /
+                ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+            std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
+                return fs::is_regular_file(path) && path.extension() == ".in";
+            });
+            std::sort(in_files.begin(), in_files.end());
+        } else if (arg.size() > 1) { // Run specific tests
+            for (unsigned i = 1; i < arg.size(); ++i) {
+                fs::path current_test = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+                    ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests" / (arg[i] + ".in");
+                if (fs::is_regular_file(current_test)) {
+                    in_files.emplace_back(current_test);
+                } else {
+                    std::cout << "\033[31mError: Test with name " + arg[i] + " is not found\n\033[0m";
+                }
+            }
+        } else {
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        }
+        // Launch selected tests:
         for (auto &it : in_files)
             std::cout << it << '\n';
         #ifdef _WIN32
@@ -207,7 +221,8 @@ void Shell::configure_commands_task() {
                 f.close();
                 if (res_in != res_out) {
                     std::cout << "\033[33;1m" << "-- Warning: Mismatch of result and expected!" << "\033[0m" << std::endl;
-                    ++errors;
+                    if (!error_code)
+                        ++errors;
                 }
             }
             std::cout << "\033[35m" << "-- Time elapsed:" <<
