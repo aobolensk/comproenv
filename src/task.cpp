@@ -1,10 +1,11 @@
 #include <string>
 #include <fstream>
-    #include <thread>
+#include <thread>
 #include <chrono>
 #include <experimental/filesystem>
 #include "shell.h"
 #include "task.h"
+#include "utils.h"
 
 namespace fs = std::experimental::filesystem;
 
@@ -44,13 +45,10 @@ void Shell::configure_commands_task() {
                 envs[current_env].get_tasks()[current_task].get_settings()["language"] << '\n';
             return -1;
         }
-        size_t pos = std::string::npos;
-        while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
-                            (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
-        }
+        replace_all(command, "@lang@", current_compiler);
         std::cout << "\033[35m" << "-- Compile task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
             "\033[0m\n";
         auto time_start = std::chrono::high_resolution_clock::now();
@@ -88,13 +86,9 @@ void Shell::configure_commands_task() {
             #endif  // _WIN32
         }
         std::cout << "cmd: " << command << '\n';
-        size_t pos = std::string::npos;
-        while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
-                            (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
-        }
         std::cout << "\033[35m" << "-- Run task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
             "\033[0m" << std::endl;
         auto time_start = std::chrono::high_resolution_clock::now();
@@ -178,13 +172,9 @@ void Shell::configure_commands_task() {
                 envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
                 #endif  // _WIN32
             }
-            size_t pos = std::string::npos;
-            while ((pos = command.find("@name@")) != std::string::npos) {
-                command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
-                                (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+            replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                                 ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                                 envs[current_env].get_tasks()[current_task].get_name()).string());
-            }
             auto time_start = std::chrono::high_resolution_clock::now();
             error_code = system(command.c_str());
             auto time_finish = std::chrono::high_resolution_clock::now();
@@ -329,18 +319,12 @@ void Shell::configure_commands_task() {
         }
         std::string command = "";
         std::cout << "gce: " << global_settings["editor"] << '\n';
-        if (global_settings.find("editor") != global_settings.end())
-            command = global_settings["editor"];
         if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
             command = envs[current_env].get_settings()["editor"];
-        size_t pos = std::string::npos;
-        while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1, file_path.string());
-        }
-        pos = std::string::npos;
-        while ((pos = command.find("@lang@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, "in");
-        }
+        if (global_settings.find("editor") != global_settings.end())
+            command = global_settings["editor"];
+        replace_all(command, "@name@", file_path.string());
+        replace_all(command, "@lang@", "in");
         std::cout << "cmd: " << command << '\n';
         return system(command.c_str());
     });
@@ -584,14 +568,8 @@ void Shell::configure_commands_task() {
             command = global_settings["editor"];
         if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
             command = envs[current_env].get_settings()["editor"];
-        size_t pos = std::string::npos;
-        while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1, file_path.string());
-        }
-        pos = std::string::npos;
-        while ((pos = command.find("@lang@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1, "out");
-        }
+        replace_all(command, "@name@", file_path.string());
+        replace_all(command, "@lang@", "out");
         std::cout << "cmd: " << command << '\n';
         return system(command.c_str());
     });
@@ -628,18 +606,10 @@ void Shell::configure_commands_task() {
             command = global_settings["editor"];
         if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
             command = envs[current_env].get_settings()["editor"];
-        size_t pos = std::string::npos;
-        while ((pos = command.find("@name@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + pos + std::size("@name@") - 1,
-                            (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
-        }
-        pos = std::string::npos;
-        while ((pos = command.find("@lang@")) != std::string::npos) {
-            command.replace(command.begin() + pos, command.begin() + pos + std::size("@lang@") - 1,
-                            envs[current_env].get_tasks()[current_task].get_settings()["language"]);
-        }
+        replace_all(command, "@lang@", envs[current_env].get_tasks()[current_task].get_settings()["language"]);
         std::cout << "cmd: " << command << '\n';
         auto ampersand_pos = command.find("&");
         #ifdef _WIN32
