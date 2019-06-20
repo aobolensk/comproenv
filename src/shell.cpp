@@ -67,9 +67,9 @@ Shell::Shell(const std::string_view config_file_path,
         }
         std::vector <std::string> s_result;
         split(s_result, result);
-        if ((s_result[0] == "Python") && (s_result[1][0] - '0' >= '3')) {
+        if ((s_result[0] == "Python") && (s_result[1][0] - '0' >= 3)) {
             std::cout << "Found: " + result << std::endl;
-        } else if ((s_result[0] == "Python") && (s_result[1][0] - '0' < '3')) {
+        } else if ((s_result[0] == "Python") && (s_result[1][0] - '0' < 3)) {
             std::cout << "Warning: Python with version that less than 3 is not supported, "
                 "so some features like parsing websites may be unavailable" << std::endl;
         } else {
@@ -102,6 +102,25 @@ void Shell::add_alias(int old_state, std::string old_name, int new_state, std::s
             help[new_state][help_info.first].insert(new_name);
             break;
         }
+    }
+}
+
+std::string Shell::get_setting_by_name(const std::string name) {
+    if (current_task != -1) {
+        auto it = envs[current_env].get_tasks()[current_task].get_settings().find(name);
+        if (it != envs[current_env].get_tasks()[current_task].get_settings().end())
+            return it->second;
+    }
+    if (current_env != -1) {
+        auto it = envs[current_env].get_settings().find(name);
+        if (it != envs[current_env].get_settings().end())
+            return it->second;
+    }
+    auto it = global_settings.find(name);
+    if (it != global_settings.end()) {
+        return it->second;
+    } else {
+        throw std::runtime_error("No setting with name: " + name);
     }
 }
 
@@ -407,7 +426,7 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        return system(global_settings["python_interpreter"].c_str());
+        return system(get_setting_by_name("python_interpreter").c_str());
     });
     add_alias(State::GLOBAL, "py-shell", State::ENVIRONMENT, "py-shell");
     add_alias(State::GLOBAL, "py-shell", State::TASK, "py-shell");
@@ -420,7 +439,7 @@ void Shell::configure_commands_global() {
         std::string state = "on";
         auto it = global_settings.find("autosave");
         if (it != global_settings.end()) {
-            state = (*it).second;
+            state = it->second;
             global_settings.erase(it);
         }
         if (state == "on")

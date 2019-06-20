@@ -32,19 +32,7 @@ void Shell::configure_commands_task() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command;
         std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["language"];
-        if (envs[current_env].get_tasks()[current_task].get_settings().find("compiler_" + current_compiler) !=
-            envs[current_env].get_tasks()[current_task].get_settings().end())
-            command = envs[current_env].get_tasks()[current_task].get_settings()["compiler_" + current_compiler];
-        else if (envs[current_env].get_settings().find("compiler_" + current_compiler) !=
-                envs[current_env].get_settings().end())
-            command = envs[current_env].get_settings()["compiler_" + current_compiler];
-        else if (global_settings.find("compiler_" + current_compiler) != global_settings.end())
-            command = global_settings["compiler_" + current_compiler];
-        else {
-            std::cout << "There is no compiler rule for language " <<
-                envs[current_env].get_tasks()[current_task].get_settings()["language"] << '\n';
-            return -1;
-        }
+        command = get_setting_by_name("compiler_" + current_compiler);
         replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
@@ -66,15 +54,9 @@ void Shell::configure_commands_task() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command;
         std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
-        if (envs[current_env].get_tasks()[current_task].get_settings().find("runner_" + current_runner) !=
-            envs[current_env].get_tasks()[current_task].get_settings().end())
-            command = envs[current_env].get_tasks()[current_task].get_settings()["runner_" + current_runner];
-        else if (envs[current_env].get_settings().find("runner_" + current_runner) !=
-                envs[current_env].get_settings().end())
-            command = envs[current_env].get_settings()["runner_" + current_runner];
-        else if (global_settings.find("runner_" + current_runner) != global_settings.end())
-            command = global_settings["runner_" + current_runner];
-        else {
+        try {
+            command = get_setting_by_name("runner_" + current_runner);
+        } catch (std::runtime_error &) {
             #ifdef _WIN32
             command = "env_" + envs[current_env].get_name() + "\\" +
                 "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
@@ -89,6 +71,7 @@ void Shell::configure_commands_task() {
         replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
+        replace_all(command, "@lang@", current_runner);
         std::cout << "\033[35m" << "-- Run task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
             "\033[0m" << std::endl;
         auto time_start = std::chrono::high_resolution_clock::now();
@@ -153,17 +136,10 @@ void Shell::configure_commands_task() {
             f.close();
             std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
             std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
-            if (envs[current_env].get_tasks()[current_task].get_settings().find("runner_" + current_runner) !=
-                envs[current_env].get_tasks()[current_task].get_settings().end())
-                command = envs[current_env].get_tasks()[current_task].get_settings()["runner_" + current_runner] +
-                    " < " + in_file.string() + " > " + temp_file_path;
-            else if (envs[current_env].get_settings().find("runner_" + current_runner) !=
-                    envs[current_env].get_settings().end())
-                command = envs[current_env].get_settings()["runner_" + current_runner] +
-                    " < " + in_file.string() + " > " + temp_file_path;
-            else if (global_settings.find("runner_" + current_runner) != global_settings.end())
-                command = global_settings["runner_" + current_runner] + " < " + in_file.string() + " > " + temp_file_path;
-            else {
+            try {
+                command = get_setting_by_name("runner_" + current_runner);
+                command += " < " + in_file.string() + " > " + temp_file_path;
+            } catch (std::runtime_error &) {
                 #ifdef _WIN32
                 command = path + "\\" +
                 envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
@@ -175,6 +151,7 @@ void Shell::configure_commands_task() {
             replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                                 ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                                 envs[current_env].get_tasks()[current_task].get_name()).string());
+            replace_all(command, "@lang@", current_runner);
             auto time_start = std::chrono::high_resolution_clock::now();
             error_code = system(command.c_str());
             auto time_finish = std::chrono::high_resolution_clock::now();
@@ -317,12 +294,7 @@ void Shell::configure_commands_task() {
         if (fs::exists(file_path)) {
             return -1;
         }
-        std::string command = "";
-        std::cout << "gce: " << global_settings["editor"] << '\n';
-        if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
-            command = envs[current_env].get_settings()["editor"];
-        if (global_settings.find("editor") != global_settings.end())
-            command = global_settings["editor"];
+        std::string command = get_setting_by_name("editor");
         replace_all(command, "@name@", file_path.string());
         replace_all(command, "@lang@", "in");
         std::cout << "cmd: " << command << '\n';
@@ -389,8 +361,10 @@ void Shell::configure_commands_task() {
         if (!f.is_open()) {
             return -1;
         }
-        if (envs[current_env].get_settings().find("template_" + lang) != envs[current_env].get_settings().end()) {
-            std::ifstream t(envs[current_env].get_settings()["template_" + lang]);
+        std::string file_name;
+        try {
+            file_name = get_setting_by_name("template_" + lang);
+            std::ifstream t(file_name);
             if (t.is_open()) {
                 std::string buf;
                 while (std::getline(t, buf))
@@ -399,16 +373,9 @@ void Shell::configure_commands_task() {
             } else {
                 std::cout << "Unable to open template file\n";
             }
-        } else if (global_settings.find("template_" + lang) != global_settings.end()) {
-            std::ifstream t(global_settings["template_" + lang]);
-            if (t.is_open()) {
-                std::string buf;
-                while (std::getline(t, buf))
-                    f << buf << '\n';
-                t.close();
-            } else {
-                std::cout << "Unable to open template file\n";
-            }
+        } catch (std::runtime_error &) {
+            std::cout << "Template for language " + lang + " is not found. "
+                            "Created empty file\n";
         }
         f.close();
         if (global_settings["autosave"] == "on") {
@@ -562,13 +529,7 @@ void Shell::configure_commands_task() {
         if (fs::exists(file_path)) {
             return -1;
         }
-        std::string command = "";
-        std::cout << "gce: " << global_settings["editor"] << '\n';
-        if (global_settings.find("editor") != global_settings.end())
-            command = global_settings["editor"];
-        if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
-            command = envs[current_env].get_settings()["editor"];
-        replace_all(command, "@name@", file_path.string());
+        std::string command = get_setting_by_name("editor");
         replace_all(command, "@lang@", "out");
         std::cout << "cmd: " << command << '\n';
         return system(command.c_str());
@@ -600,12 +561,7 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        std::string command = "";
-        std::cout << "gce: " << global_settings["editor"] << '\n';
-        if (global_settings.find("editor") != global_settings.end())
-            command = global_settings["editor"];
-        if (envs[current_env].get_settings().find("editor") != envs[current_env].get_settings().end())
-            command = envs[current_env].get_settings()["editor"];
+        std::string command = get_setting_by_name("editor");
         replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
