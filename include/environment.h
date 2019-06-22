@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include "task.h"
 
+namespace comproenv {
+
 class Environment {
  private:
     std::vector <Task> tasks;
@@ -17,5 +19,7 @@ class Environment {
     std::unordered_map <std::string, std::string> &get_settings();
     void add_setting(const std::string &key, const std::string &value);
 };
+
+}  // namespace comproenv
 
 #endif  // INCLUDE_ENVIRONMENT_H

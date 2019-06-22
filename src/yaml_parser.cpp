@@ -1,6 +1,8 @@
 #include "yaml_parser.h"
 #include "libyaml/include/yaml.h"
 
+namespace comproenv {
+
 YAMLParser::YAMLParser(std::string file_name) :
     file_name(file_name),
     file(fopen(file_name.c_str(), "r"), &fclose) {
@@ -206,3 +208,5 @@ void YAMLParser::Value::print(std::ostream &os, int indent) {
         break;
     }
 }
+
+}  // namespace comproenv

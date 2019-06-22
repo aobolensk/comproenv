@@ -1,5 +1,7 @@
 #include "utils.h"
 
+namespace comproenv {
+
 void split(std::vector <std::string> &out, const std::string &str, char delim) {
     std::stringstream ss(str);
     std::string tmp;
@@ -14,3 +16,5 @@ void replace_all(std::string &str, const std::string_view old_value, const std::
         str.replace(str.begin() + pos, str.begin() + pos + std::size(old_value), new_value);
     }
 }
+
+}  // namespace comproenv

@@ -3,6 +3,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace comproenv {
+
 class Task {
  private:
     std::unordered_map <std::string, std::string> settings;
@@ -13,5 +15,7 @@ class Task {
     std::unordered_map <std::string, std::string> &get_settings();
     std::string get_name() const;
 };
+
+}  // namespace comproenv
 
 #endif  // INCLUDE_TASK_H

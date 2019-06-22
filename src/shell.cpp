@@ -8,6 +8,8 @@
 #include "shell.h"
 #include "utils.h"
 
+namespace comproenv {
+
 namespace fs = std::experimental::filesystem;
 
 Shell::Shell(const std::string_view config_file_path,
@@ -562,3 +564,5 @@ void Shell::configure_commands_global() {
 Shell::~Shell() {
     
 }
+
+}  // namespace comproenv
