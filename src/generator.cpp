@@ -6,6 +6,8 @@
 #include "task.h"
 #include "utils.h"
 
+namespace comproenv {
+
 namespace fs = std::experimental::filesystem;
 
 void Shell::configure_commands_generator() {
@@ -114,3 +116,5 @@ void Shell::configure_commands_generator() {
     add_alias(State::GLOBAL, "help", State::GENERATOR, "help");
     add_alias(State::GLOBAL, "help", State::GENERATOR, "?");
 }
+
+}  // namespace comproenv

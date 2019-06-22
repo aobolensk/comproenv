@@ -10,6 +10,8 @@
 #include <string_view>
 #include "libyaml/include/yaml.h"
 
+namespace comproenv {
+
 class YAMLParser {
  public:
     class Value;
@@ -75,5 +77,7 @@ class YAMLParser {
     ~YAMLParser();
     friend std::ostream &operator<<(std::ostream &os, YAMLParser::Value &val);
 };
+
+}  // namespace comproenv
 
 #endif  // INCLUDE_YAML_PARSER_H

@@ -3,6 +3,8 @@
 #include "shell.h"
 #include "environment.h"
 
+namespace comproenv {
+
 namespace fs = std::experimental::filesystem;
 
 Environment::Environment(const std::string &env_name) : name(env_name) {
@@ -170,3 +172,5 @@ void Shell::configure_commands_environment() {
     add_alias(State::GLOBAL, "help", State::ENVIRONMENT, "help");
     add_alias(State::GLOBAL, "help", State::ENVIRONMENT, "?");
 }
+
+}  // namespace comproenv
