@@ -52,7 +52,7 @@ void Shell::configure_commands_generator() {
                 "tests" + "/" + "generator";
             #endif  // _WIN32
         }
-        std::cout << "cmd: " << command << '\n';
+        DEBUG_LOG(command);
         replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             "tests" / "generator").string());
@@ -80,7 +80,7 @@ void Shell::configure_commands_generator() {
         std::string command = get_setting_by_name("editor");
         replace_all(command, "@name@", file_path.string());
         replace_all(command, "@lang@", lang);
-        std::cout << "cmd: " << command << '\n';
+        DEBUG_LOG(command);
         auto ampersand_pos = command.find("&");
         #ifdef _WIN32
         if (ampersand_pos != std::string::npos) {

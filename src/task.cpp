@@ -69,7 +69,7 @@ void Shell::configure_commands_task() {
                 envs[current_env].get_tasks()[current_task].get_name();
             #endif  // _WIN32
         }
-        std::cout << "cmd: " << command << '\n';
+        DEBUG_LOG(command);
         replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
@@ -299,7 +299,7 @@ void Shell::configure_commands_task() {
         std::string command = get_setting_by_name("editor");
         replace_all(command, "@name@", file_path.string());
         replace_all(command, "@lang@", "in");
-        std::cout << "cmd: " << command << '\n';
+        DEBUG_LOG(command);
         return system(command.c_str());
     });
 
@@ -533,7 +533,7 @@ void Shell::configure_commands_task() {
         }
         std::string command = get_setting_by_name("editor");
         replace_all(command, "@lang@", "out");
-        std::cout << "cmd: " << command << '\n';
+        DEBUG_LOG(command);
         return system(command.c_str());
     });
 
@@ -568,7 +568,7 @@ void Shell::configure_commands_task() {
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         replace_all(command, "@lang@", envs[current_env].get_tasks()[current_task].get_settings()["language"]);
-        std::cout << "cmd: " << command << '\n';
+        DEBUG_LOG(command);
         auto ampersand_pos = command.find("&");
         #ifdef _WIN32
         if (ampersand_pos != std::string::npos) {

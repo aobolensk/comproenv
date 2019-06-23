@@ -229,6 +229,7 @@ void Shell::create_paths() {
 void Shell::run() {
     std::string command;
     std::vector <std::string> args;
+    DEBUG_LOG("Debug log is enabled");
     while (true) {
         std::cout << ">";
         if (current_env != -1) {
@@ -247,11 +248,8 @@ void Shell::run() {
             std::cin.ignore(32767, '\n');
         }
         std::getline(std::cin, command);
+        DEBUG_LOG(command);
         split(args, command);
-        std::cout << "DBG: ";
-        for (auto &el : args)
-            std::cout << el << " ";
-        std::cout << std::endl;
         if (args.size() == 0)
             continue;
         if (commands[current_state].find(args[0]) == commands[current_state].end()) {
