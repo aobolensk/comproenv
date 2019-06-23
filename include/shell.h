@@ -8,6 +8,8 @@
 #include "environment.h"
 #include "yaml_parser.h"
 
+namespace comproenv {
+
 class Shell {
  private:
     enum State {
@@ -37,5 +39,7 @@ class Shell {
     void run();
     ~Shell();
 };
+
+}  // namespace comproenv
 
 #endif  // INCLUDE_SHELL_H

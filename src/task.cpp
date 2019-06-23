@@ -7,6 +7,8 @@
 #include "task.h"
 #include "utils.h"
 
+namespace comproenv {
+
 namespace fs = std::experimental::filesystem;
 
 Task::Task(const std::string &task_name) : name(task_name) {
@@ -601,3 +603,5 @@ void Shell::configure_commands_task() {
     add_alias(State::GLOBAL, "help", State::TASK, "help");
     add_alias(State::GLOBAL, "help", State::TASK, "?");
 }
+
+}  // namespace comproenv
