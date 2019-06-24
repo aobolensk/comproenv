@@ -178,12 +178,12 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             if (map.has_key("tasks")) {
                 std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
                 for (auto &task_data : tasks) {
-                    YAMLParser::Mapping map = task_data.get_mapping();
-                    Task task(map.get_value("name").get_string());
-                    deserialize_compilers(task.get_settings(), map);
-                    deserialize_runners(task.get_settings(), map);
-                    deserialize_templates(task.get_settings(), map);
-                    deserialize_rest_settings(task.get_settings(), map);
+                    YAMLParser::Mapping task_map = task_data.get_mapping();
+                    Task task(task_map.get_value("name").get_string());
+                    deserialize_compilers(task.get_settings(), task_map);
+                    deserialize_runners(task.get_settings(), task_map);
+                    deserialize_templates(task.get_settings(), task_map);
+                    deserialize_rest_settings(task.get_settings(), task_map);
                     env.add_task(task);
                 }
             }
@@ -275,7 +275,7 @@ void Shell::configure_commands_global() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i) {
             if (envs[i].get_name() == arg[1]) {
-                current_env = i;
+                current_env = (int)i;
                 current_state = State::ENVIRONMENT;
                 return 0;
             }
@@ -511,7 +511,6 @@ void Shell::configure_commands_global() {
         } else {
             exit(0);
         }
-        return 0;
     });
     add_alias(State::GLOBAL, "q", State::GLOBAL, "exit");
 

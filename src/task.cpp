@@ -358,7 +358,6 @@ void Shell::configure_commands_task() {
         fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / ("generator." + lang);
-        std::string buf;
         std::ofstream f(file_path, std::ios::out);
         if (!f.is_open()) {
             return -1;

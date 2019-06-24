@@ -39,7 +39,7 @@ void Shell::configure_commands_environment() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
             if (envs[current_env].get_tasks()[i].get_name() == arg[1]) {
-                current_task = i;
+                current_task = (int)i;
                 current_state = State::TASK;
                 return 0;
             }
