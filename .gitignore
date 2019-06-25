@@ -3,3 +3,5 @@ build
 env_*
 __pycache__
 *.pyc
+config.yaml
+environments.yaml

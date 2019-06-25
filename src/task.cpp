@@ -42,6 +42,7 @@ void Shell::configure_commands_task() {
         std::cout << "\033[35m" << "-- Compile task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
             "\033[0m\n";
         auto time_start = std::chrono::high_resolution_clock::now();
+        DEBUG_LOG(command);
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
         std::cout << "\033[35m" << "-- Time elapsed:" <<
@@ -60,13 +61,13 @@ void Shell::configure_commands_task() {
             command = get_setting_by_name("runner_" + current_runner);
         } catch (std::runtime_error &) {
             #ifdef _WIN32
-            command = "env_" + envs[current_env].get_name() + "\\" +
+            command = "\"env_" + envs[current_env].get_name() + "\\" +
                 "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() + ".exe";
+                envs[current_env].get_tasks()[current_task].get_name() + ".exe" + "\"";
             #else
-            command = std::string("./") + "env_" + envs[current_env].get_name() + "/" +
+            command = std::string("\"./") + "env_" + envs[current_env].get_name() + "/" +
                 "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" +
-                envs[current_env].get_tasks()[current_task].get_name();
+                envs[current_env].get_tasks()[current_task].get_name() + "\"";
             #endif  // _WIN32
         }
         DEBUG_LOG(command);
@@ -77,6 +78,7 @@ void Shell::configure_commands_task() {
         std::cout << "\033[35m" << "-- Run task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
             "\033[0m" << std::endl;
         auto time_start = std::chrono::high_resolution_clock::now();
+        DEBUG_LOG(command);
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
         std::cout << "\033[35m" << '\n' << "-- Time elapsed:" <<
@@ -139,15 +141,17 @@ void Shell::configure_commands_task() {
             std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
             std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
             try {
-                command = get_setting_by_name("runner_" + current_runner);
-                command += " < " + in_file.string() + " > " + temp_file_path;
+                command = get_setting_by_name("runner_" + current_runner) +
+                    " < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
             } catch (std::runtime_error &) {
                 #ifdef _WIN32
-                command = path + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
+                command = "\"" + path + "\\" +
+                envs[current_env].get_tasks()[current_task].get_name() +
+                    "\" < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
                 #else
-                command = std::string("./") + path + "/" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
+                command = std::string("\"./") + path + "/" +
+                envs[current_env].get_tasks()[current_task].get_name() +
+                    "\" < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
                 #endif  // _WIN32
             }
             replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
@@ -155,6 +159,7 @@ void Shell::configure_commands_task() {
                                 envs[current_env].get_tasks()[current_task].get_name()).string());
             replace_all(command, "@lang@", current_runner);
             auto time_start = std::chrono::high_resolution_clock::now();
+            DEBUG_LOG(command);
             error_code = system(command.c_str());
             auto time_finish = std::chrono::high_resolution_clock::now();
             f.open(temp_file_path);
@@ -483,6 +488,7 @@ void Shell::configure_commands_task() {
             "tests").string() + " " +
             // Link to page with tests
             "\"" + arg[1] + "\"";
+        DEBUG_LOG(command);
         return system(command.c_str());
     });
 
@@ -531,6 +537,7 @@ void Shell::configure_commands_task() {
             return -1;
         }
         std::string command = get_setting_by_name("editor");
+        replace_all(command, "@name@", file_path.string());
         replace_all(command, "@lang@", "out");
         DEBUG_LOG(command);
         return system(command.c_str());
@@ -574,18 +581,21 @@ void Shell::configure_commands_task() {
             command.erase(ampersand_pos);
             command += " > NUL";
             std::thread thr([&](const std::string command) -> void {
+                DEBUG_LOG(command);
                 int res = system(command.c_str());
                 (void)res;
             }, command);
             thr.detach();
             return 0;
         } else {
+            DEBUG_LOG(command);
             return system(command.c_str());
         }
         #else
         if (ampersand_pos != std::string::npos) {
             command.insert(std::max(0ul, ampersand_pos - 1), " &> /dev/null ");
         }
+        DEBUG_LOG(command);
         return system(command.c_str());
         #endif  // _WIN32
     });
