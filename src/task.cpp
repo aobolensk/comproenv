@@ -61,13 +61,13 @@ void Shell::configure_commands_task() {
             command = get_setting_by_name("runner_" + current_runner);
         } catch (std::runtime_error &) {
             #ifdef _WIN32
-            command = "env_" + envs[current_env].get_name() + "\\" +
+            command = "\"env_" + envs[current_env].get_name() + "\\" +
                 "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() + ".exe";
+                envs[current_env].get_tasks()[current_task].get_name() + ".exe" + "\"";
             #else
-            command = std::string("./") + "env_" + envs[current_env].get_name() + "/" +
+            command = std::string("\"./") + "env_" + envs[current_env].get_name() + "/" +
                 "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" +
-                envs[current_env].get_tasks()[current_task].get_name();
+                envs[current_env].get_tasks()[current_task].get_name() + "\"";
             #endif  // _WIN32
         }
         DEBUG_LOG(command);
@@ -141,15 +141,17 @@ void Shell::configure_commands_task() {
             std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
             std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
             try {
-                command = get_setting_by_name("runner_" + current_runner);
-                command += " < " + in_file.string() + " > " + temp_file_path;
+                command = get_setting_by_name("runner_" + current_runner) +
+                    " < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
             } catch (std::runtime_error &) {
                 #ifdef _WIN32
-                command = path + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
+                command = "\"" + path + "\\" +
+                envs[current_env].get_tasks()[current_task].get_name() +
+                    "\" < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
                 #else
-                command = std::string("./") + path + "/" +
-                envs[current_env].get_tasks()[current_task].get_name() + " < " + in_file.string() + " > " + temp_file_path;
+                command = std::string("\"./") + path + "/" +
+                envs[current_env].get_tasks()[current_task].get_name() +
+                    "\" < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
                 #endif  // _WIN32
             }
             replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 

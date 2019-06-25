@@ -44,13 +44,13 @@ void Shell::configure_commands_generator() {
             command = get_setting_by_name("runner_" + current_runner);
         } catch (std::runtime_error &) {
             #ifdef _WIN32
-            command = "env_" + envs[current_env].get_name() + "\\" +
-                "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
-                "tests" + "\\" + "generator" + ".exe";
+            command = "\"env_" + envs[current_env].get_name() + "\\"
+                "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\"
+                "tests\\generator.@lang@\"";
             #else
-            command = std::string("./") + "env_" + envs[current_env].get_name() + "/" +
-                "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" +
-                "tests" + "/" + "generator";
+            command = std::string("\"./") + "env_" + envs[current_env].get_name() + "/"
+                "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/"
+                "tests/generator\"";
             #endif  // _WIN32
         }
         DEBUG_LOG(command);
