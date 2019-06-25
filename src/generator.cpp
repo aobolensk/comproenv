@@ -25,6 +25,7 @@ void Shell::configure_commands_generator() {
             envs[current_env].get_tasks()[current_task].get_name() << ":" <<
             "\033[0m\n";
         auto time_start = std::chrono::high_resolution_clock::now();
+        DEBUG_LOG(command);
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
         std::cout << "\033[35m" << "-- Time elapsed:" <<
@@ -61,6 +62,7 @@ void Shell::configure_commands_generator() {
             envs[current_env].get_tasks()[current_task].get_name() << ":" <<
             "\033[0m\n";
         auto time_start = std::chrono::high_resolution_clock::now();
+        DEBUG_LOG(command);
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
         std::cout << "\033[35m\n" << "-- Time elapsed:" <<
@@ -87,18 +89,21 @@ void Shell::configure_commands_generator() {
             command.erase(ampersand_pos);
             command += " > NUL";
             std::thread thr([&](const std::string command) -> void {
+                DEBUG_LOG(command);
                 int res = system(command.c_str());
                 (void)res;
             }, command);
             thr.detach();
             return 0;
         } else {
+            DEBUG_LOG(command);
             return system(command.c_str());
         }
         #else
         if (ampersand_pos != std::string::npos) {
             command.insert(std::max(0ul, ampersand_pos - 1), " &> /dev/null ");
         }
+        DEBUG_LOG(command);
         return system(command.c_str());
         #endif  // _WIN32
     });

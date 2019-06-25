@@ -426,6 +426,7 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        DEBUG_LOG(get_setting_by_name("python_interpreter"));
         return system(get_setting_by_name("python_interpreter").c_str());
     });
     add_alias(State::GLOBAL, "py-shell", State::ENVIRONMENT, "py-shell");
