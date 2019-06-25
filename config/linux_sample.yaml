@@ -3,7 +3,7 @@ global:
   editor: vim "@name@.@lang@"
   autosave: on
   compilers:
-    c: gcc @name@.c -o @name@
-    cpp: g++ @name@.cpp -o @name@
+    c: gcc "@name@.c" -o "@name@"
+    cpp: g++ "@name@.cpp" -o "@name@"
   runners:
-    py: python @name@.py
+    py: python "@name@.py"
