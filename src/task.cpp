@@ -308,7 +308,26 @@ void Shell::configure_commands_task() {
         return system(command.c_str());
     });
 
-    add_command(State::TASK, "lt", "List of tests",
+    add_command(State::TASK, "lts", "List of tests (short: only names)",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::vector <fs::path> in_files;
+        fs::recursive_directory_iterator it_begin(fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
+            return fs::is_regular_file(path) && path.extension() == ".in";
+        });
+        std::sort(in_files.begin(), in_files.end());
+        std::cout << "\033[32m" << "List of tests for task " <<
+            envs[current_env].get_tasks()[current_task].get_name() << "\033[0m" << '\n';
+        for (auto &in_file : in_files) {
+            std::cout << "\033[33m" << "Test " << in_file << "\033[0m" << '\n';
+        }
+        return 0;
+    });
+
+    add_command(State::TASK, "lt", "List of tests (full: with input and output)",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
