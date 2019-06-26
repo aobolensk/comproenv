@@ -529,7 +529,7 @@ void Shell::configure_commands_global() {
         for (size_t i = 0; i < max_name_length + 1; ++i)
             std::cout << '-';
         std::cout << '|';
-        for (size_t i = 0; i < max_desc_length; ++i)
+        for (size_t i = 0; i < max_desc_length + 1; ++i)
             std::cout << '-';
         std::cout << '\n';
         for (auto &help_info : help[current_state]) {
@@ -550,7 +550,7 @@ void Shell::configure_commands_global() {
             for (size_t i = 0; i < max_name_length + 1; ++i)
                 std::cout << '-';
             std::cout << '|';
-            for (size_t i = 0; i < max_desc_length; ++i)
+            for (size_t i = 0; i < max_desc_length + 1; ++i)
                 std::cout << '-';
             std::cout << '\n';
         }
