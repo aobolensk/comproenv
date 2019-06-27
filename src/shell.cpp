@@ -526,7 +526,7 @@ void Shell::configure_commands_global() {
             global_settings.emplace("alias_" + std::to_string(current_state), "");
             it = global_settings.find("alias_" + std::to_string(current_state));
         }
-        if (it->second.back() != ' ')
+        if (std::size(it->second) && it->second.back() != ' ')
             it->second.push_back(' ');
         it->second += arg[1] + ' ' + arg[2] + ' ';
         if (global_settings["autosave"] == "on") {
