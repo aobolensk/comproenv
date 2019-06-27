@@ -28,7 +28,7 @@ std::vector <Task> &Environment::get_tasks() {
 }
 
 
-std::unordered_map <std::string, std::string> &Environment::get_settings() {
+std::map <std::string, std::string> &Environment::get_settings() {
     return settings;
 }
 

@@ -23,7 +23,7 @@ void Task::add_setting(const std::string &key, const std::string &value) {
     settings.emplace(key, value);
 }
 
-std::unordered_map <std::string, std::string> &Task::get_settings() {
+std::map <std::string, std::string> &Task::get_settings() {
     return settings;
 }
 

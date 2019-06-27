@@ -1,7 +1,7 @@
 global:
-  python_interpreter: python3
-  editor: vim "@name@.@lang@"
   autosave: on
+  editor: vim "@name@.@lang@"
+  python_interpreter: python3
   compilers:
     c: gcc "@name@.c" -o "@name@"
     cpp: g++ "@name@.cpp" -o "@name@"
