@@ -482,6 +482,7 @@ void Shell::configure_commands_global() {
         global_settings.clear();
         envs.clear();
         parse_settings(config, environments);
+        configure_user_defined_aliases();
         create_paths();
         current_env = -1;
         current_task = -1;
@@ -534,10 +535,10 @@ void Shell::configure_commands_global() {
         if (arg.size() != 3)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         add_alias(current_state, arg[1], current_state, arg[2]);
-        auto it = global_settings.find("alias_" + std::to_string(current_state));
+        auto it = global_settings.find("alias_" + state_names[current_state]);
         if (it == global_settings.end()) {
-            global_settings.emplace("alias_" + std::to_string(current_state), "");
-            it = global_settings.find("alias_" + std::to_string(current_state));
+            global_settings.emplace("alias_" + state_names[current_state], "");
+            it = global_settings.find("alias_" + state_names[current_state]);
         }
         if (std::size(it->second) && it->second.back() != ' ')
             it->second.push_back(' ');
@@ -556,7 +557,9 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        auto it = global_settings.find("alias_" + std::to_string(current_state));
+        auto it = global_settings.find("alias_" + state_names[current_state]);
+        if (it == global_settings.end())
+            throw std::runtime_error("Aliases in state " + state_names[current_state] + " are not found");
         std::vector <std::string> aliases;
         split(aliases, it->second);
         std::function <void(const std::string_view)> delete_aliases =
@@ -628,7 +631,7 @@ void Shell::configure_commands_global() {
 
 void Shell::configure_user_defined_aliases() {
     for (size_t state = 0; state < State::INVALID; ++state) {
-        auto it = global_settings.find("alias_" + std::to_string(state));
+        auto it = global_settings.find("alias_" + state_names[state]);
         if (it == global_settings.end())
             continue;
         std::vector <std::string> aliases;
