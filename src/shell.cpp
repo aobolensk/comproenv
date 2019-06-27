@@ -552,11 +552,7 @@ void Shell::configure_commands_global() {
             }
         };
         delete_aliases(arg[1]);
-        it->second = "";
-        for (auto &s : aliases) {
-            it->second += s + " ";
-        }
-        std::cout << std::size(it->second) << std::endl;
+        it->second = join(" ", aliases);
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
             return commands[State::GLOBAL][save_args.front()](save_args);
