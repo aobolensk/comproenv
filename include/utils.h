@@ -12,6 +12,9 @@ namespace comproenv {
     #define DEBUG_LOG(str)
 #endif  // COMPROENV_DEBUG
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
 void split(std::vector <std::string> &out, const std::string &str, char delim = ' ');
 void replace_all(std::string &str, const std::string_view old_value, const std::string_view new_value);
 

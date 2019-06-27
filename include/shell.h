@@ -7,14 +7,23 @@
 #include <functional>
 #include "environment.h"
 #include "yaml_parser.h"
+#include "utils.h"
 
 namespace comproenv {
 
 class Shell {
  private:
+    #define STATES /* List of states: */ \
+        X(GLOBAL) X(ENVIRONMENT) X(TASK) X(GENERATOR)
+    #define X(state) state,
     enum State {
-        GLOBAL, ENVIRONMENT, TASK, GENERATOR, INVALID
+        STATES
+        INVALID // Impossible state, created in order to get enum size
     };
+    #undef X
+    #define X(state) TOSTRING(state),
+    std::array <std::string, (size_t)State::INVALID> state_names = { STATES };
+    #undef X
     std::array <std::unordered_map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     std::array <std::map <std::string, std::set<std::string>>, (size_t)State::INVALID> help;
     int current_env, current_task, current_state;
