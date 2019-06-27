@@ -15,6 +15,15 @@ namespace comproenv {
 void split(std::vector <std::string> &out, const std::string &str, char delim = ' ');
 void replace_all(std::string &str, const std::string_view old_value, const std::string_view new_value);
 
+template <typename T>
+std::string join(std::string delim, T container) {
+    std::string result;
+    for (const auto &it : container) {
+        result += it + delim;
+    }
+    return result;
+}
+
 }  // namespace comproenv
 
 #endif  // INCLUDE_UTILS_H
