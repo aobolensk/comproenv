@@ -7,9 +7,24 @@
 namespace comproenv {
 
 #ifdef COMPROENV_DEBUG
-    #define DEBUG_LOG(str) std::cerr << "DBG: " << str << std::endl;
+    #define DEBUG_LOG(str) /* Simple debug log */ \
+        std::cerr << "DBG: " << str << std::endl;
+    #define DEBUG_CLOG(color, str) /* Color should be provided in \033[ format */ \
+        std::cerr << color << "DBG: " << str << "\033[0m" << std::endl;
+    #define DEBUG_FLLOG(str) /* Debug log with file:line mark */ \
+        std::cerr << "DBG at " __FILE__ ":" TOSTRING(__LINE__) ": " << str << std::endl;
+    #if defined(_MSC_VER)
+        #define FUNC __FUNCSIG__
+    #elif defined(__GNUG__) || defined(__clang__)
+        #define FUNC __PRETTY_FUNCTION__
+    #else
+        #define FUNC
+    #endif  // _MSC_VER
 #else
     #define DEBUG_LOG(str)
+    #define DEBUG_CLOG(str)
+    #define DEBUG_FLLOG(str)
+    #define FUNC(x)
 #endif  // COMPROENV_DEBUG
 
 #define STRINGIFY(x) #x
