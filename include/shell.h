@@ -29,6 +29,7 @@ class Shell {
     void configure_commands_environment();
     void configure_commands_task();
     void configure_commands_generator();
+    void configure_user_defined_aliases();
     void add_command(int state, std::string name,
                     std::string help_info,
                     std::function<int(std::vector <std::string> &)> func);

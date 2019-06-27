@@ -51,6 +51,7 @@ Shell::Shell(const std::string_view config_file_path,
         }
     }
     parse_settings(config, environments);
+    configure_user_defined_aliases();
     if (global_settings.find("python_interpreter") == global_settings.end()) {
         global_settings.emplace("python_interpreter", "python");
     }
@@ -525,13 +526,18 @@ void Shell::configure_commands_global() {
             global_settings.emplace("alias_" + std::to_string(current_state), "");
             it = global_settings.find("alias_" + std::to_string(current_state));
         }
-        it->second += arg[1] + " " + arg[2] + " ";
+        if (it->second.back() != ' ')
+            it->second.push_back(' ');
+        it->second += arg[1] + ' ' + arg[2] + ' ';
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
             return commands[State::GLOBAL][save_args.front()](save_args);
         }
         return 0;
     });
+    add_alias(State::GLOBAL, "alias", State::ENVIRONMENT, "alias");
+    add_alias(State::GLOBAL, "alias", State::TASK, "alias");
+    add_alias(State::GLOBAL, "alias", State::GENERATOR, "alias");
 
     add_command(State::GLOBAL, "delete-alias", "Delete aliases for commands",
     [this](std::vector <std::string> &arg) -> int {
@@ -559,6 +565,9 @@ void Shell::configure_commands_global() {
         }
         return 0;
     });
+    add_alias(State::GLOBAL, "delete-alias", State::ENVIRONMENT, "delete-alias");
+    add_alias(State::GLOBAL, "delete-alias", State::TASK, "delete-alias");
+    add_alias(State::GLOBAL, "delete-alias", State::GENERATOR, "delete-alias");
 
     add_command(State::GLOBAL, "help", "Help",
     [this](std::vector <std::string> &arg) -> int {
@@ -602,6 +611,19 @@ void Shell::configure_commands_global() {
         return 0;
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
+}
+
+void Shell::configure_user_defined_aliases() {
+    for (size_t state = 0; state < State::INVALID; ++state) {
+        auto it = global_settings.find("alias_" + std::to_string(state));
+        if (it == global_settings.end())
+            continue;
+        std::vector <std::string> aliases;
+        split(aliases, it->second);
+        for (size_t i = 0; i < aliases.size(); i += 2) {
+            add_alias(state, aliases[i], state, aliases[i + 1]);
+        }
+    }
 }
 
 Shell::~Shell() {
