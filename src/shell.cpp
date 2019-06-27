@@ -244,6 +244,7 @@ void Shell::create_paths() {
 }
 
 void Shell::run() {
+    DEBUG_LOG("Launching shell: " << FUNC);
     std::string command;
     std::vector <std::string> args;
     DEBUG_LOG("Debug log is enabled");

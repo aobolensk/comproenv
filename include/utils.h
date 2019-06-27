@@ -8,8 +8,16 @@ namespace comproenv {
 
 #ifdef COMPROENV_DEBUG
     #define DEBUG_LOG(str) std::cerr << "DBG: " << str << std::endl;
+    #if defined(_MSC_VER)
+        #define FUNC __FUNCSIG__
+    #elif defined(__GNUG__) || defined(__clang__)
+        #define FUNC __PRETTY_FUNCTION__
+    #else
+        #define FUNC
+    #endif  // _MSC_VER
 #else
     #define DEBUG_LOG(str)
+    #define FUNC(x)
 #endif  // COMPROENV_DEBUG
 
 #define STRINGIFY(x) #x
