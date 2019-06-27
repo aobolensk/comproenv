@@ -3,7 +3,7 @@
 #include <vector>
 #include <set>
 #include <array>
-#include <unordered_map>
+#include <map>
 #include <functional>
 #include "environment.h"
 #include "yaml_parser.h"
@@ -24,11 +24,11 @@ class Shell {
     #define X(state) TOSTRING(state),
     std::array <std::string, (size_t)State::INVALID> state_names = { STATES };
     #undef X
-    std::array <std::unordered_map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
+    std::array <std::map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     std::array <std::map <std::string, std::set<std::string>>, (size_t)State::INVALID> help;
     int current_env, current_task, current_state;
     std::vector <Environment> envs;
-    std::unordered_map <std::string, std::string> global_settings;
+    std::map <std::string, std::string> global_settings;
     std::string config_file;
     std::string environments_file;
     void parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &environments);

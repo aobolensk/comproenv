@@ -136,7 +136,7 @@ void Shell::configure_commands() {
 
 void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &environments) {
     DEBUG_LOG("Settings parsing");
-    auto deserialize_compilers = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+    auto deserialize_compilers = [&](std::map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
         if (map.has_key("compilers")) {
             std::map <std::string, YAMLParser::Value> compilers = map.get_value("compilers").get_mapping().get_map();
             for (auto &compiler_data : compilers) {
@@ -145,7 +145,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             }
         }
     };
-    auto deserialize_runners = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+    auto deserialize_runners = [&](std::map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
         if (map.has_key("runners")) {
             std::map <std::string, YAMLParser::Value> runners = map.get_value("runners").get_mapping().get_map();
             for (auto &runner_data : runners) {
@@ -154,7 +154,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             }
         }
     };
-    auto deserialize_templates = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+    auto deserialize_templates = [&](std::map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
         if (map.has_key("templates")) {
             std::map <std::string, YAMLParser::Value> templates = map.get_value("templates").get_mapping().get_map();
             for (auto &template_data : templates) {
@@ -163,7 +163,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             }
         }
     };
-    auto deserialize_aliases = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+    auto deserialize_aliases = [&](std::map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
         if (map.has_key("aliases")) {
             std::map <std::string, YAMLParser::Value> aliases = map.get_value("aliases").get_mapping().get_map();
             for (auto &alias_data : aliases) {
@@ -172,7 +172,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             }
         }
     };
-    auto deserialize_rest_settings = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+    auto deserialize_rest_settings = [&](std::map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
         for (auto &setting : map.get_map()) {
             if (setting.first != "name" &&
                 setting.first != "tasks" &&
@@ -364,7 +364,7 @@ void Shell::configure_commands_global() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         int indent = 0;
         std::ofstream f(config_file, std::ios::out);
-        auto serialize_settings = [&](std::unordered_map <std::string, std::string> &settings) {
+        auto serialize_settings = [&](std::map <std::string, std::string> &settings) {
             std::vector <std::pair <std::string, std::string>> compilers, runners, templates, aliases;
             auto export_instances = [&](const std::vector <std::pair <std::string, std::string>>& instances,
                                         const std::string instances_name) -> void {
