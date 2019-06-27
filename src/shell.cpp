@@ -159,13 +159,22 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             }
         }
     };
+    auto deserialize_aliases = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+        if (map.has_key("aliases")) {
+            std::map <std::string, YAMLParser::Value> aliases = map.get_value("aliases").get_mapping().get_map();
+            for (auto &alias_data : aliases) {
+                settings.emplace("alias_" + alias_data.first, alias_data.second.get_string());
+            }
+        }
+    };
     auto deserialize_rest_settings = [&](std::unordered_map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
         for (auto &setting : map.get_map()) {
             if (setting.first != "name" &&
                 setting.first != "tasks" &&
                 setting.first != "compilers" &&
                 setting.first != "runners" &&
-                setting.first != "templates") {
+                setting.first != "templates" &&
+                setting.first != "aliases") {
                 settings.emplace(setting.first, setting.second.get_string());
             }
         }
@@ -200,6 +209,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
         deserialize_compilers(global_settings, global_settings_map);
         deserialize_runners(global_settings, global_settings_map);
         deserialize_templates(global_settings, global_settings_map);
+        deserialize_aliases(global_settings, global_settings_map);
         deserialize_rest_settings(global_settings, global_settings_map);
     }
 }
@@ -349,7 +359,7 @@ void Shell::configure_commands_global() {
         int indent = 0;
         std::ofstream f(config_file, std::ios::out);
         auto serialize_settings = [&](std::unordered_map <std::string, std::string> &settings) {
-            std::vector <std::pair <std::string, std::string>> compilers, runners, templates;
+            std::vector <std::pair <std::string, std::string>> compilers, runners, templates, aliases;
             auto export_instances = [&](const std::vector <std::pair <std::string, std::string>>& instances,
                                         const std::string instances_name) -> void {
                 if (instances.size()) {
@@ -372,6 +382,8 @@ void Shell::configure_commands_global() {
                     runners.emplace_back(setting.first.substr(std::size("runner_") - 1), setting.second);
                 } else if (setting.first.compare(0, std::size("template_") - 1, "template_") == 0) {
                     templates.emplace_back(setting.first.substr(std::size("template_") - 1), setting.second);
+                } else if (setting.first.compare(0, std::size("alias_") - 1, "alias_") == 0) {
+                    aliases.emplace_back(setting.first.substr(std::size("alias_") - 1), setting.second);
                 } else {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
@@ -381,6 +393,7 @@ void Shell::configure_commands_global() {
             export_instances(compilers, "compilers");
             export_instances(runners, "runners");
             export_instances(templates, "templates");
+            export_instances(aliases, "aliases");
         };
         if (global_settings.size()) {
             f << "global:" << std::endl;
