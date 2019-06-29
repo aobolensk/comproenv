@@ -637,7 +637,7 @@ void Shell::configure_commands_global() {
 }
 
 void Shell::configure_user_defined_aliases() {
-    for (size_t state = 0; state < State::INVALID; ++state) {
+    for (int state = 0; state < State::INVALID; ++state) {
         auto it = global_settings.find("alias_" + state_names[state]);
         if (it == global_settings.end())
             continue;
