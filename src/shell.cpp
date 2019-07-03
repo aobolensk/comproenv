@@ -3,6 +3,12 @@
 #include <experimental/filesystem>
 #include <stdexcept>
 #include <csignal>
+#ifdef _WIN32
+#include <Windows.h>
+#undef min
+#undef max
+#pragma warning(disable: 4996)
+#endif  // _WIN32
 #include "environment.h"
 #include "yaml_parser.h"
 #include "shell.h"
@@ -643,7 +649,15 @@ void Shell::configure_commands_global() {
         std::cout << "Commit: " TOSTRING(COMPROENV_HASH) "\n";
         std::cout << "3rd party dependencies:\n";
         std::cout << "    libyaml: " TOSTRING(COMPROENV_LIBYAML_HASH) "\n";
-        return 0;
+		std::cout << "OS:";
+		#ifdef _WIN32
+		OSVERSIONINFOEX info;
+		ZeroMemory(&info, sizeof(OSVERSIONINFOEX));
+		info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+		GetVersionEx((LPOSVERSIONINFO)& info);
+		std::cout << " Microsoft Windows " << info.dwMajorVersion << "." << info.dwMinorVersion << "\n";
+		#endif  // _WIN32
+		return 0;
     });
 }
 
