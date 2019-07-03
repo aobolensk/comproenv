@@ -39,7 +39,9 @@ matrix:
       install:
         - export PATH=$MSBUILD_PATH:$PATH
       script:
-        - (echo about & echo.q) | python launch.py --f build run
+        - echo about > launch.txt
+        - echo q >> launch.txt
+        - python launch.py --f build run < launch.txt
     - os: osx
       language: cpp
       osx_image: xcode10.2

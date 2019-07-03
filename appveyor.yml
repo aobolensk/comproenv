@@ -1,4 +1,6 @@
 image: Visual Studio 2019
 
 build_script:
-  - cmd: (echo about & echo.q) | python launch.py --f build run
+  - cmd: echo about > launch.txt
+  - cmd: echo q >> launch.txt
+  - cmd: python launch.py --f build run < launch.txt
