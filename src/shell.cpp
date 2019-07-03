@@ -685,7 +685,7 @@ void Shell::configure_commands_global() {
         #ifdef __clang__
         std::cout << "clang++ " TOSTRING(__clang_major__) "." TOSTRING(__clang_minor__) "." TOSTRING(__clang_patchlevel__) "\n";
         #elif _MSC_FULL_VER
-        std::cout << "MSVC " _MSC_FULL_VER "\n";
+        std::cout << "MSVC " TOSTRING(_MSC_FULL_VER) "\n";
         #elif __GNUC__
         std::cout << "g++ " TOSTRING(__GNUC__) "." TOSTRING(__GNUC_MINOR__) "." TOSTRING(__GNUC_PATCHLEVEL__) "\n";
         #else
