@@ -657,13 +657,13 @@ void Shell::configure_commands_global() {
         printf("%d-%02d-%02d %02d:%02d:%02d\n",
                 1900 + ctm->tm_year, 1 + ctm->tm_mon, ctm->tm_mday,
                 ctm->tm_hour, ctm->tm_min, ctm->tm_sec);
-        std::cout << "OS:";
+        std::cout << "OS: ";
         #ifdef _WIN32
         OSVERSIONINFOEX info;
         ZeroMemory(&info, sizeof(OSVERSIONINFOEX));
         info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
         GetVersionEx((LPOSVERSIONINFO)& info);
-        std::cout << " Microsoft Windows " << info.dwMajorVersion << "." << info.dwMinorVersion << "\n";
+        std::cout << "Microsoft Windows " << info.dwMajorVersion << "." << info.dwMinorVersion << "\n";
         #elif __linux__
         std::ifstream ver("/proc/version");
         if (!ver.is_open()) {
@@ -671,15 +671,15 @@ void Shell::configure_commands_global() {
         } else {
             std::string buf;
             std::getline(ver, buf);
-            std::cout << " " << buf << "\n";
+            std::cout << buf << "\n";
         }
         ver.close();
         // TODO: specify Linux distributives
         #elif __APPLE__
-        std::cout << " macOS\n";
+        std::cout << "macOS\n";
         // TODO: print more information about macOS
         #else
-        std::cout << " unknown\n"
+        std::cout << "unknown\n"
         #endif  // _WIN32
         return 0;
     });
