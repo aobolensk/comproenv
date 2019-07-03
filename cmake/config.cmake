@@ -25,8 +25,3 @@ endif(MSVC)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCOMPROENV_DEBUG)
 endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
-
-# Get comproenv commit hash
-execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD OUTPUT_VARIABLE foo)
-string(STRIP ${foo} foo)
-add_definitions(-DCOMMIT_HASH=${foo})

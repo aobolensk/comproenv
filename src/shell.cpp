@@ -640,7 +640,9 @@ void Shell::configure_commands_global() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Repo: https://github.com/gooddoog/comproenv.git\n";
-        std::cout << "Commit: " TOSTRING(COMMIT_HASH) "\n";
+        std::cout << "Commit: " TOSTRING(COMPROENV_HASH) "\n";
+        std::cout << "3rd party dependencies:\n";
+        std::cout << "    libyaml: " TOSTRING(COMPROENV_LIBYAML_HASH) "\n";
         return 0;
     });
 }
