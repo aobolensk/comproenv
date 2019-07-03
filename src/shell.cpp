@@ -3,6 +3,7 @@
 #include <experimental/filesystem>
 #include <stdexcept>
 #include <csignal>
+#include <ctime>
 #ifdef _WIN32
 #include <Windows.h>
 #undef min
@@ -649,7 +650,13 @@ void Shell::configure_commands_global() {
         std::cout << "Commit: " TOSTRING(COMPROENV_HASH) "\n";
         std::cout << "3rd party dependencies:\n";
         std::cout << "    libyaml: " TOSTRING(COMPROENV_LIBYAML_HASH) "\n";
-        std::cout << "Build time: " TOSTRING(COMPROENV_BUILDTIME) "\n";
+        std::cout << "Build   time: " TOSTRING(COMPROENV_BUILDTIME) "\n";
+        std::cout << "Current time: ";
+        time_t now = time(0);
+        tm *ctm = localtime(&now);
+        printf("%d-%02d-%02d %02d:%02d:%02d\n",
+                1900 + ctm->tm_year, 1 + ctm->tm_mon, ctm->tm_mday,
+                ctm->tm_hour, ctm->tm_min, ctm->tm_sec);
         std::cout << "OS:";
         #ifdef _WIN32
         OSVERSIONINFOEX info;
