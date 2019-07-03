@@ -666,8 +666,10 @@ void Shell::configure_commands_global() {
             std::cout << " " << buf << "\n";
         }
         ver.close();
+        // TODO: specify Linux distributives
         #elif __APPLE__
         std::cout << " macOS\n";
+        // TODO: print more information about macOS
         #else
         std::cout << " unknown\n"
         #endif  // _WIN32
