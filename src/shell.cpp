@@ -680,7 +680,17 @@ void Shell::configure_commands_global() {
         // TODO: print more information about macOS
         #else
         std::cout << "unknown\n"
-        #endif  // _WIN32
+        #endif
+        std::cout << "Compiler: ";
+        #ifdef __clang__
+        std::cout << "clang++ " TOSTRING(__clang_major__) "." TOSTRING(__clang_minor__) "." TOSTRING(__clang_patchlevel__) "\n";
+        #elif _MSC_FULL_VER
+        std::cout << "MSVC " _MSC_FULL_VER "\n";
+        #elif __GNUC__
+        std::cout << "g++ " TOSTRING(__GNUC__) "." TOSTRING(__GNUC_MINOR__) "." TOSTRING(__GNUC_PATCHLEVEL__) "\n";
+        #else
+        std::cout << "unknown\n";
+        #endif
         return 0;
     });
 }
