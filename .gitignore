@@ -1,4 +1,5 @@
 build
+.vs
 .vscode
 env_*
 __pycache__

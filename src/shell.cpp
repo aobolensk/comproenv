@@ -3,6 +3,13 @@
 #include <experimental/filesystem>
 #include <stdexcept>
 #include <csignal>
+#include <ctime>
+#ifdef _WIN32
+#include <Windows.h>
+#undef min
+#undef max
+#pragma warning(disable: 4996)
+#endif  // _WIN32
 #include "environment.h"
 #include "yaml_parser.h"
 #include "shell.h"
@@ -634,6 +641,58 @@ void Shell::configure_commands_global() {
         return 0;
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
+
+    add_command(State::GLOBAL, "about", "Get information about comproenv executable and environment",
+    [](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::cout << "Repo: https://github.com/gooddoog/comproenv.git\n";
+        std::cout << "Commit: " TOSTRING(COMPROENV_HASH) "\n";
+        std::cout << "3rd party dependencies:\n";
+        std::cout << "    libyaml: " TOSTRING(COMPROENV_LIBYAML_HASH) "\n";
+        std::cout << "Build   time: " TOSTRING(COMPROENV_BUILDTIME) "\n";
+        std::cout << "Current time: ";
+        time_t now = time(0);
+        tm *ctm = localtime(&now);
+        printf("%d-%02d-%02d %02d:%02d:%02d\n",
+                1900 + ctm->tm_year, 1 + ctm->tm_mon, ctm->tm_mday,
+                ctm->tm_hour, ctm->tm_min, ctm->tm_sec);
+        std::cout << "OS: ";
+        #ifdef _WIN32
+        OSVERSIONINFOEX info;
+        ZeroMemory(&info, sizeof(OSVERSIONINFOEX));
+        info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+        GetVersionEx((LPOSVERSIONINFO)& info);
+        std::cout << "Microsoft Windows " << info.dwMajorVersion << "." << info.dwMinorVersion << "\n";
+        #elif __linux__
+        std::ifstream ver("/proc/version");
+        if (!ver.is_open()) {
+            std::cout << " /proc/version file is not found\n";
+        } else {
+            std::string buf;
+            std::getline(ver, buf);
+            std::cout << buf << "\n";
+        }
+        ver.close();
+        // TODO: specify Linux distributives
+        #elif __APPLE__
+        std::cout << "macOS\n";
+        // TODO: print more information about macOS
+        #else
+        std::cout << "unknown\n"
+        #endif
+        std::cout << "Compiler: ";
+        #ifdef __clang__
+        std::cout << "clang++ " TOSTRING(__clang_major__) "." TOSTRING(__clang_minor__) "." TOSTRING(__clang_patchlevel__) "\n";
+        #elif _MSC_FULL_VER
+        std::cout << "MSVC " TOSTRING(_MSC_FULL_VER) "\n";
+        #elif __GNUC__
+        std::cout << "g++ " TOSTRING(__GNUC__) "." TOSTRING(__GNUC_MINOR__) "." TOSTRING(__GNUC_PATCHLEVEL__) "\n";
+        #else
+        std::cout << "unknown\n";
+        #endif
+        return 0;
+    });
 }
 
 void Shell::configure_user_defined_aliases() {
