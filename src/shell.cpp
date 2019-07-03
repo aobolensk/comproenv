@@ -656,6 +656,20 @@ void Shell::configure_commands_global() {
         info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
         GetVersionEx((LPOSVERSIONINFO)& info);
         std::cout << " Microsoft Windows " << info.dwMajorVersion << "." << info.dwMinorVersion << "\n";
+        #elif __linux__
+        std::ifstream ver("/proc/version");
+        if (!ver.is_open()) {
+            std::cout << " /proc/version file is not found\n";
+        } else {
+            std::string buf;
+            std::getline(ver, buf);
+            std::cout << " " << buf << "\n";
+        }
+        ver.close();
+        #elif __APPLE__
+        std::cout << " macOS\n";
+        #else
+        std::cout << " unknown\n"
         #endif  // _WIN32
         return 0;
     });
