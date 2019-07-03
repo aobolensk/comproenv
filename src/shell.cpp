@@ -649,6 +649,7 @@ void Shell::configure_commands_global() {
         std::cout << "Commit: " TOSTRING(COMPROENV_HASH) "\n";
         std::cout << "3rd party dependencies:\n";
         std::cout << "    libyaml: " TOSTRING(COMPROENV_LIBYAML_HASH) "\n";
+        std::cout << "Build time: " TOSTRING(COMPROENV_BUILDTIME) "\n";
         std::cout << "OS:";
         #ifdef _WIN32
         OSVERSIONINFOEX info;

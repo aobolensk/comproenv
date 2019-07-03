@@ -13,6 +13,10 @@ execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD WORKING_DIRECTORY "${PR
 string(STRIP ${libyaml_hash} libyaml_hash)
 add_definitions(-DCOMPROENV_LIBYAML_HASH=${libyaml_hash})
 
+# Get build timestamp
+string(TIMESTAMP build_time "%Y-%m-%d %H:%M:%S")
+add_definitions(-DCOMPROENV_BUILDTIME=${build_time})
+
 add_library(comproenv-lib ${headers} ${sources})
 target_link_libraries(comproenv-lib yaml)
 set_target_properties(comproenv-lib PROPERTIES OUTPUT_NAME comproenv)
