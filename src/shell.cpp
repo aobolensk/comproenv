@@ -634,6 +634,15 @@ void Shell::configure_commands_global() {
         return 0;
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
+
+    add_command(State::GLOBAL, "about", "Get information about comproenv executable",
+    [](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::cout << "Repo: https://github.com/gooddoog/comproenv.git\n";
+        std::cout << "Commit: " TOSTRING(COMMIT_HASH) "\n";
+        return 0;
+    });
 }
 
 void Shell::configure_user_defined_aliases() {
