@@ -642,7 +642,7 @@ void Shell::configure_commands_global() {
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
 
-    add_command(State::GLOBAL, "about", "Get information about comproenv executable",
+    add_command(State::GLOBAL, "about", "Get information about comproenv executable and environment",
     [](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
