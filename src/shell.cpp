@@ -10,7 +10,7 @@
 #undef max
 #pragma warning(disable: 4996)
 #endif  // _WIN32
-#if defined(__linux__) or defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__)
 #include <sys/utsname.h>
 #endif
 #include "environment.h"
@@ -667,7 +667,7 @@ void Shell::configure_commands_global() {
         info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
         GetVersionEx((LPOSVERSIONINFO)& info);
         std::cout << "Microsoft Windows " << info.dwMajorVersion << "." << info.dwMinorVersion << "\n";
-        #elif defined(__linux__) or defined(__APPLE__)
+        #elif defined(__linux__) || defined(__APPLE__)
         utsname buf;
         if (uname(&buf)) {
             std::cout << "undefined *nix\n";
