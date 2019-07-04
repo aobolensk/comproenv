@@ -10,6 +10,9 @@
 #undef max
 #pragma warning(disable: 4996)
 #endif  // _WIN32
+#if defined(__linux__) || defined(__APPLE__)
+#include <sys/utsname.h>
+#endif
 #include "environment.h"
 #include "yaml_parser.h"
 #include "shell.h"
@@ -664,22 +667,15 @@ void Shell::configure_commands_global() {
         info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
         GetVersionEx((LPOSVERSIONINFO)& info);
         std::cout << "Microsoft Windows " << info.dwMajorVersion << "." << info.dwMinorVersion << "\n";
-        #elif __linux__
-        std::ifstream ver("/proc/version");
-        if (!ver.is_open()) {
-            std::cout << " /proc/version file is not found\n";
+        #elif defined(__linux__) || defined(__APPLE__)
+        utsname buf;
+        if (uname(&buf)) {
+            std::cout << "undefined *nix\n";
         } else {
-            std::string buf;
-            std::getline(ver, buf);
-            std::cout << buf << "\n";
+            std::cout << buf.sysname << ' ' << buf.nodename << ' ' << buf.release << ' ' << buf.version << ' ' << buf.machine << "\n";
         }
-        ver.close();
-        // TODO: specify Linux distributives
-        #elif __APPLE__
-        std::cout << "macOS\n";
-        // TODO: print more information about macOS
         #else
-        std::cout << "unknown\n"
+        std::cout << "unknown\n";
         #endif
         std::cout << "Compiler: ";
         #ifdef __clang__
