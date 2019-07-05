@@ -2,6 +2,7 @@
 Environment for competitive programming
 
 ## Requirements:
+- CMake 3.5+
 - Python 3.7+ (needed for website parser)  
   with modules:
   - bs4
