@@ -19,6 +19,10 @@ $ python launch.py --f build run --r config/linux_sample.yaml            # With 
 
 $ python launch.py --f build run --b \"-DCMAKE_BUILD_TYPE=Debug\"        # Debug build
 
+# Docker:
+$ docker build -t comproenv .
+$ docker run -v comproenv:/app -it comproenv
+
 # Alternative (without scripts):
 $ git submodule update --init --recursive
 $ mkdir build
