@@ -76,3 +76,14 @@ matrix:
         - pip3 install bs4 requests termcolor
       script:
         - python3 scripts/parser.py test
+    - os: linux
+      language: cpp
+      dist: xenial
+      name: Docker-g++
+      services:
+        - docker
+      script:
+        - echo about > launch.txt
+        - echo q >> launch.txt
+        - docker build -t comproenv .
+        - docker run -v comproenv:/app -it comproenv bash -c "cat launch.txt | python3 launch.py --f run"
