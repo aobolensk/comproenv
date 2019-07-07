@@ -1,7 +1,7 @@
-file(GLOB_RECURSE sources "*.cpp")
-
 include("${PROJECT_SOURCE_DIR}/cmake/config.cmake")
-add_executable(comproenv main.cpp)
+
+add_executable(comproenv comproenv.cpp)
+
 target_link_libraries(comproenv comproenv-lib)
 if (NOT MSVC)
     target_link_libraries(comproenv stdc++)
