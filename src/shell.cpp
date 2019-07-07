@@ -606,40 +606,17 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        std::cout << "Help:" << "\n";
-        size_t max_name_length = 0, max_desc_length = 0;
         for (auto &help_info : help[current_state]) {
-            for (const std::string &command : help_info.second)
-                max_name_length = std::max(max_name_length, command.size());
-            max_desc_length = std::max(max_desc_length, help_info.first.size());
-        }
-        for (size_t i = 0; i < max_name_length + 1; ++i)
-            std::cout << '-';
-        std::cout << '|';
-        for (size_t i = 0; i < max_desc_length + 1; ++i)
-            std::cout << '-';
-        std::cout << '\n';
-        for (auto &help_info : help[current_state]) {
-            // Line
             bool flag = false;
+            std::cout << "| ";
             for (const std::string &command : help_info.second) {
-                for (size_t i = 0; i < max_name_length - command.size(); ++i)
-                    std::cout << ' ';
-                std::cout << command << " |";
-                if (!flag) {
-                    std::cout << ' ' << help_info.first << "\n";
+                if (flag)
+                    std::cout << ", ";
+                else
                     flag = true;
-                } else {
-                    std::cout << "\n";
-                }
+                std::cout << command;
             }
-            // Separator
-            for (size_t i = 0; i < max_name_length + 1; ++i)
-                std::cout << '-';
-            std::cout << '|';
-            for (size_t i = 0; i < max_desc_length + 1; ++i)
-                std::cout << '-';
-            std::cout << '\n';
+            std::cout << " | " << help_info.first << " |\n";
         }
         return 0;
     });
