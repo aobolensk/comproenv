@@ -12,7 +12,7 @@
 namespace comproenv {
 
 class Shell {
- private:
+ public:
     #define STATES /* List of states: */ \
         X(GLOBAL) X(ENVIRONMENT) X(TASK) X(GENERATOR)
     #define X(state) state,
@@ -22,8 +22,9 @@ class Shell {
     };
     #undef X
     #define X(state) TOSTRING(state),
-    std::array <std::string, (size_t)State::INVALID> state_names = { STATES };
+    const std::array <std::string, (size_t)State::INVALID> state_names = { STATES };
     #undef X
+ private:
     std::array <std::map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     std::array <std::map <std::string, std::set<std::string>>, (size_t)State::INVALID> help;
     int current_env, current_task, current_state;
@@ -47,6 +48,7 @@ class Shell {
  public:
     Shell(const std::string_view config_file_path = "", const std::string_view environments_file_path = "");
     void run();
+    std::string get_help(State state);
     ~Shell();
 };
 

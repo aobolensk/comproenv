@@ -2,6 +2,7 @@
 Environment for competitive programming
 
 ## Requirements:
+- CMake 3.5+
 - Python 3.7+ (needed for website parser)  
   with modules:
   - bs4
@@ -17,6 +18,10 @@ $ python launch.py --f build run                                         # Defau
 $ python launch.py --f build run --r config/linux_sample.yaml            # With config file specification
 
 $ python launch.py --f build run --b \"-DCMAKE_BUILD_TYPE=Debug\"        # Debug build
+
+# Docker:
+$ docker build -t comproenv .
+$ docker run -v comproenv:/app -it comproenv
 
 # Alternative (without scripts):
 $ git submodule update --init --recursive

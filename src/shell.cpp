@@ -696,6 +696,23 @@ void Shell::configure_user_defined_aliases() {
     }
 }
 
+std::string Shell::get_help(Shell::State state) {
+    std::string result;
+    for (auto &help_info : help[state]) {
+        bool flag = false;
+       result += "| ";
+        for (const std::string &command : help_info.second) {
+            if (flag)
+               result += ", ";
+            else
+                flag = true;
+           result += command;
+        }
+       result += " | " + help_info.first + " |\n";
+    }
+    return result;
+}
+
 Shell::~Shell() {
     
 }
