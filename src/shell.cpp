@@ -41,8 +41,8 @@ Shell::Shell(const std::string_view config_file_path,
         std::cout << "Configuration file (" << config_file << ") does not exist. Creating new one." << std::endl;
     }
     if (environments_file == "")
-        environments_file = "config.yaml";
-    if (fs::exists(config_file)) {
+        environments_file = "environments.yaml";
+    if (fs::exists(environments_file)) {
         YAMLParser p1(environments_file);
         try {
             environments = p1.parse().get_mapping();
@@ -50,7 +50,7 @@ Shell::Shell(const std::string_view config_file_path,
             std::cout << "No environments found" << std::endl;
         }
     } else {
-        std::cout << "Environments file (" << config_file << ") does not exist. Creating new one." << std::endl;
+        std::cout << "Environments file (" << environments_file << ") does not exist. Creating new one." << std::endl;
     }
     parse_settings(config, environments);
     configure_user_defined_aliases();
