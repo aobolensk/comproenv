@@ -95,7 +95,7 @@ void Shell::configure_commands_task() {
         std::vector <fs::path> in_files;
         // Select tests
         if (arg.size() == 1) { // Run all tests
-            fs::recursive_directory_iterator it_begin(fs::current_path() / ("env_" + envs[current_env].get_name()) /
+            fs::recursive_directory_iterator it_begin(fs::path("env_" + envs[current_env].get_name()) /
                 ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
             std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
                 return fs::is_regular_file(path) && path.extension() == ".in";
@@ -103,7 +103,7 @@ void Shell::configure_commands_task() {
             std::sort(in_files.begin(), in_files.end());
         } else if (arg.size() > 1) { // Run specific tests
             for (unsigned i = 1; i < arg.size(); ++i) {
-                fs::path current_test = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+                fs::path current_test = fs::path("env_" + envs[current_env].get_name()) /
                     ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests" / (arg[i] + ".in");
                 if (fs::is_regular_file(current_test)) {
                     in_files.emplace_back(current_test);
@@ -142,19 +142,19 @@ void Shell::configure_commands_task() {
             std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
             try {
                 command = get_setting_by_name("runner_" + current_runner) +
-                    " < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
+                    " < " + in_file.string() + " > " + temp_file_path;
             } catch (std::runtime_error &) {
                 #ifdef _WIN32
-                command = "\"" + path + "\\" +
+                command = path + "\\" +
                 envs[current_env].get_tasks()[current_task].get_name() +
-                    "\" < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
+                    ".exe < " + in_file.string() + " > " + temp_file_path;
                 #else
-                command = std::string("\"./") + path + "/" +
+                command = std::string("./") + path + "/" +
                 envs[current_env].get_tasks()[current_task].get_name() +
-                    "\" < \"" + in_file.string() + "\" > \"" + temp_file_path + "\"";
+                    " < " + in_file.string() + " > " + temp_file_path;
                 #endif  // _WIN32
             }
-            replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+            replace_all(command, "@name@", (fs::path("env_" + envs[current_env].get_name()) / 
                                 ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                                 envs[current_env].get_tasks()[current_task].get_name()).string());
             replace_all(command, "@lang@", current_runner);
