@@ -524,6 +524,31 @@ void Shell::configure_commands_global() {
         return 0;
     });
 
+    add_command(State::GLOBAL, "sets", "Print settings",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() > 2)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::cout << "Global:\n";
+        for (const auto &it : global_settings) {
+            std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
+        }
+        if (current_env != -1) {
+            std::cout << "Environment:\n";
+            for (const auto &it : envs[current_env].get_settings()) {
+                std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
+            }
+        }
+        if (current_task != -1) {
+            std::cout << "Task:\n";
+            for (const auto &it : envs[current_task].get_tasks()[current_task].get_settings()) {
+                std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
+            }
+        }
+        return 0;
+    });
+    add_alias(State::GLOBAL, "sets", State::ENVIRONMENT, "sets");
+    add_alias(State::GLOBAL, "sets", State::TASK, "sets");
+
     add_command(State::GLOBAL, "q", "Exit from program",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
