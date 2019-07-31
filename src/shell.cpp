@@ -223,9 +223,8 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
 }
 
 void Shell::create_paths() {
-    fs::path path = fs::current_path();
     for (auto &env : envs) {
-        fs::path env_path = path / ("env_" + env.get_name());
+        fs::path env_path = fs::path("env_" + env.get_name());
         if (!fs::exists(env_path)) {
             fs::create_directory(env_path);
         }
@@ -311,7 +310,7 @@ void Shell::configure_commands_global() {
             if (envs[i].get_name() == arg[1])
                 throw std::runtime_error("Environment named " + arg[1] + " already exists");
         envs.push_back(arg[1]);
-        fs::path path = fs::current_path() / ("env_" + arg[1]);
+        fs::path path = fs::path("env_" + arg[1]);
         if (!fs::exists(path)) {
             fs::create_directory(path);
         }
@@ -329,7 +328,7 @@ void Shell::configure_commands_global() {
         for (size_t i = 0; i < envs.size(); ++i) {
             if (envs[i].get_name() == arg[1]) {
                 envs.erase(envs.begin() + i);
-                fs::path path = fs::current_path() / ("env_" + arg[1]);
+                fs::path path = fs::path("env_" + arg[1]);
                 if (global_settings["autosave"] == "on") {
                     std::vector <std::string> save_args = {"s"};
                     commands[State::GLOBAL][save_args.front()](save_args);

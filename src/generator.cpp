@@ -17,7 +17,7 @@ void Shell::configure_commands_generator() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
         std::string command = get_setting_by_name("compiler_" + current_compiler);
-        replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::path("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             "tests" / "generator").string());
         replace_all(command, "@lang@", current_compiler);
@@ -54,7 +54,7 @@ void Shell::configure_commands_generator() {
             #endif  // _WIN32
         }
         DEBUG_LOG(command);
-        replace_all(command, "@name@", (fs::current_path() / ("env_" + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::path("env_" + envs[current_env].get_name()) / 
                             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
                             "tests" / "generator").string());
         replace_all(command, "@lang@", current_runner);
@@ -75,7 +75,7 @@ void Shell::configure_commands_generator() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path file_path = fs::current_path() / ("env_" + envs[current_env].get_name()) /
+        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
             ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / "generator";
         std::string lang = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
