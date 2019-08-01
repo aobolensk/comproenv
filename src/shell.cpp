@@ -527,18 +527,20 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        std::cout << "Global:\n";
-        for (const auto &it : global_settings) {
-            std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
+        if (global_settings.size()) {
+            std::cout << "Settings in " << state_names[State::GLOBAL] << ":\n";
+            for (const auto &it : global_settings) {
+                std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
+            }
         }
-        if (current_env != -1) {
-            std::cout << "Environment:\n";
+        if (current_env != -1 && envs[current_env].get_settings().size()) {
+            std::cout << "Settings in " << state_names[State::ENVIRONMENT] << ":\n";
             for (const auto &it : envs[current_env].get_settings()) {
                 std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
             }
         }
-        if (current_task != -1) {
-            std::cout << "Task:\n";
+        if (current_task != -1 && envs[current_task].get_tasks()[current_task].get_settings().size()) {
+            std::cout << "Settings in " << state_names[State::TASK] << ":\n";
             for (const auto &it : envs[current_task].get_tasks()[current_task].get_settings()) {
                 std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
             }
