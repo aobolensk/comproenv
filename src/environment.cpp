@@ -90,7 +90,7 @@ void Shell::configure_commands_environment() {
                     std::cout << "Unable to open template file\n";
                 }
             } catch (std::runtime_error &) {
-                file_name = fs::path("templates") / lang;
+                file_name = (fs::path("templates") / lang).string();
                 DEBUG_LOG("Default template file: " + file_name);
                 if (fs::is_regular_file(file_name)) {
                     std::ifstream t(file_name);
