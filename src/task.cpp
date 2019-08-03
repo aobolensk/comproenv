@@ -204,6 +204,9 @@ void Shell::configure_commands_task() {
                 "\033[0m" << std::endl;
             std::cout << "\033[33m" << "-- End of test " << in_file << "\033[0m" << std::endl;
         }
+        if (std::size(in_files) && remove(temp_file_path.c_str())) {
+            std::cout << "Unable to delete temporary file\n";
+        }
         if (errors == 0) {
             std::cout << "\033[32;1m" << "-- Test command: All " << std::size(in_files) <<
                 " tests successfully passed!" << "\033[0m\n";
