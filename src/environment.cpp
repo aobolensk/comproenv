@@ -79,6 +79,7 @@ void Shell::configure_commands_environment() {
             std::string file_name;
             try {
                 file_name = get_setting_by_name("template_" + lang);
+                DEBUG_LOG("Template file: " + file_name);
                 std::ifstream t(file_name);
                 if (t.is_open()) {
                     std::string buf;
@@ -89,8 +90,22 @@ void Shell::configure_commands_environment() {
                     std::cout << "Unable to open template file\n";
                 }
             } catch (std::runtime_error &) {
-                std::cout << "Template for language " + lang + " is not found. "
-                                "Created empty file\n";
+                file_name = (fs::path("templates") / lang).string();
+                DEBUG_LOG("Default template file: " + file_name);
+                if (fs::is_regular_file(file_name)) {
+                    std::ifstream t(file_name);
+                    if (t.is_open()) {
+                        std::string buf;
+                        while (std::getline(t, buf))
+                            f << buf << '\n';
+                        t.close();
+                    } else {
+                        std::cout << "Unable to open default template file\n";
+                    }
+                } else {
+                    std::cout << "Template for language " + lang + " is not found. "
+                                    "Created empty file\n";
+                }
             }
             f.close();
         }
