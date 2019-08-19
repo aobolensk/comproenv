@@ -8,12 +8,14 @@
 | ce | Create environment |
 | alias | Define aliases for commands |
 | delete-alias | Delete aliases for commands |
-| exit, q, qq | Exit from program |
+| exit, q | Exit from program |
 | about | Get information about comproenv executable and environment |
-| ?, h, help | Help |
+| ?, help | Help |
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
 | le | List of environments |
+| sets | Print settings |
+| reload-envs | Reload all environments and tasks from comproenv directory |
 | re | Remove environment |
 | s | Save settings |
 | se | Set environment |
@@ -33,6 +35,8 @@
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
 | lt | List of tasks |
+| sets | Print settings |
+| reload-envs | Reload all environments and tasks from comproenv directory |
 | rt | Remove task |
 | st | Set task |
 | autosave | Toggle autosave |
@@ -63,6 +67,8 @@
 | lt | List of tests (full: with input and output) |
 | lts | List of tests (short: only names) |
 | parse | Parse page with tests |
+| sets | Print settings |
+| reload-envs | Reload all environments and tasks from comproenv directory |
 | rg | Remove generator |
 | ro | Remove output |
 | rt | Remove test |
@@ -84,5 +90,6 @@
 | ?, help | Help |
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
+| reload-envs | Reload all environments and tasks from comproenv directory |
 | rg | Run generator |
 | autosave | Toggle autosave |
