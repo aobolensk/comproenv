@@ -219,11 +219,24 @@ void Shell::configure_commands_task() {
 
     add_command(State::TASK, "ct", "Create test",
     [this](std::vector <std::string> &arg) -> int {
-        if (arg.size() != 2)
+        if (arg.size() > 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::string test_name;
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
-            "tests" / (arg[1] + ".in");
+            "tests";
+        if (arg.size() == 1) {
+            unsigned num = 1;
+            while (true) {
+                test_name = "test_" + std::to_string(num);
+                if (!fs::is_regular_file(file_path / (test_name + ".in")))
+                    break;
+                ++num;
+            }
+        } else {
+            test_name = arg[1];
+        }
+        file_path /= (test_name + ".in");
         std::string buf;
         std::cout << "Write test (send empty line at the end of text):\n";
         std::ofstream f(file_path);
@@ -241,14 +254,25 @@ void Shell::configure_commands_task() {
 
     add_command(State::TASK, "cte", "Create test with expected result",
     [this](std::vector <std::string> &arg) -> int {
-        if (arg.size() != 2)
+        if (arg.size() > 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path in_path = fs::path(env_prefix + envs[current_env].get_name()) /
+        std::string test_name;
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
-            "tests" / (arg[1] + ".in");
-        fs::path out_path = fs::path(env_prefix + envs[current_env].get_name()) /
-            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
-            "tests" / (arg[1] + ".out");
+            "tests";
+        if (arg.size() == 1) {
+            unsigned num = 1;
+            while (true) {
+                test_name = "test_" + std::to_string(num);
+                if (!fs::is_regular_file(file_path / (test_name + ".in")))
+                    break;
+                ++num;
+            }
+        } else {
+            test_name = arg[1];
+        }
+        fs::path in_path = file_path / (test_name + ".in");
+        fs::path out_path = file_path / (test_name + ".out");
         std::string buf;
         std::cout << "Write test (send empty line at the end of text):\n";
         std::ofstream f(in_path);
