@@ -33,6 +33,9 @@ def build():
     os.chdir("..")
     return 0
 
+def generate_docs():
+    return subprocess.call(os.path.join(".", "build", "bin", executable("generate_docs")) + " docs", shell=True)
+
 def run():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     if os.name == "posix":
@@ -61,6 +64,8 @@ def main():
     for arg in args.function:
         if arg == "build":
             ret_code = build()
+        elif arg == "docs":
+            ret_code = generate_docs()
         elif arg == "run":
             ret_code = run()
         else:

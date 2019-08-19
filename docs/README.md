@@ -13,11 +13,11 @@ Environment for competitive programming
 
 ```console
 # Via python script:
-$ python launch.py --f build run                                         # Default build
+$ python launch.py --f build docs run                                         # Default build
 
-$ python launch.py --f build run --r config/linux_sample.yaml            # With config file specification
+$ python launch.py --f build docs run --r config/linux_sample.yaml            # With config file specification
 
-$ python launch.py --f build run --b \"-DCMAKE_BUILD_TYPE=Debug\"        # Debug build
+$ python launch.py --f build docs run --b \"-DCMAKE_BUILD_TYPE=Debug\"        # Debug build
 
 # Docker:
 $ docker build -t comproenv .

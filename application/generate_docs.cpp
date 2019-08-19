@@ -21,6 +21,10 @@ int main(int argc, char *argv[]) {
     if (!commands.is_open()) {
         std::cerr << "File " << commands_path << " can not be opened" << std::endl;
     }
+    fclose(stdin);
+    fclose(stdout);
+    fclose(stderr);
+    commands << "#### Warning! This document is generated automatically by using 'generate_docs' executable\n\n";
     commands << "# Commands list";
     comproenv::Shell shell;
     for (int i = 0; i < comproenv::Shell::State::INVALID; ++i) {
