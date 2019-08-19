@@ -224,12 +224,12 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
 
 void Shell::create_paths() {
     for (auto &env : envs) {
-        fs::path env_path = fs::path("env_" + env.get_name());
+        fs::path env_path = fs::path(env_prefix + env.get_name());
         if (!fs::exists(env_path)) {
             fs::create_directory(env_path);
         }
         for (auto &task : env.get_tasks()) {
-            fs::path task_path = env_path / ("task_" + task.get_name());
+            fs::path task_path = env_path / (task_prefix + task.get_name());
             if (!fs::exists(task_path)) {
                 fs::create_directory(task_path);
             }
@@ -310,7 +310,7 @@ void Shell::configure_commands_global() {
             if (envs[i].get_name() == arg[1])
                 throw std::runtime_error("Environment named " + arg[1] + " already exists");
         envs.push_back(arg[1]);
-        fs::path path = fs::path("env_" + arg[1]);
+        fs::path path = fs::path(env_prefix + arg[1]);
         if (!fs::exists(path)) {
             fs::create_directory(path);
         }
@@ -328,7 +328,7 @@ void Shell::configure_commands_global() {
         for (size_t i = 0; i < envs.size(); ++i) {
             if (envs[i].get_name() == arg[1]) {
                 envs.erase(envs.begin() + i);
-                fs::path path = fs::path("env_" + arg[1]);
+                fs::path path = fs::path(env_prefix + arg[1]);
                 if (global_settings["autosave"] == "on") {
                     std::vector <std::string> save_args = {"s"};
                     commands[State::GLOBAL][save_args.front()](save_args);
@@ -500,6 +500,40 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "reload-settings", State::ENVIRONMENT, "reload-settings");
     add_alias(State::GLOBAL, "reload-settings", State::TASK, "reload-settings");
     add_alias(State::GLOBAL, "reload-settings", State::GENERATOR, "reload-settings");
+
+    add_command(State::GLOBAL, "reload-envs", "Reload all environments and tasks from comproenv directory",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        envs.clear();
+        for (auto &p : fs::directory_iterator(".")) {
+            std::string env_dir = p.path().filename().string();
+            if (env_dir.find(env_prefix) == 0) {
+                std::string env_name = env_dir.substr(env_prefix.size(), env_dir.size() - env_prefix.size());
+                envs.push_back(Environment(env_name));
+                for (auto &q : fs::directory_iterator(env_dir)) {
+                    std::string task_dir = q.path().filename().string();
+                    std::string task_name = task_dir.substr(task_prefix.size(), task_dir.size() - task_prefix.size());
+                    if (task_dir.find(task_prefix) == 0) {
+                        envs.back().get_tasks().push_back(Task(task_name));
+                        for (auto &r : fs::directory_iterator(fs::path(env_dir) / fs::path(task_dir))) {
+                            if (r.path().has_extension()) {
+                                std::string task_lang = r.path().extension().string().substr(1);
+                                if (task_lang != "in" && task_lang != "out" && task_lang != "exe") {
+                                    envs.back().get_tasks().back().add_setting("language", task_lang);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return 0;
+    });
+    add_alias(State::GLOBAL, "reload-envs", State::ENVIRONMENT, "reload-envs");
+    add_alias(State::GLOBAL, "reload-envs", State::TASK, "reload-envs");
+    add_alias(State::GLOBAL, "reload-envs", State::GENERATOR, "reload-envs");
 
     add_command(State::GLOBAL, "set", "Configure global settings",
     [this](std::vector <std::string> &arg) -> int {

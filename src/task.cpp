@@ -35,8 +35,8 @@ void Shell::configure_commands_task() {
         std::string command;
         std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["language"];
         command = get_setting_by_name("compiler_" + current_compiler);
-        replace_all(command, "@name@", (fs::path("env_" + envs[current_env].get_name()) / 
-                            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+                            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         replace_all(command, "@lang@", current_compiler);
         std::cout << "\033[35m" << "-- Compile task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
@@ -61,18 +61,18 @@ void Shell::configure_commands_task() {
             command = get_setting_by_name("runner_" + current_runner);
         } catch (std::runtime_error &) {
             #ifdef _WIN32
-            command = "\"env_" + envs[current_env].get_name() + "\\" +
-                "task_" + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
+            command = "\"" + env_prefix + envs[current_env].get_name() + "\\" +
+                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
                 envs[current_env].get_tasks()[current_task].get_name() + ".exe" + "\"";
             #else
-            command = std::string("\"./") + "env_" + envs[current_env].get_name() + "/" +
-                "task_" + envs[current_env].get_tasks()[current_task].get_name() + "/" +
+            command = std::string("\"./") + env_prefix + envs[current_env].get_name() + "/" +
+                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "/" +
                 envs[current_env].get_tasks()[current_task].get_name() + "\"";
             #endif  // _WIN32
         }
         DEBUG_LOG(command);
-        replace_all(command, "@name@", (fs::path("env_" + envs[current_env].get_name()) / 
-                            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+                            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         replace_all(command, "@lang@", current_runner);
         std::cout << "\033[35m" << "-- Run task " << envs[current_env].get_tasks()[current_task].get_name() << ":" <<
@@ -95,16 +95,16 @@ void Shell::configure_commands_task() {
         std::vector <fs::path> in_files;
         // Select tests
         if (arg.size() == 1) { // Run all tests
-            fs::recursive_directory_iterator it_begin(fs::path("env_" + envs[current_env].get_name()) /
-                ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+            fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
+                (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
             std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
                 return fs::is_regular_file(path) && path.extension() == ".in";
             });
             std::sort(in_files.begin(), in_files.end());
         } else if (arg.size() > 1) { // Run specific tests
             for (unsigned i = 1; i < arg.size(); ++i) {
-                fs::path current_test = fs::path("env_" + envs[current_env].get_name()) /
-                    ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests" / (arg[i] + ".in");
+                fs::path current_test = fs::path(env_prefix + envs[current_env].get_name()) /
+                    (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests" / (arg[i] + ".in");
                 if (fs::is_regular_file(current_test)) {
                     in_files.emplace_back(current_test);
                 } else {
@@ -118,12 +118,12 @@ void Shell::configure_commands_task() {
         for (auto &it : in_files)
             std::cout << it << '\n';
         #ifdef _WIN32
-        path = std::string("env_") + envs[current_env].get_name() + "\\" +
-            "task_" + envs[current_env].get_tasks()[current_task].get_name();
+        path = env_prefix + envs[current_env].get_name() + "\\" +
+            task_prefix + envs[current_env].get_tasks()[current_task].get_name();
         temp_file_path = path + "\\" + "temp.txt";
         #else
-        path = "env_" + envs[current_env].get_name() + "/" +
-            "task_" + envs[current_env].get_tasks()[current_task].get_name();
+        path = env_prefix + envs[current_env].get_name() + "/" +
+            task_prefix + envs[current_env].get_tasks()[current_task].get_name();
         temp_file_path = path + "/" + "temp.txt";
         #endif  // _WIN32
         int errors = 0, error_code = 0;
@@ -154,8 +154,8 @@ void Shell::configure_commands_task() {
                     " < " + in_file.string() + " > " + temp_file_path;
                 #endif  // _WIN32
             }
-            replace_all(command, "@name@", (fs::path("env_" + envs[current_env].get_name()) / 
-                                ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+                                (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                                 envs[current_env].get_tasks()[current_task].get_name()).string());
             replace_all(command, "@lang@", current_runner);
             auto time_start = std::chrono::high_resolution_clock::now();
@@ -221,8 +221,8 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".in");
         std::string buf;
         std::cout << "Write test (send empty line at the end of text):\n";
@@ -243,11 +243,11 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path in_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path in_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".in");
-        fs::path out_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path out_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".out");
         std::string buf;
         std::cout << "Write test (send empty line at the end of text):\n";
@@ -279,14 +279,14 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".in");
         if (fs::exists(file_path)) {
             fs::remove(file_path);
         }
-        file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".out");
         if (fs::exists(file_path)) {
             fs::remove(file_path);
@@ -298,8 +298,8 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / arg[1];
         if (fs::exists(file_path)) {
             return -1;
@@ -316,8 +316,8 @@ void Shell::configure_commands_task() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::vector <fs::path> in_files;
-        fs::recursive_directory_iterator it_begin(fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
         std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
             return fs::is_regular_file(path) && path.extension() == ".in";
         });
@@ -335,8 +335,8 @@ void Shell::configure_commands_task() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::vector <fs::path> in_files;
-        fs::recursive_directory_iterator it_begin(fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
         std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
             return fs::is_regular_file(path) && path.extension() == ".in";
         });
@@ -382,8 +382,8 @@ void Shell::configure_commands_task() {
         else
             lang = "cpp";
         envs[current_env].get_tasks()[current_task].get_settings()["generator"] = lang;
-        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / ("generator." + lang);
         std::ofstream f(file_path, std::ios::out);
         if (!f.is_open()) {
@@ -422,8 +422,8 @@ void Shell::configure_commands_task() {
             throw std::runtime_error("Generator doesn't exist");
         std::string lang = (*it).second;
         envs[current_env].get_tasks()[current_task].get_settings().erase(it);
-        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / ("generator." + lang);
         if (fs::exists(file_path)) {
             fs::remove(file_path);
@@ -505,8 +505,8 @@ void Shell::configure_commands_task() {
         std::string command = global_settings["python_interpreter"] +
             " scripts/parser.py" + " run " +
             // Path to tests directory
-            (fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+            (fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests").string() + " " +
             // Link to page with tests
             "\"" + arg[1] + "\"";
@@ -518,8 +518,8 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".out");
         std::string buf;
         std::ofstream f(file_path);
@@ -539,8 +539,8 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".out");
         if (fs::exists(file_path)) {
             fs::remove(file_path);
@@ -552,8 +552,8 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
-        fs::path file_path = fs::path("env_" + envs[current_env].get_name()) /
-            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / arg[1];
         if (fs::exists(file_path)) {
             return -1;
@@ -592,8 +592,8 @@ void Shell::configure_commands_task() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string command = get_setting_by_name("editor");
-        replace_all(command, "@name@", (fs::path("env_" + envs[current_env].get_name()) / 
-                            ("task_" + envs[current_env].get_tasks()[current_task].get_name()) /
+        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+                            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         replace_all(command, "@lang@", envs[current_env].get_tasks()[current_task].get_settings()["language"]);
         DEBUG_LOG(command);
