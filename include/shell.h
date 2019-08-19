@@ -11,6 +11,9 @@
 
 namespace comproenv {
 
+const static std::string env_prefix = "env_";
+const static std::string task_prefix = "task_";
+
 class Shell {
  public:
     #define STATES /* List of states: */ \

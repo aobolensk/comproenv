@@ -224,12 +224,12 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
 
 void Shell::create_paths() {
     for (auto &env : envs) {
-        fs::path env_path = fs::path("env_" + env.get_name());
+        fs::path env_path = fs::path(env_prefix + env.get_name());
         if (!fs::exists(env_path)) {
             fs::create_directory(env_path);
         }
         for (auto &task : env.get_tasks()) {
-            fs::path task_path = env_path / ("task_" + task.get_name());
+            fs::path task_path = env_path / (task_prefix + task.get_name());
             if (!fs::exists(task_path)) {
                 fs::create_directory(task_path);
             }
@@ -310,7 +310,7 @@ void Shell::configure_commands_global() {
             if (envs[i].get_name() == arg[1])
                 throw std::runtime_error("Environment named " + arg[1] + " already exists");
         envs.push_back(arg[1]);
-        fs::path path = fs::path("env_" + arg[1]);
+        fs::path path = fs::path(env_prefix + arg[1]);
         if (!fs::exists(path)) {
             fs::create_directory(path);
         }
@@ -328,7 +328,7 @@ void Shell::configure_commands_global() {
         for (size_t i = 0; i < envs.size(); ++i) {
             if (envs[i].get_name() == arg[1]) {
                 envs.erase(envs.begin() + i);
-                fs::path path = fs::path("env_" + arg[1]);
+                fs::path path = fs::path(env_prefix + arg[1]);
                 if (global_settings["autosave"] == "on") {
                     std::vector <std::string> save_args = {"s"};
                     commands[State::GLOBAL][save_args.front()](save_args);
@@ -507,8 +507,6 @@ void Shell::configure_commands_global() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         envs.clear();
         for (auto &p : fs::directory_iterator(".")) {
-            static const std::string env_prefix = "env_";
-            static const std::string task_prefix = "task_";
             std::string env_dir = p.path().filename().string();
             if (env_dir.find(env_prefix) == 0) {
                 std::string env_name = env_dir.substr(env_prefix.size(), env_dir.size() - env_prefix.size());
