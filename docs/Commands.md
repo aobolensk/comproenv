@@ -1,3 +1,5 @@
+#### Warning! This document is generated automatically by using 'generate_docs' executable
+
 # Commands list
 
 ### Scope: GLOBAL
