@@ -518,7 +518,7 @@ void Shell::configure_commands_global() {
                         envs.back().get_tasks().push_back(Task(task_name));
                         for (auto &r : fs::directory_iterator(fs::path(env_dir) / fs::path(task_dir))) {
                             if (r.path().has_extension()) {
-                                std::string task_lang = r.path().extension().string().substr(1, task_lang.size() - 1);
+                                std::string task_lang = r.path().extension().string().substr(1);
                                 if (task_lang != "in" && task_lang != "out" && task_lang != "exe") {
                                     envs.back().get_tasks().back().add_setting("language", task_lang);
                                     break;
