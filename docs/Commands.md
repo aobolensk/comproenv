@@ -21,6 +21,7 @@
 | re | Remove environment |
 | s | Save settings |
 | se | Set environment |
+| history | Show commands history |
 | autosave | Toggle autosave |
 
 
@@ -41,6 +42,7 @@
 | reload-envs | Reload all environments and tasks from comproenv directory |
 | rt | Remove task |
 | st | Set task |
+| history | Show commands history |
 | autosave | Toggle autosave |
 
 
@@ -76,6 +78,7 @@
 | rt | Remove test |
 | r | Run task |
 | sg | Set generator |
+| history | Show commands history |
 | t | Test task |
 | autosave | Toggle autosave |
 
@@ -94,4 +97,5 @@
 | py-shell | Launch Python shell |
 | reload-envs | Reload all environments and tasks from comproenv directory |
 | rg | Run generator |
+| history | Show commands history |
 | autosave | Toggle autosave |
