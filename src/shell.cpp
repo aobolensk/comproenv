@@ -174,6 +174,14 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             }
         }
     };
+    auto deserialize_commands_history = [&](std::map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+        if (map.has_key("commands_history")) {
+            std::vector <YAMLParser::Value> history = map.get_value("commands_history").get_sequence();
+            for (const auto &command : history) {
+                commands_history.push(command.get_string());
+            }
+        }
+    };
     auto deserialize_rest_settings = [&](std::map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
         for (auto &setting : map.get_map()) {
             if (setting.first != "name" &&
@@ -181,7 +189,8 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
                 setting.first != "compilers" &&
                 setting.first != "runners" &&
                 setting.first != "templates" &&
-                setting.first != "aliases") {
+                setting.first != "aliases" &&
+                setting.first != "commands_history") {
                 settings.emplace(setting.first, setting.second.get_string());
                 DEBUG_LOG(setting.first + ": " + setting.second.get_string());
             }
@@ -218,6 +227,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
         deserialize_runners(global_settings, global_settings_map);
         deserialize_templates(global_settings, global_settings_map);
         deserialize_aliases(global_settings, global_settings_map);
+        deserialize_commands_history(global_settings, global_settings_map);
         deserialize_rest_settings(global_settings, global_settings_map);
     }
 }
@@ -385,23 +395,42 @@ void Shell::configure_commands_global() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         int indent = 0;
         std::ofstream f(config_file, std::ios::out);
-        auto serialize_settings = [&](std::map <std::string, std::string> &settings) {
-            std::vector <std::pair <std::string, std::string>> compilers, runners, templates, aliases;
-            auto export_instances = [&](const std::vector <std::pair <std::string, std::string>>& instances,
-                                        const std::string instances_name) -> void {
-                if (instances.size()) {
+
+        auto serialize_mapping = [&](const std::vector <std::pair <std::string, std::string>> &instances,
+                                    const std::string instances_name) -> void {
+            if (instances.size()) {
+                for (int i = 0; i < indent; ++i)
+                    f << " ";
+                f << instances_name << ":" << std::endl;
+                indent += 2;
+                for (auto &instance : instances) {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
-                    f << instances_name << ":" << std::endl;
-                    indent += 2;
-                    for (auto &instance : instances) {
-                        for (int i = 0; i < indent; ++i)
-                            f << " ";
-                        f << instance.first << ": " << instance.second << std::endl;
-                    }
-                    indent -= 2;
+                    f << instance.first << ": " << instance.second << std::endl;
                 }
-            };
+                indent -= 2;
+            }
+        };
+
+        auto serialize_sequence = [&](const std::vector <std::string> &instances,
+                                    const std::string instances_name) -> void {
+            if (instances.size()) {
+                for (int i = 0; i < indent; ++i)
+                    f << " ";
+                f << instances_name << ":" << std::endl;
+                indent += 2;
+                for (auto &instance : instances) {
+                    for (int i = 0; i < indent; ++i)
+                        f << " ";
+                    f << "- " << instance << std::endl;
+                }
+                indent -= 2;
+            }
+        };
+
+        auto serialize_settings = [&](std::map <std::string, std::string> &settings) {
+            std::vector <std::pair <std::string, std::string>> compilers, runners, templates, aliases;
+
             for (auto &setting : settings) {
                 if (setting.first.compare(0, std::size("compiler_") - 1, "compiler_") == 0) {
                     compilers.emplace_back(setting.first.substr(std::size("compiler_") - 1), setting.second);
@@ -417,15 +446,16 @@ void Shell::configure_commands_global() {
                     f << setting.first << ": " << setting.second << std::endl;
                 }
             }
-            export_instances(compilers, "compilers");
-            export_instances(runners, "runners");
-            export_instances(templates, "templates");
-            export_instances(aliases, "aliases");
+            serialize_mapping(compilers, "compilers");
+            serialize_mapping(runners, "runners");
+            serialize_mapping(templates, "templates");
+            serialize_mapping(aliases, "aliases");
         };
         if (global_settings.size()) {
             f << "global:" << std::endl;
             indent += 2;
             serialize_settings(global_settings);
+            serialize_sequence(commands_history.get_all(), "commands_history");
             indent -= 2;
         }
         f.close();
