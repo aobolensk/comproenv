@@ -13,6 +13,7 @@ namespace comproenv {
 
 const static std::string env_prefix = "env_";
 const static std::string task_prefix = "task_";
+#define MAX_HISTORY_SIZE 8
 
 class Shell {
  public:
@@ -35,6 +36,16 @@ class Shell {
     std::map <std::string, std::string> global_settings;
     std::string config_file;
     std::string environments_file;
+    struct CommandsHistory {
+    private:
+        std::array <std::string, MAX_HISTORY_SIZE> buf;
+        int start, end;
+    public:
+        CommandsHistory();
+        ~CommandsHistory() = default;
+        void push(const std::string &com);
+        std::vector <std::string> get_all();
+    } commands_history;
     void parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &environments);
     void create_paths();
     void configure_commands();

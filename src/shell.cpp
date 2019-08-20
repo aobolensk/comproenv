@@ -244,6 +244,24 @@ void Shell::create_paths() {
     }
 }
 
+Shell::CommandsHistory::CommandsHistory() {
+    start = end = 0;
+}
+
+void Shell::CommandsHistory::push(const std::string &com) {
+    buf[end] = com;
+    if (start == (end + 1) % MAX_HISTORY_SIZE)
+        start = (start + 1) % MAX_HISTORY_SIZE;
+    end = (end + 1) % MAX_HISTORY_SIZE;
+}
+
+std::vector <std::string> Shell::CommandsHistory::get_all() {
+    std::vector <std::string> result;
+    for (int i = start; i != end; i = (i + 1) % MAX_HISTORY_SIZE)
+        result.push_back(buf[i]);
+    return result;
+}
+
 void Shell::run() {
     DEBUG_LOG("Launching shell: " << FUNC);
     std::string command;
@@ -282,6 +300,7 @@ void Shell::run() {
             } catch(std::runtime_error &re) {
                 std::cout << "Error: " << re.what() << '\n';
             }
+            commands_history.push(join(" ", args));
         }
         std::cout << std::flush;
     }
@@ -478,6 +497,21 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "autosave", State::ENVIRONMENT, "autosave");
     add_alias(State::GLOBAL, "autosave", State::TASK, "autosave");
     add_alias(State::GLOBAL, "autosave", State::GENERATOR, "autosave");
+
+    add_command(State::GLOBAL, "history", "Show commands history",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        auto history = commands_history.get_all();
+        std::cout << "Commands history:\n";
+        for (const auto &command : history) {
+            std::cout << command << '\n';
+        }
+        return 0;
+    });
+    add_alias(State::GLOBAL, "history", State::ENVIRONMENT, "history");
+    add_alias(State::GLOBAL, "history", State::TASK, "history");
+    add_alias(State::GLOBAL, "history", State::GENERATOR, "history");
 
     add_command(State::GLOBAL, "reload-settings", "Hot reload settings from config file ",
     [this](std::vector <std::string> &arg) -> int {
