@@ -36,8 +36,14 @@ void replace_all(std::string &str, const std::string_view old_value, const std::
 template <typename T>
 std::string join(std::string delim, T container) {
     std::string result;
+    bool first = true;
     for (const auto &it : container) {
-        result += it + delim;
+        if (!first) {
+            result += delim;
+        } else {
+            first = false;
+        }
+        result += it;
     }
     return result;
 }
