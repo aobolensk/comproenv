@@ -174,7 +174,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             }
         }
     };
-    auto deserialize_commands_history = [&](std::map <std::string, std::string> &settings, YAMLParser::Mapping &map) {
+    auto deserialize_commands_history = [&](YAMLParser::Mapping &map) {
         if (map.has_key("commands_history")) {
             std::vector <YAMLParser::Value> history = map.get_value("commands_history").get_sequence();
             for (const auto &command : history) {
@@ -227,7 +227,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
         deserialize_runners(global_settings, global_settings_map);
         deserialize_templates(global_settings, global_settings_map);
         deserialize_aliases(global_settings, global_settings_map);
-        deserialize_commands_history(global_settings, global_settings_map);
+        deserialize_commands_history(global_settings_map);
         deserialize_rest_settings(global_settings, global_settings_map);
     }
 }
