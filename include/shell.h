@@ -13,7 +13,7 @@ namespace comproenv {
 
 const static std::string env_prefix = "env_";
 const static std::string task_prefix = "task_";
-#define MAX_HISTORY_SIZE 8
+#define MAX_HISTORY_SIZE 32
 
 class Shell {
  public:
