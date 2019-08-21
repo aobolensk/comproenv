@@ -422,7 +422,7 @@ void Shell::configure_commands_global() {
                 for (auto &instance : instances) {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
-                    f << "- " << instance << std::endl;
+                    f << "- " << '\"' << instance << '\"' << std::endl;
                 }
                 indent -= 2;
             }
