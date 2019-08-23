@@ -1,4 +1,9 @@
-import os, subprocess, argparse, multiprocessing, signal
+import os
+import subprocess
+import argparse
+import multiprocessing
+import signal
+import shutil
 
 def executable(filename):
     if os.name == "nt":
@@ -12,16 +17,23 @@ def enumerate_args(args):
         return ''
     return ' '.join(args)
 
+def clean():
+    if os.path.exists("build"):
+        shutil.rmtree("build")
+    return 0
+
 def build():
     subprocess.call("git submodule update --init --recursive", shell=True)
     if not os.path.exists("build"):
         os.mkdir("build")
-    os.chdir("build")
-    ret_code = subprocess.call("cmake .. " +
-                enumerate_args(args.build_args), shell=True)
-    if ret_code != 0:
-        print("Failed build (cmake)")
-        return 1
+        os.chdir("build")
+        ret_code = subprocess.call("cmake .. " +
+                    enumerate_args(args.build_args), shell=True)
+        if ret_code != 0:
+            print("Failed build (cmake)")
+            return 1
+    else:
+        os.chdir("build")
     if os.name == "posix":
         ret_code = subprocess.call("cmake --build . --config Release -- -j" +
                 str(multiprocessing.cpu_count()), shell=True)
@@ -64,6 +76,8 @@ def main():
     for arg in args.function:
         if arg == "build":
             ret_code = build()
+        elif arg == "clean":
+            ret_code = clean()
         elif arg == "docs":
             ret_code = generate_docs()
         elif arg == "run":
