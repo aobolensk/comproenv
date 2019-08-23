@@ -5,9 +5,10 @@
 #include <array>
 #include <map>
 #include <functional>
-#include "environment.h"
-#include "yaml_parser.h"
 #include "utils.h"
+#include "environment.h"
+#include "task.h"
+#include "yaml_parser.h"
 
 namespace comproenv {
 

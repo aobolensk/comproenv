@@ -1,7 +1,6 @@
 #include <fstream>
 #include <vector>
 #include <experimental/filesystem>
-#include <stdexcept>
 #include <csignal>
 #include <ctime>
 #ifdef _WIN32
