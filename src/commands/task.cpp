@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <chrono>
+#include <thread>
 #include <experimental/filesystem>
 #include "shell.h"
 
