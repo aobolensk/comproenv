@@ -1,9 +1,10 @@
-import os
-import subprocess
 import argparse
 import multiprocessing
-import signal
+import os
 import shutil
+import signal
+import subprocess
+
 
 def executable(filename):
     if os.name == "nt":
