@@ -2,12 +2,13 @@
 Environment for competitive programming
 
 ## Requirements:
-- CMake 3.5+
-- Python 3.7+ (needed for website parser)  
+- [CMake](https://cmake.org/download/) 3.5+
+- [Python](https://www.python.org/downloads/) 3.7+ (needed for website parser)
   with modules:
   - bs4
   - requests
   - termcolor
+- [Optional] [rlwrap](https://github.com/hanslub42/rlwrap) - readline wrapper (Linux)
 
 ## Build and run:
 
