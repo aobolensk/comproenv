@@ -7,11 +7,19 @@ namespace comproenv {
 
 namespace fs = std::experimental::filesystem;
 
+#ifndef _WIN32
+static void sigint_handler(int sig_num) {}
+#endif  // _WIN32
+
 Shell::Shell(const std::string_view config_file_path,
              const std::string_view environments_file_path) :
              config_file(config_file_path),
              environments_file(environments_file_path) {
+    #ifndef _WIN32
+    signal(SIGINT, &sigint_handler);
+    #else
     signal(SIGINT, SIG_IGN);
+    #endif  // _WIN32
     #ifndef _WIN32
     signal(SIGTSTP, SIG_IGN);
     #endif  // _WIN32
