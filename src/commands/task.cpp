@@ -109,7 +109,10 @@ void Shell::configure_commands_task() {
             task_prefix + envs[current_env].get_tasks()[current_task].get_name();
         temp_file_path = path + "/" + "temp.txt";
         #endif  // _WIN32
-        int errors = 0, error_code = 0;
+        int errors = 0;
+        int runtime_errors = 0;
+        int mismatched_answers_errors = 0;
+        int error_code = 0;
         std::cout << "\033[32m" << "-- Test command" << "\033[0m" << '\n';
         for (auto &in_file : in_files) {
             std::cout << "\033[33m" << "-- Test " << in_file << "\033[0m" << '\n';
@@ -153,6 +156,7 @@ void Shell::configure_commands_task() {
             }
             if (error_code) {
                 std::cout << "\033[31m" << "-- Runtime error!" << "\033[0m" << std::endl;
+                ++runtime_errors;
                 ++errors;
             }
             std::string out_file = in_file.string();
@@ -178,8 +182,10 @@ void Shell::configure_commands_task() {
                 f.close();
                 if (res_in != res_out) {
                     std::cout << "\033[33;1m" << "-- Warning: Mismatch of result and expected!" << "\033[0m" << std::endl;
-                    if (!error_code)
+                    if (!error_code) {
+                        ++mismatched_answers_errors;
                         ++errors;
+                    }
                 }
             }
             std::cout << "\033[35m" << "-- Time elapsed:" <<
@@ -195,7 +201,26 @@ void Shell::configure_commands_task() {
                 " tests successfully passed!" << "\033[0m\n";
         } else {
             std::cout << "\033[31;1m" << "-- Test command: Warning! " << errors <<
-                "/" << std::size(in_files) << " tests failed!" << "\033[0m\n";
+                "/" << std::size(in_files) << " tests failed";
+            if (mismatched_answers_errors > 0 ||
+                runtime_errors > 0) {
+                std::cout << " (";
+                bool need_space = false;
+                if (mismatched_answers_errors > 0) {
+                    if (need_space)
+                        std::cout << ", ";
+                    std::cout << mismatched_answers_errors << " mismatched answers";
+                    need_space = true;
+                }
+                if (runtime_errors > 0) {
+                    if (need_space)
+                        std::cout << ", ";
+                    std::cout << runtime_errors << " runtime errors";
+                    need_space = true;
+                }
+                std::cout << ")";
+            }
+            std::cout << "!" << "\033[0m\n";
         }
         return errors;
     });
