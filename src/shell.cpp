@@ -326,7 +326,7 @@ std::string Shell::get_help(Shell::State state) {
     std::string result;
     for (auto &help_info : help[state]) {
         bool flag = false;
-       result += "| ";
+        result += "| ";
         for (const std::string &command : help_info.second) {
             if (flag)
                result += ", ";
@@ -334,7 +334,14 @@ std::string Shell::get_help(Shell::State state) {
                 flag = true;
            result += command;
         }
-       result += " | " + help_info.first + " |\n";
+        result += " | ";
+        for (size_t i = 0; i < help_info.first.size(); ++i) {
+            if (help_info.first[i] != '\n')
+                result.push_back(help_info.first[i]);
+            else
+                result.push_back(' ');
+        }
+        result += " |\n";
     }
     return result;
 }
