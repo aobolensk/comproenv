@@ -490,7 +490,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
 
     add_command(State::GLOBAL, "about", "Get information about comproenv executable\nand environment",
-    [](std::vector <std::string> &arg) -> int {
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Repo: https://github.com/gooddoog/comproenv.git\n";
@@ -531,6 +531,25 @@ void Shell::configure_commands_global() {
         #else
         std::cout << "unknown\n";
         #endif
+        std::cout << "Python: ";
+        std::string command = global_settings["python_interpreter"] + " --version 2>&1";
+        #ifdef _WIN32
+        std::unique_ptr<FILE, decltype(&_pclose)> stream(_popen(command.c_str(), "r"), _pclose);
+        #else
+        std::unique_ptr<FILE, decltype(&pclose)> stream(popen(command.c_str(), "r"), pclose);
+        #endif
+        char buffer[256];
+        std::string result;
+        while (fgets(buffer, 256, stream.get())) {
+            result += buffer;
+        }
+        std::vector <std::string> s_result;
+        split(s_result, result);
+        if ((s_result[0] == "Python")) {
+            std::cout << s_result[1] << '\n';
+        } else {
+            std::cout << "not found\n";
+        }
         return 0;
     });
 }
