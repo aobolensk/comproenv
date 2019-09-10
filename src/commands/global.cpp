@@ -270,7 +270,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "reload-settings", State::TASK, "reload-settings");
     add_alias(State::GLOBAL, "reload-settings", State::GENERATOR, "reload-settings");
 
-    add_command(State::GLOBAL, "reload-envs", "Reload all environments and tasks from comproenv directory",
+    add_command(State::GLOBAL, "reload-envs", "Reload all environments and tasks\nfrom comproenv directory",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
@@ -432,7 +432,16 @@ void Shell::configure_commands_global() {
         for (auto &help_info : help[current_state]) {
             for (const std::string &command : help_info.second)
                 max_name_length = std::max(max_name_length, command.size());
-            max_desc_length = std::max(max_desc_length, help_info.first.size());
+            size_t current_line_length = 0;
+            for (size_t i = 0; i < help_info.first.size(); ++i) {
+                if (help_info.first[i] == '\n') {
+                    max_desc_length = std::max(max_desc_length, current_line_length);
+                    current_line_length = 0;
+                } else {
+                    ++current_line_length;
+                }
+            }
+            max_desc_length = std::max(max_desc_length, current_line_length);
         }
         for (size_t i = 0; i < max_name_length + 1; ++i)
             std::cout << '-';
@@ -441,19 +450,33 @@ void Shell::configure_commands_global() {
             std::cout << '-';
         std::cout << '\n';
         for (auto &help_info : help[current_state]) {
-            // Line
-            bool flag = false;
-            for (const std::string &command : help_info.second) {
-                for (size_t i = 0; i < max_name_length - command.size(); ++i)
-                    std::cout << ' ';
-                std::cout << command << " |";
-                if (!flag) {
-                    std::cout << ' ' << help_info.first << "\n";
-                    flag = true;
+            // Help info
+            auto command = help_info.second.begin();
+            size_t description_index = 0;
+            while (description_index < help_info.first.size()) {
+                if (command != help_info.second.end()) {
+                    for (size_t i = 0; i < max_name_length - command->size(); ++i)
+                        std::cout << ' ';
+                    std::cout << *command << " | ";
+                    ++command;
                 } else {
-                    std::cout << "\n";
+                    for (size_t i = 0; i < max_name_length; ++i)
+                        std::cout << ' ';
+                    std::cout << *command << " | ";
+                }
+                bool endline_trigger = false;
+                while (description_index < help_info.first.size()) {
+                    if (help_info.first[description_index] == '\n') {
+                        endline_trigger = true;
+                    }
+                    std::cout << help_info.first[description_index];
+                    ++description_index;
+                    if (endline_trigger) {
+                        break;
+                    }
                 }
             }
+            std::cout << '\n';
             // Separator
             for (size_t i = 0; i < max_name_length + 1; ++i)
                 std::cout << '-';
@@ -466,7 +489,7 @@ void Shell::configure_commands_global() {
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
 
-    add_command(State::GLOBAL, "about", "Get information about comproenv executable and environment",
+    add_command(State::GLOBAL, "about", "Get information about comproenv executable\nand environment",
     [](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
