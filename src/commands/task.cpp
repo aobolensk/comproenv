@@ -529,7 +529,7 @@ void Shell::configure_commands_task() {
             std::sort(in_files.begin(), in_files.end());
             std::vector <std::string> test_names;
             for (const fs::path &path : in_files) {
-                std::string test_name = path.filename();
+                std::string test_name = path.filename().string();
                 test_names.push_back(std::string(test_name.begin(), test_name.end() - std::size(".in") + 1));
             }
             int index = 0;
