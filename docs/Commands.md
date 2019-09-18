@@ -52,6 +52,7 @@
 |---------|-------------|
 | cr | Compile & Run |
 | cat | Compile & Test |
+| catf | Compile & Test (stop testing after first failure) |
 | c | Compile task |
 | ctr | Compile, Test & Run |
 | set | Configure task settings |
