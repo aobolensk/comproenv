@@ -159,5 +159,53 @@ def test():
         print("Checking " + file_name)
         errors += assert_eq("99.666".split(), f.read().split())
 
+    link = base64.b64decode("aHR0cHM6Ly9hdGNvZGVyLmpwL2NvbnRlc3RzL2FiYzE0MS90YXNrcy9hYmMxNDFfYQ==").decode("utf-8")
+    print("Test: " + link)
+    parser.run(temp_dir, link)
+    file_name = "atcoder_sample_1.in"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("Sunny".split(), f.read().split())
+    file_name = "atcoder_sample_1.out"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("Cloudy".split(), f.read().split())
+    file_name = "atcoder_sample_2.in"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("Rainy".split(), f.read().split())
+    file_name = "atcoder_sample_2.out"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("Sunny".split(), f.read().split())
+
+    link = base64.b64decode("aHR0cHM6Ly9hdGNvZGVyLmpwL2NvbnRlc3RzL2FiYzE0MS90YXNrcy9hYmMxNDFfYw==").decode("utf-8")
+    print("Test: " + link)
+    parser.run(temp_dir, link)
+    file_name = "atcoder_sample_1.in"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("6 3 4\n3\n1\n3\n2".split(), f.read().split())
+    file_name = "atcoder_sample_1.out"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("No\nNo\nYes\nNo\nNo\nNo".split(), f.read().split())
+    file_name = "atcoder_sample_2.in"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("6 5 4\n3\n1\n3\n2".split(), f.read().split())
+    file_name = "atcoder_sample_2.out"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("Yes\nYes\nYes\nYes\nYes\nYes".split(), f.read().split())
+    file_name = "atcoder_sample_3.in"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("10 13 15\n3\n1\n4\n1\n5\n9\n2\n6\n5\n3\n5\n8\n9\n7\n9".split(), f.read().split())
+    file_name = "atcoder_sample_3.out"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("No\nNo\nNo\nNo\nYes\nNo\nNo\nNo\nYes\nNo".split(), f.read().split())
+
     shutil.rmtree(temp_dir)
     exit(errors)
