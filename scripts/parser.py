@@ -117,6 +117,26 @@ def run(path, link):
                     result = cells[1].get_text()
                     with open(os.path.join(path, "timus_sample_" + str(i)) + ".out", "w") as f:
                         f.write(result)
+    elif (link.startswith("http://atcoder.jp/") or
+        link.startswith("https://atcoder.jp/")):
+        page = requests.get(link).text
+        soup = BeautifulSoup(page, "html.parser")
+        english_span = soup.find("span", class_="lang-en")
+        divs = english_span.find_all("div", class_="part")
+        i = 0
+        for div in divs:
+            test_section = div.find("section")
+            if (test_section.find("h3").contents[0]).startswith("Sample Input"):
+                i += 1
+                result = test_section.find("pre").contents[0]
+                result = remove_empty_lines(result)
+                with open(os.path.join(path, "atcoder_sample_" + str(i)) + ".in", "w") as f:
+                    f.write(result)
+            elif (test_section.find("h3").contents[0]).startswith("Sample Output"):
+                result = test_section.find("pre").contents[0]
+                result = remove_empty_lines(result)
+                with open(os.path.join(path, "atcoder_sample_" + str(i)) + ".out", "w") as f:
+                    f.write(result)
     else:
         print("Couldn't parse contents of this page")
         exit(-1)
