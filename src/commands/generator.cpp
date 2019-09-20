@@ -126,6 +126,63 @@ void Shell::configure_commands_generator() {
     });
     add_alias(State::GENERATOR, "eg", State::GENERATOR, "edit");
 
+    add_command(State::GENERATOR, "lts", "List of tests (short: only names)",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::vector <fs::path> in_files;
+        fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
+            return fs::is_regular_file(path) && path.extension() == ".in";
+        });
+        std::sort(in_files.begin(), in_files.end());
+        std::cout << "\033[32m" << "List of tests for task " <<
+            envs[current_env].get_tasks()[current_task].get_name() << "\033[0m" << '\n';
+        for (auto &in_file : in_files) {
+            std::cout << "\033[33m" << "Test " << in_file << "\033[0m" << '\n';
+        }
+        return 0;
+    });
+
+    add_command(State::GENERATOR, "lt", "List of tests (full: with input and output)",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::vector <fs::path> in_files;
+        fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
+            return fs::is_regular_file(path) && path.extension() == ".in";
+        });
+        std::sort(in_files.begin(), in_files.end());
+        std::cout << "\033[32m" << "List of tests for task " <<
+            envs[current_env].get_tasks()[current_task].get_name() << "\033[0m" << '\n';
+        for (auto &in_file : in_files) {
+            std::cout << "\033[33m" << "Test " << in_file << "\033[0m" << '\n';
+            std::cout << "\033[35m" << "-- Input:" << "\033[0m" << '\n';
+            std::string buf;
+            std::ifstream f(in_file);
+            if (!f.is_open())
+                return -1;
+            while (std::getline(f, buf))
+                std::cout << buf << '\n';
+            f.close();
+            std::string out_file = in_file.string();
+            out_file.pop_back();
+            out_file.pop_back();
+            out_file += "out";
+            f.open(out_file);
+            if (f.is_open()) {
+                std::cout << "\033[35m" << "-- Output:" << "\033[0m" << '\n';
+                while (std::getline(f, buf))
+                    std::cout << buf << '\n';
+                f.close();
+            }
+        }
+        return 0;
+    });
+
     add_command(State::GENERATOR, "q", "Exit from generator",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
