@@ -47,15 +47,19 @@ void Shell::configure_commands_generator() {
         std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
         std::string command;
         #ifdef _WIN32
-        std::string directory = "\"" + env_prefix + envs[current_env].get_name() + "\\" +
+        std::string directory = env_prefix + envs[current_env].get_name() + "\\" +
                 task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "\\"
                 "tests";
         #else
-        std::string directory = std::string("\"./") + env_prefix + envs[current_env].get_name() + "/" +
+        std::string directory = env_prefix + envs[current_env].get_name() + "/" +
                 task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "/"
                 "tests";
         #endif  // _WIN32
-        chdir(directory.c_str());
+        DEBUG_LOG("current dir: " << fs::current_path().string());
+        DEBUG_LOG("go to: " << directory);
+        if (chdir(directory.c_str())) {
+            std::cout << "Failed to change directory\n";
+        }
         try {
             command = get_setting_by_name("runner_" + current_runner);
         } catch (std::runtime_error &) {
@@ -66,9 +70,7 @@ void Shell::configure_commands_generator() {
             #endif  // _WIN32
         }
         DEBUG_LOG(command);
-        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
-                            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
-                            "tests" / "generator").string());
+        replace_all(command, "@name@", "generator");
         replace_all(command, "@lang@", current_runner);
         std::cout << "\033[35m" << "-- Run generator for " <<
             envs[current_env].get_tasks()[current_task].get_name() << ":" <<
@@ -77,7 +79,9 @@ void Shell::configure_commands_generator() {
         DEBUG_LOG(command);
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
-        chdir("../../..");
+        if (chdir("../../..")) {
+            std::cout << "Failed to change directory\n";
+        }
         std::cout << "\033[35m\n" << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
             "\033[0m\n";
