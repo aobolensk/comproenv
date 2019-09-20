@@ -150,8 +150,11 @@ void Shell::configure_commands_task() {
             auto time_finish = std::chrono::high_resolution_clock::now();
             f.open(temp_file_path);
             if (f.is_open()) {
-                while (std::getline(f, buf))
+                int lines_count = 0;
+                while (lines_count++ < MAX_LINES_COUNT && std::getline(f, buf))
                     std::cout << buf << '\n';
+                if (lines_count == MAX_LINES_COUNT)
+                    std::cout << "...\n";
                 f.close();
             }
             if (error_code) {
