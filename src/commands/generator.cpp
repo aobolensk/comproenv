@@ -3,6 +3,12 @@
 #include <fstream>
 #include <thread>
 #include <experimental/filesystem>
+#ifdef _WIN32
+#include <direct.h>
+#define chdir _chdir
+#else
+#include <unistd.h>
+#endif  // _WIN32
 #include "shell.h"
 #include "utils.h"
 
@@ -40,23 +46,31 @@ void Shell::configure_commands_generator() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
         std::string command;
+        #ifdef _WIN32
+        std::string directory = env_prefix + envs[current_env].get_name() + "\\" +
+                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "\\"
+                "tests";
+        #else
+        std::string directory = env_prefix + envs[current_env].get_name() + "/" +
+                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "/"
+                "tests";
+        #endif  // _WIN32
+        DEBUG_LOG("current dir: " << fs::current_path().string());
+        DEBUG_LOG("go to: " << directory);
+        if (chdir(directory.c_str())) {
+            std::cout << "Failed to change directory\n";
+        }
         try {
             command = get_setting_by_name("runner_" + current_runner);
         } catch (std::runtime_error &) {
             #ifdef _WIN32
-            command = "\"" + env_prefix + envs[current_env].get_name() + "\\" +
-                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "\\"
-                "tests\\generator\"";
+            command = "generator.exe";
             #else
-            command = std::string("\"./") + env_prefix + envs[current_env].get_name() + "/" +
-                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "/"
-                "tests/generator\"";
+            command = "./generator";
             #endif  // _WIN32
         }
         DEBUG_LOG(command);
-        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
-                            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
-                            "tests" / "generator").string());
+        replace_all(command, "@name@", "generator");
         replace_all(command, "@lang@", current_runner);
         std::cout << "\033[35m" << "-- Run generator for " <<
             envs[current_env].get_tasks()[current_task].get_name() << ":" <<
@@ -65,6 +79,9 @@ void Shell::configure_commands_generator() {
         DEBUG_LOG(command);
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
+        if (chdir("../../..")) {
+            std::cout << "Failed to change directory\n";
+        }
         std::cout << "\033[35m\n" << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
             "\033[0m\n";
@@ -108,6 +125,63 @@ void Shell::configure_commands_generator() {
         #endif  // _WIN32
     });
     add_alias(State::GENERATOR, "eg", State::GENERATOR, "edit");
+
+    add_command(State::GENERATOR, "lts", "List of tests (short: only names)",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::vector <fs::path> in_files;
+        fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
+            return fs::is_regular_file(path) && path.extension() == ".in";
+        });
+        std::sort(in_files.begin(), in_files.end());
+        std::cout << "\033[32m" << "List of tests for task " <<
+            envs[current_env].get_tasks()[current_task].get_name() << "\033[0m" << '\n';
+        for (auto &in_file : in_files) {
+            std::cout << "\033[33m" << "Test " << in_file << "\033[0m" << '\n';
+        }
+        return 0;
+    });
+
+    add_command(State::GENERATOR, "lt", "List of tests (full: with input and output)",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+        std::vector <fs::path> in_files;
+        fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
+            return fs::is_regular_file(path) && path.extension() == ".in";
+        });
+        std::sort(in_files.begin(), in_files.end());
+        std::cout << "\033[32m" << "List of tests for task " <<
+            envs[current_env].get_tasks()[current_task].get_name() << "\033[0m" << '\n';
+        for (auto &in_file : in_files) {
+            std::cout << "\033[33m" << "Test " << in_file << "\033[0m" << '\n';
+            std::cout << "\033[35m" << "-- Input:" << "\033[0m" << '\n';
+            std::string buf;
+            std::ifstream f(in_file);
+            if (!f.is_open())
+                return -1;
+            while (std::getline(f, buf))
+                std::cout << buf << '\n';
+            f.close();
+            std::string out_file = in_file.string();
+            out_file.pop_back();
+            out_file.pop_back();
+            out_file += "out";
+            f.open(out_file);
+            if (f.is_open()) {
+                std::cout << "\033[35m" << "-- Output:" << "\033[0m" << '\n';
+                while (std::getline(f, buf))
+                    std::cout << buf << '\n';
+                f.close();
+            }
+        }
+        return 0;
+    });
 
     add_command(State::GENERATOR, "q", "Exit from generator",
     [this](std::vector <std::string> &arg) -> int {
