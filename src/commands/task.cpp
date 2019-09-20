@@ -500,14 +500,14 @@ void Shell::configure_commands_task() {
 
     add_command(State::TASK, "cat", "Compile & Test",
     [this](std::vector <std::string> &arg) -> int {
-        if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::vector <std::string> args;
         args.push_back("c");
         int res = commands[current_state]["c"](args);
         if (res == 0) {
             args.pop_back();
             args.push_back("t");
+            for (size_t i = 1; i < arg.size(); ++i)
+                args.push_back(arg[i]);
             res = commands[current_state]["t"](args);
         }
         return res;
