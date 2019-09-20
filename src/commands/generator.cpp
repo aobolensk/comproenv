@@ -46,7 +46,7 @@ void Shell::configure_commands_generator() {
             #ifdef _WIN32
             command = "\"" + env_prefix + envs[current_env].get_name() + "\\" +
                 task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "\\"
-                "tests\\generator.@lang@\"";
+                "tests\\generator\"";
             #else
             command = std::string("\"./") + env_prefix + envs[current_env].get_name() + "/" +
                 task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "/"
