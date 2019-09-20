@@ -67,6 +67,9 @@ def parse_args():
     parser.add_argument("--build_args", nargs='*', help="Args for build system")
     parser.add_argument("--run_args", nargs='*', help="Args for application")
     args = parser.parse_args()
+    if args.function is None:
+        parser.print_help()
+        exit(1)
     print(args)
     return args
 
