@@ -96,6 +96,8 @@
 | ?, help | Help |
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
+| lt | List of tests (full: with input and output) |
+| lts | List of tests (short: only names) |
 | reload-envs | Reload all environments and tasks from comproenv directory |
 | rg | Run generator |
 | history | Show commands history |
