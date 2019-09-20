@@ -3,6 +3,12 @@
 #include <fstream>
 #include <thread>
 #include <experimental/filesystem>
+#ifdef _WIN32
+#include <direct.h>
+#define chdir _chdir
+#else
+#include <unistd.h>
+#endif  // _WIN32
 #include "shell.h"
 #include "utils.h"
 
@@ -40,17 +46,23 @@ void Shell::configure_commands_generator() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
         std::string command;
+        #ifdef _WIN32
+        std::string directory = "\"" + env_prefix + envs[current_env].get_name() + "\\" +
+                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "\\"
+                "tests";
+        #else
+        std::string directory = std::string("\"./") + env_prefix + envs[current_env].get_name() + "/" +
+                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "/"
+                "tests";
+        #endif  // _WIN32
+        chdir(directory.c_str());
         try {
             command = get_setting_by_name("runner_" + current_runner);
         } catch (std::runtime_error &) {
             #ifdef _WIN32
-            command = "\"" + env_prefix + envs[current_env].get_name() + "\\" +
-                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "\\"
-                "tests\\generator\"";
+            command = "generator.exe";
             #else
-            command = std::string("\"./") + env_prefix + envs[current_env].get_name() + "/" +
-                task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "/"
-                "tests/generator\"";
+            command = "./generator";
             #endif  // _WIN32
         }
         DEBUG_LOG(command);
@@ -65,6 +77,7 @@ void Shell::configure_commands_generator() {
         DEBUG_LOG(command);
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
+        chdir("../../..");
         std::cout << "\033[35m\n" << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
             "\033[0m\n";
