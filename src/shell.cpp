@@ -249,10 +249,12 @@ void Shell::create_paths() {
 
 int Shell::store_cache(std::string_view cache_file) {
     if (!fs::is_regular_file(std::string(cache_file))) {
+        std::cout << "Can not find cache file" << std::endl;
         return -1;
     }
     std::ofstream f(std::string(cache_file), std::ios::trunc);
     if (!f.is_open()) {
+        std::cout << "Can not open cache file" << std::endl;
         return -2;
     }
     f << current_env << " " << current_task << " " << current_state << std::endl;
@@ -262,20 +264,25 @@ int Shell::store_cache(std::string_view cache_file) {
 
 int Shell::read_cache(std::string_view cache_file) {
     if (!fs::is_regular_file(std::string(cache_file))) {
+        std::cout << "Can not find cache file" << std::endl;
         return -1;
     }
     std::ifstream f(std::string(cache_file), std::ios::in);
     if (!f.is_open()) {
+        std::cout << "Can not open cache file" << std::endl;
         return -2;
     }
     f >> current_env >> current_task >> current_state;
     if ((current_env < -1 || current_env > (int)envs.size()) ||                                 // Wrong environment index
-        (current_task < -1 || current_task > (int)envs[current_env].get_tasks().size()) ||      // Wrong task index
+        (current_task < -1 ||
+        (current_env != -1 && current_task > (int)envs[current_env].get_tasks().size())) ||     // Wrong task index
         (current_state < 0 || current_state >= (int)State::INVALID)                             // Wrong state index
         ) {
         std::cout << "Unable to restore previous state from cache" << std::endl;
         current_env = current_task = -1;
         current_state = 0;
+    } else {
+        std::cout << "Successfully restored previous state from cache!" << std::endl;
     }
     f.close();
     return 0;
