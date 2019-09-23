@@ -358,6 +358,9 @@ void Shell::configure_commands_global() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Exiting..." << std::endl;
+        if (remove((fs::current_path() / cache_file_name).string().c_str())) {
+            std::cout << "Unable to remove cache file" << std::endl;
+        }
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
             int res = commands[State::GLOBAL][save_args.front()](save_args);

@@ -14,6 +14,7 @@ namespace comproenv {
 
 const static std::string env_prefix = "env_";
 const static std::string task_prefix = "task_";
+const static std::string cache_file_name = ".comproenv_cache";
 const static int MAX_HISTORY_SIZE = 32;
 const static int MAX_LINES_COUNT = 100;
 
@@ -56,6 +57,7 @@ class Shell {
     void configure_commands_task();
     void configure_commands_generator();
     void configure_user_defined_aliases();
+    int store_cache(std::string_view cache_file);
     void add_command(int state, std::string name,
                     std::string help_info,
                     std::function<int(std::vector <std::string> &)> func);

@@ -247,6 +247,19 @@ void Shell::create_paths() {
     }
 }
 
+int Shell::store_cache(std::string_view cache_file) {
+    if (!fs::is_regular_file(cache_file)) {
+        return -1;
+    }
+    std::ofstream f(std::string(cache_file), std::ios::trunc);
+    if (!f.is_open()) {
+        return -2;
+    }
+    f << current_env << " " << current_task << " " << current_state << std::endl;
+    f.close();
+    return 0;
+}
+
 Shell::CommandsHistory::CommandsHistory() {
     start = end = 0;
 }
@@ -270,6 +283,13 @@ void Shell::run() {
     std::string command;
     std::vector <std::string> args;
     DEBUG_LOG("Debug log is enabled");
+    std::ofstream f;
+    f.open((fs::current_path() / cache_file_name).string(), std::ios::out | std::ios::app);
+    if (!f.is_open()) {
+        std::cout << fs::current_path() / cache_file_name << std::endl;
+        std::cout << "Unable to open cache file" << std::endl;
+    }
+    store_cache((fs::current_path() / cache_file_name).string());
     while (true) {
         std::cout << ">";
         if (current_env != -1) {
