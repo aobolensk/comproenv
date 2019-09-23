@@ -39,6 +39,7 @@ class Shell {
     std::map <std::string, std::string> global_settings;
     std::string config_file;
     std::string environments_file;
+    std::string cache_file;
     struct CommandsHistory {
     private:
         std::array <std::string, MAX_HISTORY_SIZE> buf;

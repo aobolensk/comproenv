@@ -305,19 +305,19 @@ void Shell::run() {
     std::vector <std::string> args;
     DEBUG_LOG("Debug log is enabled");
     std::ofstream f;
-    std::string cache_file_path = (fs::current_path() / cache_file_name).string();
-    if (fs::exists(cache_file_path)) {
-        read_cache(cache_file_path);
+    cache_file = (fs::current_path() / cache_file_name).string();
+    if (fs::exists(cache_file)) {
+        read_cache(cache_file);
     } else {
-        f.open(cache_file_path, std::ios::out | std::ios::app);
+        f.open(cache_file, std::ios::out | std::ios::app);
         if (!f.is_open()) {
-            std::cout << cache_file_path << std::endl;
+            std::cout << cache_file << std::endl;
             std::cout << "Unable to open cache file" << std::endl;
         } else {
             f.close();
         }
     }
-    store_cache(cache_file_path);
+    store_cache(cache_file);
     while (true) {
         std::cout << ">";
         if (current_env != -1) {
