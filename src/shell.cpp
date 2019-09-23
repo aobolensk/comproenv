@@ -247,7 +247,7 @@ void Shell::create_paths() {
     }
 }
 
-int Shell::store_cache(std::string_view cache_file) {
+int Shell::store_cache() {
     if (!fs::is_regular_file(std::string(cache_file))) {
         std::cout << "Can not find cache file" << std::endl;
         return -1;
@@ -262,7 +262,7 @@ int Shell::store_cache(std::string_view cache_file) {
     return 0;
 }
 
-int Shell::read_cache(std::string_view cache_file) {
+int Shell::read_cache() {
     if (!fs::is_regular_file(std::string(cache_file))) {
         std::cout << "Can not find cache file" << std::endl;
         return -1;
@@ -314,7 +314,7 @@ void Shell::run() {
     std::ofstream f;
     cache_file = (fs::current_path() / cache_file_name).string();
     if (fs::exists(cache_file)) {
-        read_cache(cache_file);
+        read_cache();
     } else {
         f.open(cache_file, std::ios::out | std::ios::app);
         if (!f.is_open()) {
@@ -324,7 +324,7 @@ void Shell::run() {
             f.close();
         }
     }
-    store_cache(cache_file);
+    store_cache();
     while (true) {
         std::cout << ">";
         if (current_env != -1) {
