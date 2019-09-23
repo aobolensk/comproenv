@@ -30,6 +30,7 @@ void Shell::configure_commands_global() {
             if (envs[i].get_name() == arg[1]) {
                 current_env = (int)i;
                 current_state = State::ENVIRONMENT;
+                store_cache();
                 return 0;
             }
         }
@@ -264,6 +265,7 @@ void Shell::configure_commands_global() {
         current_env = -1;
         current_task = -1;
         current_state = State::GLOBAL;
+        store_cache();
         return 0;
     });
     add_alias(State::GLOBAL, "reload-settings", State::ENVIRONMENT, "reload-settings");
