@@ -248,7 +248,7 @@ void Shell::create_paths() {
 }
 
 int Shell::store_cache(std::string_view cache_file) {
-    if (!fs::is_regular_file(cache_file)) {
+    if (!fs::is_regular_file(std::string(cache_file))) {
         return -1;
     }
     std::ofstream f(std::string(cache_file), std::ios::trunc);
@@ -256,6 +256,27 @@ int Shell::store_cache(std::string_view cache_file) {
         return -2;
     }
     f << current_env << " " << current_task << " " << current_state << std::endl;
+    f.close();
+    return 0;
+}
+
+int Shell::read_cache(std::string_view cache_file) {
+    if (!fs::is_regular_file(std::string(cache_file))) {
+        return -1;
+    }
+    std::ifstream f(std::string(cache_file), std::ios::in);
+    if (!f.is_open()) {
+        return -2;
+    }
+    f >> current_env >> current_task >> current_state;
+    if ((current_env < -1 || current_env > (int)envs.size()) ||                                 // Wrong environment index
+        (current_task < -1 || current_task > (int)envs[current_env].get_tasks().size()) ||      // Wrong task index
+        (current_state < 0 || current_state >= (int)State::INVALID)                             // Wrong state index
+        ) {
+        std::cout << "Unable to restore previous state from cache" << std::endl;
+        current_env = current_task = -1;
+        current_state = 0;
+    }
     f.close();
     return 0;
 }
@@ -284,12 +305,19 @@ void Shell::run() {
     std::vector <std::string> args;
     DEBUG_LOG("Debug log is enabled");
     std::ofstream f;
-    f.open((fs::current_path() / cache_file_name).string(), std::ios::out | std::ios::app);
-    if (!f.is_open()) {
-        std::cout << fs::current_path() / cache_file_name << std::endl;
-        std::cout << "Unable to open cache file" << std::endl;
+    std::string cache_file_path = (fs::current_path() / cache_file_name).string();
+    if (fs::exists(cache_file_path)) {
+        read_cache(cache_file_path);
+    } else {
+        f.open(cache_file_path, std::ios::out | std::ios::app);
+        if (!f.is_open()) {
+            std::cout << cache_file_path << std::endl;
+            std::cout << "Unable to open cache file" << std::endl;
+        } else {
+            f.close();
+        }
     }
-    store_cache((fs::current_path() / cache_file_name).string());
+    store_cache(cache_file_path);
     while (true) {
         std::cout << ">";
         if (current_env != -1) {
