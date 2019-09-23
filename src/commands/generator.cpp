@@ -188,6 +188,7 @@ void Shell::configure_commands_generator() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_state = State::TASK;
+        store_cache();
         return 0;
     });
     add_alias(State::GENERATOR, "q", State::GENERATOR, "exit");

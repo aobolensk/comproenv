@@ -477,6 +477,7 @@ void Shell::configure_commands_task() {
         if (envs[current_env].get_tasks()[current_task].get_settings().find("generator") !=
             envs[current_env].get_tasks()[current_task].get_settings().end()) {
             current_state = State::GENERATOR;
+            store_cache();
         } else {
             throw std::runtime_error("Generator doesn't exist");
         }
@@ -703,6 +704,7 @@ void Shell::configure_commands_task() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_task = -1;
         current_state = State::ENVIRONMENT;
+        store_cache();
         return 0;
     });
     add_alias(State::TASK, "q", State::TASK, "exit");

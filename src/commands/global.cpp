@@ -30,6 +30,7 @@ void Shell::configure_commands_global() {
             if (envs[i].get_name() == arg[1]) {
                 current_env = (int)i;
                 current_state = State::ENVIRONMENT;
+                store_cache();
                 return 0;
             }
         }
@@ -264,6 +265,7 @@ void Shell::configure_commands_global() {
         current_env = -1;
         current_task = -1;
         current_state = State::GLOBAL;
+        store_cache();
         return 0;
     });
     add_alias(State::GLOBAL, "reload-settings", State::ENVIRONMENT, "reload-settings");
@@ -358,6 +360,9 @@ void Shell::configure_commands_global() {
         if (arg.size() != 1)
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         std::cout << "Exiting..." << std::endl;
+        if (remove((fs::current_path() / cache_file_name).string().c_str())) {
+            std::cout << "Unable to remove cache file" << std::endl;
+        }
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
             int res = commands[State::GLOBAL][save_args.front()](save_args);

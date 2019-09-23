@@ -15,6 +15,7 @@ void Shell::configure_commands_environment() {
             if (envs[current_env].get_tasks()[i].get_name() == arg[1]) {
                 current_task = (int)i;
                 current_state = State::TASK;
+                store_cache();
                 return 0;
             }
         }
@@ -154,6 +155,7 @@ void Shell::configure_commands_environment() {
             throw std::runtime_error("Incorrect arguments for command " + arg[0]);
         current_env = -1;
         current_state = State::GLOBAL;
+        store_cache();
         return 0;
     });
     add_alias(State::ENVIRONMENT, "q", State::ENVIRONMENT, "exit");
