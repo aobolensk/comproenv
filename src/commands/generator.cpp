@@ -20,7 +20,7 @@ void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "cg", "Compile generator",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
         std::string command = get_setting_by_name("compiler_" + current_compiler);
         replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
@@ -43,7 +43,7 @@ void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "rg", "Run generator",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
         std::string command;
         #ifdef _WIN32
@@ -91,7 +91,7 @@ void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "eg", "Edit generator",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / "generator";
@@ -129,7 +129,7 @@ void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "lts", "List of tests (short: only names)",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::vector <fs::path> in_files;
         fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
@@ -148,7 +148,7 @@ void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "lt", "List of tests (full: with input and output)",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::vector <fs::path> in_files;
         fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
@@ -186,7 +186,7 @@ void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "q", "Exit from generator",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         current_state = State::TASK;
         store_cache();
         return 0;

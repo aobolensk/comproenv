@@ -1,6 +1,7 @@
 #include <fstream>
 #include <experimental/filesystem>
 #include "shell.h"
+#include "utils.h"
 
 namespace comproenv {
 
@@ -10,7 +11,7 @@ void Shell::configure_commands_environment() {
     add_command(State::ENVIRONMENT, "st", "Set task",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
             if (envs[current_env].get_tasks()[i].get_name() == arg[1]) {
                 current_task = (int)i;
@@ -19,16 +20,16 @@ void Shell::configure_commands_environment() {
                 return 0;
             }
         }
-        throw std::runtime_error("Incorrect task name");
+        FAILURE("Incorrect task name");
     });
 
     add_command(State::ENVIRONMENT, "ct", "Create task",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() < 2 || arg.size() > 3)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i)
             if (envs[current_env].get_tasks()[i].get_name() == arg[1])
-                throw std::runtime_error("Task named " + arg[1] + " already exists");
+                FAILURE("Task named " + arg[1] + " already exists");
         envs[current_env].get_tasks().push_back(arg[1]);
         fs::path path = fs::path(env_prefix + envs[current_env].get_name()) / (task_prefix + arg[1]);
         std::string lang;
@@ -97,7 +98,7 @@ void Shell::configure_commands_environment() {
     add_command(State::ENVIRONMENT, "rt", "Remove task",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
             if (envs[current_env].get_tasks()[i].get_name() == arg[1]) {
                 envs[current_env].get_tasks().erase(envs[current_env].get_tasks().begin() + i);
@@ -111,13 +112,13 @@ void Shell::configure_commands_environment() {
                 }
             }
         }
-        throw std::runtime_error("Incorrect task name");
+        FAILURE("Incorrect task name");
     });
 
     add_command(State::ENVIRONMENT, "lt", "List of tasks",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::cout << "List of tasks in environment " << envs[current_env].get_name() << "\n";
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
             std::cout << "    |-> " << envs[current_env].get_tasks()[i].get_name() << ": " <<
@@ -140,7 +141,7 @@ void Shell::configure_commands_environment() {
             envs[current_env].get_settings().erase(arg[1]);
             envs[current_env].get_settings().emplace(arg[1], second_arg);
         } else {
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         }
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
@@ -152,7 +153,7 @@ void Shell::configure_commands_environment() {
     add_command(State::ENVIRONMENT, "q", "Exit from environment",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         current_env = -1;
         current_state = State::GLOBAL;
         store_cache();

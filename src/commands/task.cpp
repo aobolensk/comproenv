@@ -14,7 +14,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "c", "Compile task", 
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string command;
         std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["language"];
         command = get_setting_by_name("compiler_" + current_compiler);
@@ -37,7 +37,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "r", "Run task",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string command;
         std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
         try {
@@ -95,7 +95,7 @@ void Shell::configure_commands_task() {
                 }
             }
         } else {
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         }
         // Launch selected tests:
         for (auto &it : in_files)
@@ -231,7 +231,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "ct", "Create test",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string test_name;
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
@@ -266,7 +266,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "cte", "Create test with expected result",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string test_name;
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
@@ -313,7 +313,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "rt", "Remove test",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".in");
@@ -332,7 +332,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "et", "Edit test",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / arg[1];
@@ -349,7 +349,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "lts", "List of tests (short: only names)",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::vector <fs::path> in_files;
         fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
@@ -368,7 +368,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "lt", "List of tests (full: with input and output)",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::vector <fs::path> in_files;
         fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
@@ -406,10 +406,10 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "cg", "Create generator",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2 || arg.size() < 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         if (envs[current_env].get_tasks()[current_task].get_settings().find("generator") !=
             envs[current_env].get_tasks()[current_task].get_settings().end()) {
-            throw std::runtime_error("Generator is already created");
+            FAILURE("Generator is already created");
         }
         std::string lang;
         if (arg.size() == 2)
@@ -451,10 +451,10 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "rg", "Remove generator",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         auto it = envs[current_env].get_tasks()[current_task].get_settings().find("generator");
         if (it == envs[current_env].get_tasks()[current_task].get_settings().end())
-            throw std::runtime_error("Generator doesn't exist");
+            FAILURE("Generator doesn't exist");
         std::string lang = (*it).second;
         envs[current_env].get_tasks()[current_task].get_settings().erase(it);
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
@@ -473,13 +473,13 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "sg", "Set generator",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         if (envs[current_env].get_tasks()[current_task].get_settings().find("generator") !=
             envs[current_env].get_tasks()[current_task].get_settings().end()) {
             current_state = State::GENERATOR;
             store_cache();
         } else {
-            throw std::runtime_error("Generator doesn't exist");
+            FAILURE("Generator doesn't exist");
         }
         return 0;
     });
@@ -487,7 +487,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "cr", "Compile & Run",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::vector <std::string> args;
         args.push_back("c");
         int res = commands[current_state]["c"](args);
@@ -517,7 +517,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "catf", "Compile & Test (stop testing after first failure)",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::vector <std::string> args;
         args.push_back("c");
         int res = commands[current_state]["c"](args);
@@ -558,7 +558,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "ctr", "Compile, Test & Run",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::vector <std::string> args;
         args.push_back("c");
         int res = commands[current_state]["c"](args);
@@ -578,7 +578,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "parse", "Parse page with tests",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string command = global_settings["python_interpreter"] +
             " scripts/parser.py" + " run " +
             // Path to tests directory
@@ -594,7 +594,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "co", "Create output",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".out");
@@ -615,7 +615,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "ro", "Remove output",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / (arg[1] + ".out");
@@ -628,7 +628,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "eo", "Edit output",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         fs::path file_path = fs::path(env_prefix + envs[current_env].get_name()) /
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / arg[1];
@@ -655,7 +655,7 @@ void Shell::configure_commands_task() {
             envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
             envs[current_env].get_tasks()[current_task].get_settings().emplace(arg[1], second_arg);
         } else {
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         }
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
@@ -667,7 +667,7 @@ void Shell::configure_commands_task() {
     add_command(State::TASK, "edit", "Edit task in text editor",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string command = get_setting_by_name("editor");
         replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
@@ -701,7 +701,7 @@ void Shell::configure_commands_task() {
 
     add_command(State::TASK, "q", "Exit from task", [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            throw std::runtime_error("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         current_task = -1;
         current_state = State::ENVIRONMENT;
         store_cache();
