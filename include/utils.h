@@ -30,7 +30,7 @@ namespace comproenv {
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-#define ERROR(text) do {                                        \
+#define FAILURE(text) do {                                      \
         std::cout << "Error: " << std::string(text) << '\n';    \
         return -1;                                              \
     } while (false)

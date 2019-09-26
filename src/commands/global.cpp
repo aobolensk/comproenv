@@ -25,7 +25,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "se", "Set environment",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i) {
             if (envs[i].get_name() == arg[1]) {
                 current_env = (int)i;
@@ -34,16 +34,16 @@ void Shell::configure_commands_global() {
                 return 0;
             }
         }
-        ERROR("Incorrect environment name");
+        FAILURE("Incorrect environment name");
     });
 
     add_command(State::GLOBAL, "ce", "Create environment",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i)
             if (envs[i].get_name() == arg[1])
-                ERROR("Environment named " + arg[1] + " already exists");
+                FAILURE("Environment named " + arg[1] + " already exists");
         envs.push_back(arg[1]);
         fs::path path = fs::path(env_prefix + arg[1]);
         if (!fs::exists(path)) {
@@ -59,7 +59,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "re", "Remove environment",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i) {
             if (envs[i].get_name() == arg[1]) {
                 envs.erase(envs.begin() + i);
@@ -73,13 +73,13 @@ void Shell::configure_commands_global() {
                 }
             }
         }
-        ERROR("Incorrect environment name");
+        FAILURE("Incorrect environment name");
     });
 
     add_command(State::GLOBAL, "le", "List of environments",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::cout << "List of environments in global:\n";
         for (size_t i = 0; i < envs.size(); ++i) {
             std::cout << "|-> " << envs[i].get_name() << "\n";
@@ -98,7 +98,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "s", "Save settings",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         int indent = 0;
         std::ofstream f(config_file, std::ios::out);
 
@@ -202,7 +202,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "py-shell", "Launch Python shell",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         DEBUG_LOG(get_setting_by_name("python_interpreter"));
         return system(get_setting_by_name("python_interpreter").c_str());
     });
@@ -213,7 +213,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "autosave", "Toggle autosave",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::string state = "on";
         auto it = global_settings.find("autosave");
         if (it != global_settings.end()) {
@@ -225,7 +225,7 @@ void Shell::configure_commands_global() {
         else if (state == "off")
             state = "on";
         else
-            ERROR("Unknown state for autosave");
+            FAILURE("Unknown state for autosave");
         global_settings["autosave"] = state;
         std::cout << "Set autosave to " << state << std::endl;
         return 0;
@@ -237,7 +237,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "history", "Show commands history",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         auto history = commands_history.get_all();
         std::cout << "Commands history:\n";
         for (const auto &command : history) {
@@ -252,7 +252,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "reload-settings", "Hot reload settings from config file ",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         YAMLParser config_parser(config_file);
         YAMLParser::Mapping config = config_parser.parse().get_mapping();
         YAMLParser environments_parser(config_file);
@@ -275,7 +275,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "reload-envs", "Reload all environments and tasks\nfrom comproenv directory",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         envs.clear();
         for (auto &p : fs::directory_iterator(".")) {
             std::string env_dir = p.path().filename().string();
@@ -319,7 +319,7 @@ void Shell::configure_commands_global() {
             global_settings.erase(arg[1]);
             global_settings.emplace(arg[1], second_arg);
         } else {
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         }
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
@@ -331,7 +331,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "sets", "Print settings",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         if (global_settings.size()) {
             std::cout << "Settings in " << state_names[State::GLOBAL] << ":\n";
             for (const auto &it : global_settings) {
@@ -358,7 +358,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "q", "Exit from program",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::cout << "Exiting..." << std::endl;
         if (remove((fs::current_path() / cache_file_name).string().c_str())) {
             std::cout << "Unable to remove cache file" << std::endl;
@@ -376,7 +376,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "alias", "Define aliases for commands",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 3)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         add_alias(current_state, arg[1], current_state, arg[2]);
         auto it = global_settings.find("alias_" + state_names[current_state]);
         if (it == global_settings.end()) {
@@ -399,10 +399,10 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "delete-alias", "Delete aliases for commands",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         auto it = global_settings.find("alias_" + state_names[current_state]);
         if (it == global_settings.end())
-            ERROR("Aliases in state " + state_names[current_state] + " are not found");
+            FAILURE("Aliases in state " + state_names[current_state] + " are not found");
         std::vector <std::string> aliases;
         split(aliases, it->second);
         std::function <void(const std::string_view)> delete_aliases =
@@ -431,7 +431,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "help", "Help",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::cout << "Help:" << "\n";
         size_t max_name_length = 0, max_desc_length = 0;
         for (auto &help_info : help[current_state]) {
@@ -497,7 +497,7 @@ void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "about", "Get information about comproenv executable\nand environment",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
-            ERROR("Incorrect arguments for command " + arg[0]);
+            FAILURE("Incorrect arguments for command " + arg[0]);
         std::cout << "Repo: https://github.com/gooddoog/comproenv.git\n";
         std::cout << "Commit: " TOSTRING(COMPROENV_HASH) "\n";
         std::cout << "3rd party dependencies:\n";
