@@ -22,7 +22,10 @@ void Shell::configure_commands_generator() {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
         std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
-        std::string command = get_setting_by_name("compiler_" + current_compiler);
+        if (!get_setting_by_name("compiler_" + current_compiler).has_value()) {
+            FAILURE("There's no compiler for language " + current_compiler);
+        }
+        std::string command = get_setting_by_name("compiler_" + current_compiler).value();
         replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             "tests" / "generator").string());
@@ -60,15 +63,14 @@ void Shell::configure_commands_generator() {
         if (chdir(directory.c_str())) {
             std::cout << "Failed to change directory\n";
         }
-        try {
-            command = get_setting_by_name("runner_" + current_runner);
-        } catch (std::runtime_error &) {
+        command = get_setting_by_name("runner_" + current_runner).value_or(
             #ifdef _WIN32
-            command = "generator.exe";
+            "generator.exe"
             #else
-            command = "./generator";
+            "./generator"
             #endif  // _WIN32
-        }
+        );
+
         DEBUG_LOG(command);
         replace_all(command, "@name@", "generator");
         replace_all(command, "@lang@", current_runner);
@@ -96,7 +98,10 @@ void Shell::configure_commands_generator() {
             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
             "tests" / "generator";
         std::string lang = envs[current_env].get_tasks()[current_task].get_settings()["generator"];
-        std::string command = get_setting_by_name("editor");
+        if (!get_setting_by_name("editor").has_value()) {
+            FAILURE("There's no editor in config file");
+        }
+        std::string command = get_setting_by_name("editor").value();
         replace_all(command, "@name@", file_path.string());
         replace_all(command, "@lang@", lang);
         DEBUG_LOG(command);

@@ -203,8 +203,11 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
-        DEBUG_LOG(get_setting_by_name("python_interpreter"));
-        return system(get_setting_by_name("python_interpreter").c_str());
+        if (!get_setting_by_name("python_interpreter").has_value()) {
+            FAILURE("Python interpreter is not found!");
+        }
+        DEBUG_LOG(get_setting_by_name("python_interpreter").value());
+        return system(get_setting_by_name("python_interpreter").value().c_str());
     });
     add_alias(State::GLOBAL, "py-shell", State::ENVIRONMENT, "py-shell");
     add_alias(State::GLOBAL, "py-shell", State::TASK, "py-shell");

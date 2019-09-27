@@ -17,7 +17,10 @@ void Shell::configure_commands_task() {
             FAILURE("Incorrect arguments for command " + arg[0]);
         std::string command;
         std::string current_compiler = envs[current_env].get_tasks()[current_task].get_settings()["language"];
-        command = get_setting_by_name("compiler_" + current_compiler);
+        if (!get_setting_by_name("compiler_" + current_compiler).has_value()) {
+            FAILURE("There's no compiler for language " + current_compiler);
+        }
+        command = get_setting_by_name("compiler_" + current_compiler).value();
         replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
@@ -40,19 +43,17 @@ void Shell::configure_commands_task() {
             FAILURE("Incorrect arguments for command " + arg[0]);
         std::string command;
         std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
-        try {
-            command = get_setting_by_name("runner_" + current_runner);
-        } catch (std::runtime_error &) {
+        command = get_setting_by_name("runner_" + current_runner).value_or(
             #ifdef _WIN32
-            command = "\"" + env_prefix + envs[current_env].get_name() + "\\" +
+            std::string("\"") + env_prefix + envs[current_env].get_name() + "\\" +
                 task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() + ".exe" + "\"";
+                envs[current_env].get_tasks()[current_task].get_name() + ".exe" + "\""
             #else
-            command = std::string("\"./") + env_prefix + envs[current_env].get_name() + "/" +
+            std::string("\"./") + env_prefix + envs[current_env].get_name() + "/" +
                 task_prefix + envs[current_env].get_tasks()[current_task].get_name() + "/" +
-                envs[current_env].get_tasks()[current_task].get_name() + "\"";
-            #endif  // _WIN32
-        }
+                envs[current_env].get_tasks()[current_task].get_name() + "\""
+        #endif  // _WIN32
+        );
         DEBUG_LOG(command);
         replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
@@ -126,20 +127,17 @@ void Shell::configure_commands_task() {
             f.close();
             std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
             std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
-            try {
-                command = get_setting_by_name("runner_" + current_runner) +
-                    " < " + in_file.string() + " > " + temp_file_path;
-            } catch (std::runtime_error &) {
+            command = get_setting_by_name("runner_" + current_runner).value_or(
                 #ifdef _WIN32
-                command = path + "\\" +
+                path + "\\" +
                 envs[current_env].get_tasks()[current_task].get_name() +
-                    ".exe < " + in_file.string() + " > " + temp_file_path;
+                    ".exe < " + in_file.string() + " > " + temp_file_path
                 #else
-                command = std::string("./") + path + "/" +
+                std::string("./") + path + "/" +
                 envs[current_env].get_tasks()[current_task].get_name() +
-                    " < " + in_file.string() + " > " + temp_file_path;
+                    " < " + in_file.string() + " > " + temp_file_path
                 #endif  // _WIN32
-            }
+            ) + " < " + in_file.string() + " > " + temp_file_path;
             replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
                                 (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                                 envs[current_env].get_tasks()[current_task].get_name()).string());
@@ -339,7 +337,10 @@ void Shell::configure_commands_task() {
         if (fs::exists(file_path)) {
             return -1;
         }
-        std::string command = get_setting_by_name("editor");
+        if (!get_setting_by_name("editor").has_value()) {
+            FAILURE("There's no editor in config file");
+        }
+        std::string command = get_setting_by_name("editor").value();
         replace_all(command, "@name@", file_path.string());
         replace_all(command, "@lang@", "in");
         DEBUG_LOG(command);
@@ -425,8 +426,12 @@ void Shell::configure_commands_task() {
             return -1;
         }
         std::string file_name;
-        try {
-            file_name = get_setting_by_name("template_" + lang);
+        file_name = get_setting_by_name("template_" + lang)
+            .value_or((fs::path("templates") / lang).string());
+        if (!fs::is_regular_file(file_name)) {
+            std::cout << "Template for language " + lang + " is not found. "
+                            "Created empty file\n";
+        } else {
             std::ifstream t(file_name);
             if (t.is_open()) {
                 std::string buf;
@@ -436,9 +441,6 @@ void Shell::configure_commands_task() {
             } else {
                 std::cout << "Unable to open template file\n";
             }
-        } catch (std::runtime_error &) {
-            std::cout << "Template for language " + lang + " is not found. "
-                            "Created empty file\n";
         }
         f.close();
         if (global_settings["autosave"] == "on") {
@@ -635,7 +637,10 @@ void Shell::configure_commands_task() {
         if (fs::exists(file_path)) {
             return -1;
         }
-        std::string command = get_setting_by_name("editor");
+        if (!get_setting_by_name("editor").has_value()) {
+            FAILURE("There's no editor in config file");
+        }
+        std::string command = get_setting_by_name("editor").value();
         replace_all(command, "@name@", file_path.string());
         replace_all(command, "@lang@", "out");
         DEBUG_LOG(command);
@@ -668,7 +673,10 @@ void Shell::configure_commands_task() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
-        std::string command = get_setting_by_name("editor");
+        if (!get_setting_by_name("editor").has_value()) {
+            FAILURE("There's no editor in config file");
+        }
+        std::string command = get_setting_by_name("editor").value();
         replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());

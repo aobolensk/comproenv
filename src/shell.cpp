@@ -103,7 +103,7 @@ void Shell::add_alias(int old_state, std::string old_name, int new_state, std::s
     }
 }
 
-std::string Shell::get_setting_by_name(const std::string name) {
+std::optional <std::string> Shell::get_setting_by_name(const std::string name) {
     if (current_task != -1) {
         auto it = envs[current_env].get_tasks()[current_task].get_settings().find(name);
         if (it != envs[current_env].get_tasks()[current_task].get_settings().end())
@@ -118,7 +118,7 @@ std::string Shell::get_setting_by_name(const std::string name) {
     if (it != global_settings.end()) {
         return it->second;
     } else {
-        throw std::runtime_error("No setting with name: " + name);
+        return {};
     }
 }
 
