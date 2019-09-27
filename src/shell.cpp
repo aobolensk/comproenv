@@ -92,8 +92,10 @@ void Shell::add_command(int state, std::string name,
 
 void Shell::add_alias(int old_state, std::string old_name, int new_state, std::string new_name) {
     auto old_command = commands[old_state].find(old_name);
-    if (old_command == commands[old_state].end())
-        throw std::runtime_error("Unable to add alias for " + old_name);
+    if (old_command == commands[old_state].end()) {
+        std::cout << "Unable to add alias for " + old_name << '\n';
+        return;
+    }
     commands[new_state].emplace(new_name, old_command->second);
     for (auto &help_info : help[old_state]) {
         if (help_info.second.find(old_name) != help_info.second.end()) {
@@ -103,7 +105,7 @@ void Shell::add_alias(int old_state, std::string old_name, int new_state, std::s
     }
 }
 
-std::string Shell::get_setting_by_name(const std::string name) {
+std::optional <std::string> Shell::get_setting_by_name(const std::string name) {
     if (current_task != -1) {
         auto it = envs[current_env].get_tasks()[current_task].get_settings().find(name);
         if (it != envs[current_env].get_tasks()[current_task].get_settings().end())
@@ -118,7 +120,7 @@ std::string Shell::get_setting_by_name(const std::string name) {
     if (it != global_settings.end()) {
         return it->second;
     } else {
-        throw std::runtime_error("No setting with name: " + name);
+        return {};
     }
 }
 

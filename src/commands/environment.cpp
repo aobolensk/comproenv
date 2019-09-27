@@ -34,11 +34,7 @@ void Shell::configure_commands_environment() {
         fs::path path = fs::path(env_prefix + envs[current_env].get_name()) / (task_prefix + arg[1]);
         std::string lang;
         if (arg.size() == 2) {
-            try {
-                lang = get_setting_by_name("language");
-            } catch (std::runtime_error &) {
-                lang = "cpp";
-            }
+            lang = get_setting_by_name("language").value_or("cpp");
             envs[current_env].get_tasks().back().get_settings().emplace("language", lang);
         } else if (arg.size() == 3) {
             lang = arg[2];
@@ -52,10 +48,10 @@ void Shell::configure_commands_environment() {
             if (!f.is_open()) {
                 return -1;
             }
-            std::string file_name;
-            try {
-                file_name = get_setting_by_name("template_" + lang);
-                DEBUG_LOG("Template file: " + file_name);
+            std::string file_name = get_setting_by_name("template_" + lang)
+                .value_or((fs::path("templates") / lang).string());
+            DEBUG_LOG("Template file: " + file_name);
+            if (fs::is_regular_file(file_name)) {
                 std::ifstream t(file_name);
                 if (t.is_open()) {
                     std::string buf;
@@ -63,27 +59,12 @@ void Shell::configure_commands_environment() {
                         f << buf << '\n';
                     t.close();
                 } else {
-                    std::cout << "Unable to open template file\n";
+                    std::cout << "Unable to open default template file\n";
                 }
-            } catch (std::runtime_error &) {
-                file_name = (fs::path("templates") / lang).string();
-                DEBUG_LOG("Default template file: " + file_name);
-                if (fs::is_regular_file(file_name)) {
-                    std::ifstream t(file_name);
-                    if (t.is_open()) {
-                        std::string buf;
-                        while (std::getline(t, buf))
-                            f << buf << '\n';
-                        t.close();
-                    } else {
-                        std::cout << "Unable to open default template file\n";
-                    }
-                } else {
-                    std::cout << "Template for language " + lang + " is not found. "
-                                    "Created empty file\n";
-                }
+            } else {
+                std::cout << "Template for language " + lang + " is not found. "
+                                "Created empty file\n";
             }
-            f.close();
         }
         if (!fs::exists(path / "tests")) {
             fs::create_directory(path / "tests");
