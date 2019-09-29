@@ -16,8 +16,6 @@ namespace comproenv {
 const static std::string env_prefix = "env_";
 const static std::string task_prefix = "task_";
 const static std::string cache_file_name = ".comproenv_cache";
-const static int MAX_HISTORY_SIZE = 32;
-const static int MAX_LINES_COUNT = 100;
 
 class Shell {
  public:
@@ -33,6 +31,8 @@ class Shell {
     const std::array <std::string, (size_t)State::INVALID> state_names = { STATES };
     #undef X
  private:
+    static int MAX_HISTORY_SIZE;
+    static int MAX_LINES_COUNT;
     std::array <std::map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     std::array <std::map <std::string, std::set<std::string>>, (size_t)State::INVALID> help;
     int current_env, current_task, current_state;
@@ -43,10 +43,11 @@ class Shell {
     std::string cache_file;
     struct CommandsHistory {
     private:
-        std::array <std::string, MAX_HISTORY_SIZE> buf;
+        std::vector <std::string> buf;
         int start, end;
     public:
-        CommandsHistory();
+        CommandsHistory() = default;
+        CommandsHistory(int buf_size);
         ~CommandsHistory() = default;
         void push(const std::string &com);
         std::vector <std::string> get_all();

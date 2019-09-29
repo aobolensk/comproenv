@@ -11,6 +11,9 @@ namespace fs = std::experimental::filesystem;
 static void sigint_handler(int sig_num) {}
 #endif  // _WIN32
 
+int Shell::MAX_LINES_COUNT;
+int Shell::MAX_HISTORY_SIZE;
+
 Shell::Shell(const std::string_view config_file_path,
              const std::string_view environments_file_path) :
              config_file(config_file_path),
@@ -47,9 +50,6 @@ Shell::Shell(const std::string_view config_file_path,
     }
     parse_settings(config, environments);
     configure_user_defined_aliases();
-    if (global_settings.find("python_interpreter") == global_settings.end()) {
-        global_settings.emplace("python_interpreter", "python");
-    }
     auto it = global_settings.find("python_interpreter");
     if (it != global_settings.end()) {
         std::string command = it->second + " --version 2>&1";
@@ -191,6 +191,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             }
         }
     };
+
     if (environments.has_key("environments")) {
         std::vector <YAMLParser::Value> environments_content = environments.get_value("environments").get_sequence();
         for (auto &env_data : environments_content) {
@@ -216,14 +217,39 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             envs.push_back(env);
         }
     }
+
     if (config.has_key("global")) {
         YAMLParser::Mapping global_settings_map = config.get_value("global").get_mapping();
         deserialize_compilers(global_settings, global_settings_map);
         deserialize_runners(global_settings, global_settings_map);
         deserialize_templates(global_settings, global_settings_map);
         deserialize_aliases(global_settings, global_settings_map);
-        deserialize_commands_history(global_settings_map);
         deserialize_rest_settings(global_settings, global_settings_map);
+    }
+
+    if (global_settings.find("python_interpreter") == global_settings.end()) {
+        global_settings.emplace("python_interpreter", "python");
+    }
+    if (global_settings.find("max_history_size") == global_settings.end()) {
+        global_settings.emplace("max_history_size", "32");
+    }
+    if (global_settings.find("max_lines_count") == global_settings.end()) {
+        global_settings.emplace("max_lines_count", "100");
+    }
+
+    MAX_HISTORY_SIZE = std::stoi(global_settings.find("max_history_size")->second);
+    if (MAX_HISTORY_SIZE == 0) {
+        MAX_HISTORY_SIZE = 32;
+    }
+    MAX_LINES_COUNT = std::stoi(global_settings.find("max_lines_count")->second);
+    if (MAX_LINES_COUNT == 0) {
+        MAX_LINES_COUNT = 100;
+    }
+    commands_history = CommandsHistory(MAX_HISTORY_SIZE);
+
+    if (config.has_key("global")) {
+        YAMLParser::Mapping global_settings_map = config.get_value("global").get_mapping();
+        deserialize_commands_history(global_settings_map);
     }
 }
 
@@ -290,8 +316,9 @@ int Shell::read_cache() {
     return 0;
 }
 
-Shell::CommandsHistory::CommandsHistory() {
+Shell::CommandsHistory::CommandsHistory(int buf_size) {
     start = end = 0;
+    buf.resize(buf_size);
 }
 
 void Shell::CommandsHistory::push(const std::string &com) {
