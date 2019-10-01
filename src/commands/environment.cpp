@@ -108,6 +108,29 @@ void Shell::configure_commands_environment() {
         return 0;
     });
 
+    add_command(State::ENVIRONMENT, "ee", "Edit environment",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        std::string buf;
+        std::error_code e;
+        do {
+            e.clear();
+            std::cout << "Name [" << envs[current_env].get_name() << "]: ";
+            std::getline(std::cin, buf);
+            if (buf.size() > 0) {
+                fs::rename(env_prefix + envs[current_env].get_name(), env_prefix + buf, e);
+                if (e.value() != 0) {
+                    std::cout << "Rename error: " << e.message() << std::endl;
+                } else {
+                    envs[current_env].set_name(buf);
+                    std::cout << "Set environment name: " << buf << '\n';
+                }
+            }
+        } while (e.value() != 0);
+        return 0;
+    });
+
     add_command(State::ENVIRONMENT, "set", "Configure environment settings",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {

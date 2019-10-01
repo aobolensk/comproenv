@@ -18,6 +18,10 @@ std::string Environment::get_name() const {
     return name;
 }
 
+void Environment::set_name(std::string_view new_name) {
+    this->name = new_name;
+}
+
 std::vector <Task> &Environment::get_tasks() {
     return tasks;
 }

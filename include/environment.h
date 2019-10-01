@@ -15,6 +15,7 @@ class Environment {
     Environment(const std::string &env_name);
     void add_task(const Task &task);
     std::string get_name() const;
+    void set_name(std::string_view new_name);
     std::vector <Task> &get_tasks();
     std::map <std::string, std::string> &get_settings();
     void add_setting(const std::string &key, const std::string &value);
