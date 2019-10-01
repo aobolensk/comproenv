@@ -226,6 +226,33 @@ void Shell::configure_commands_task() {
         return errors;
     });
 
+    add_command(State::TASK, "ee", "Edit task",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        std::string buf;
+        std::error_code e;
+        do {
+            e.clear();
+            std::cout << "Name [" <<
+                envs[current_env].get_tasks()[current_task].get_name() << "]: ";
+            std::getline(std::cin, buf);
+            if (buf.size() > 0) {
+                fs::rename(fs::path(env_prefix + envs[current_env].get_name()) /
+                    fs::path(task_prefix + envs[current_env].get_tasks()[current_task].get_name()),
+                    fs::path(env_prefix + envs[current_env].get_name()) /
+                    fs::path(task_prefix + buf), e);
+                if (e.value() != 0) {
+                    std::cout << "Rename error: " << e.message() << std::endl;
+                } else {
+                    envs[current_env].get_tasks()[current_task].set_name(buf);
+                    std::cout << "Set task name: " << buf << '\n';
+                }
+            }
+        } while (e.value() != 0);
+        return 0;
+    });
+
     add_command(State::TASK, "ct", "Create test",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2)
