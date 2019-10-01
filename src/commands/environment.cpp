@@ -113,26 +113,21 @@ void Shell::configure_commands_environment() {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
         std::string buf;
-        int err_code = 0;
+        std::error_code e;
         do {
-            err_code = 0;
+            e.clear();
             std::cout << "Name [" << envs[current_env].get_name() << "]: ";
             std::getline(std::cin, buf);
             if (buf.size() > 0) {
-                for (size_t i = 0; i < envs.size(); ++i) {
-                    if (envs[i].get_name() == buf) {
-                        std::cout << "This name already exists\n";
-                        err_code = 1;
-                        break;
-                    }
+                fs::rename(env_prefix + envs[current_env].get_name(), env_prefix + buf, e);
+                if (e.value() != 0) {
+                    std::cout << "Rename error: " << e.message() << std::endl;
+                } else {
+                    envs[current_env].set_name(buf);
+                    std::cout << "Set environment name: " << buf << '\n';
                 }
-                if (err_code)
-                    continue;
-                fs::rename(env_prefix + envs[current_env].get_name(), env_prefix + buf);
-                envs[current_env].set_name(buf);
-                std::cout << "Set environment name: " << buf << '\n';
             }
-        } while (err_code);
+        } while (e.value() != 0);
         return 0;
     });
 
