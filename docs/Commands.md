@@ -16,6 +16,7 @@
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
 | le | List of environments |
+| les | List of environments (short: only names) |
 | sets | Print settings |
 | reload-envs | Reload all environments and tasks from comproenv directory |
 | re | Remove environment |
@@ -33,6 +34,7 @@
 | ct | Create task |
 | alias | Define aliases for commands |
 | delete-alias | Delete aliases for commands |
+| ee | Edit environment |
 | exit, q | Exit from environment |
 | ?, help | Help |
 | reload-settings | Hot reload settings from config file  |
@@ -63,6 +65,7 @@
 | alias | Define aliases for commands |
 | delete-alias | Delete aliases for commands |
 | eo | Edit output |
+| ee | Edit task |
 | edit | Edit task in text editor |
 | et | Edit test |
 | exit, q | Exit from task |
