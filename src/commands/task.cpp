@@ -232,24 +232,68 @@ void Shell::configure_commands_task() {
             FAILURE("Incorrect arguments for command " + arg[0]);
         std::string buf;
         std::error_code e;
+        fs::path path = fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name());
+        std::string &lang = envs[current_env].get_tasks()[current_task].get_settings()["language"];
         do {
             e.clear();
-            std::cout << "Name [" <<
-                envs[current_env].get_tasks()[current_task].get_name() << "]: ";
+            std::cout << "Name [" << envs[current_env].get_tasks()[current_task].get_name() << "]: ";
             std::getline(std::cin, buf);
             if (buf.size() > 0) {
-                fs::rename(fs::path(env_prefix + envs[current_env].get_name()) /
-                    fs::path(task_prefix + envs[current_env].get_tasks()[current_task].get_name()),
+                fs::rename(path,
                     fs::path(env_prefix + envs[current_env].get_name()) /
                     fs::path(task_prefix + buf), e);
                 if (e.value() != 0) {
                     std::cout << "Rename error: " << e.message() << std::endl;
                 } else {
                     envs[current_env].get_tasks()[current_task].set_name(buf);
+                    path = fs::path(env_prefix + envs[current_env].get_name()) /
+                        (task_prefix + envs[current_env].get_tasks()[current_task].get_name());
+                    for (auto &entry : fs::directory_iterator(path)) {
+                        if (fs::is_regular_file(entry.path())) {
+                            if (entry.path().filename().string().find(buf) == std::string::npos) {
+                                fs::path new_path = entry.path().parent_path() / (buf + '.' + lang);
+                                fs::rename(entry.path(), new_path, e);
+                                if (e.value() != 0) {
+                                    std::cout << "Rename error: " << e.message() << std::endl;
+                                }
+                            }
+                        }
+                    }
                     std::cout << "Set task name: " << buf << '\n';
                 }
             }
         } while (e.value() != 0);
+
+        std::cout << "Language [" << lang << "]: ";
+        std::getline(std::cin, buf);
+        if (buf.size() > 0 && buf != lang) {
+            lang = buf;
+            fs::path file_path = path / (envs[current_env].get_tasks()[current_task].get_name() + "." + lang);
+            if (!fs::is_regular_file(file_path)) {
+                std::ofstream f(file_path, std::ios::out);
+                if (!f.is_open()) {
+                    return -1;
+                }
+                std::string template_file = get_setting_by_name("template_" + lang)
+                    .value_or((fs::path("templates") / lang).string());
+                DEBUG_LOG("Template file: " + template_file);
+                if (fs::is_regular_file(template_file)) {
+                    std::ifstream t(template_file);
+                    if (t.is_open()) {
+                        std::string buffer;
+                        while (std::getline(t, buffer))
+                            f << buffer << '\n';
+                        t.close();
+                    } else {
+                        std::cout << "Unable to open default template file\n";
+                    }
+                } else {
+                    std::cout << "Template for language " + lang + " is not found. "
+                                    "Created empty file\n";
+                }
+            }
+        }
         return 0;
     });
 
