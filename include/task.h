@@ -14,6 +14,7 @@ class Task {
     void add_setting(const std::string &key, const std::string &value);
     std::map <std::string, std::string> &get_settings();
     std::string get_name() const;
+    void set_name(std::string_view new_name);
 };
 
 }  // namespace comproenv
