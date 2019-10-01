@@ -281,9 +281,9 @@ void Shell::configure_commands_task() {
                 if (fs::is_regular_file(template_file)) {
                     std::ifstream t(template_file);
                     if (t.is_open()) {
-                        std::string buf;
-                        while (std::getline(t, buf))
-                            f << buf << '\n';
+                        std::string buffer;
+                        while (std::getline(t, buffer))
+                            f << buffer << '\n';
                         t.close();
                     } else {
                         std::cout << "Unable to open default template file\n";
