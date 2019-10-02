@@ -495,6 +495,12 @@ void Shell::configure_commands_global() {
                 }
             }
             std::cout << '\n';
+            while (command != help_info.second.end()) {
+                for (size_t i = 0; i < max_name_length - command->size(); ++i)
+                    std::cout << ' ';
+                std::cout << *command << " |\n";
+                ++command;
+            }
             // Separator
             for (size_t i = 0; i < max_name_length + 1; ++i)
                 std::cout << '-';
