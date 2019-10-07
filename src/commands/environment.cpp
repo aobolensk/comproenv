@@ -17,6 +17,7 @@ void Shell::configure_commands_environment() {
                 current_task = (int)i;
                 current_state = State::TASK;
                 store_cache();
+                set_console_title();
                 return 0;
             }
         }
@@ -161,6 +162,7 @@ void Shell::configure_commands_environment() {
         current_env = -1;
         current_state = State::GLOBAL;
         store_cache();
+        set_console_title();
         return 0;
     });
     add_alias(State::ENVIRONMENT, "q", State::ENVIRONMENT, "exit");

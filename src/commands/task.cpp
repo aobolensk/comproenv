@@ -551,6 +551,7 @@ void Shell::configure_commands_task() {
             envs[current_env].get_tasks()[current_task].get_settings().end()) {
             current_state = State::GENERATOR;
             store_cache();
+            set_console_title();
         } else {
             FAILURE("Generator doesn't exist");
         }
@@ -784,6 +785,7 @@ void Shell::configure_commands_task() {
         current_task = -1;
         current_state = State::ENVIRONMENT;
         store_cache();
+        set_console_title();
         return 0;
     });
     add_alias(State::TASK, "q", State::TASK, "exit");

@@ -1,6 +1,9 @@
 #include <fstream>
 #include <experimental/filesystem>
 #include <csignal>
+#ifdef _WIN32
+#include <Windows.h>
+#endif  // _WIN32
 #include "shell.h"
 
 namespace comproenv {
@@ -335,6 +338,22 @@ std::vector <std::string> Shell::CommandsHistory::get_all() {
     return result;
 }
 
+void Shell::set_console_title() {
+    #ifdef _WIN32
+    std::string title = application_name;
+    if (current_env != -1) {
+        title += " -> " + envs[current_env].get_name();
+        if (current_task != -1) {
+            title += "/" + envs[current_env].get_tasks()[current_task].get_name();
+            if (current_state == State::GENERATOR) {
+                title += "/generator";
+            }
+        }
+    }
+    SetConsoleTitle(title.c_str());
+    #endif  // _WIN32
+}
+
 void Shell::run() {
     DEBUG_LOG("Launching shell: " << FUNC);
     std::string command;
@@ -354,6 +373,7 @@ void Shell::run() {
         }
     }
     store_cache();
+    set_console_title();
     while (true) {
         std::cout << ">";
         if (current_env != -1) {
