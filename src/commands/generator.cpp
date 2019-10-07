@@ -194,6 +194,7 @@ void Shell::configure_commands_generator() {
             FAILURE("Incorrect arguments for command " + arg[0]);
         current_state = State::TASK;
         store_cache();
+        set_console_title();
         return 0;
     });
     add_alias(State::GENERATOR, "q", State::GENERATOR, "exit");

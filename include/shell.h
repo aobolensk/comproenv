@@ -16,6 +16,7 @@ namespace comproenv {
 const static std::string env_prefix = "env_";
 const static std::string task_prefix = "task_";
 const static std::string cache_file_name = ".comproenv_cache";
+const static std::string application_name = "comproenv";
 
 class Shell {
  public:
@@ -62,6 +63,7 @@ class Shell {
     void configure_user_defined_aliases();
     int store_cache();
     int read_cache();
+    void set_console_title();
     void add_command(int state, std::string name,
                     std::string help_info,
                     std::function<int(std::vector <std::string> &)> func);
