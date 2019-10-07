@@ -94,8 +94,6 @@ matrix:
         - mv docs/Commands.md docs/Commands.md.old
         - python3 launch.py --f docs
         - diff docs/Commands.md docs/Commands.md.old
-        - diffStat=$(diff docs/Commands.md docs/Commands.md.old | wc -l)
-        - exit $diffStat
     # - os: linux
     #   language: cpp
     #   dist: bionic
