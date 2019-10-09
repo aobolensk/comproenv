@@ -359,9 +359,9 @@ void Shell::configure_commands_global() {
                 std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
             }
         }
-        if (current_task != -1 && envs[current_task].get_tasks()[current_task].get_settings().size()) {
+        if (current_task != -1 && envs[current_env].get_tasks()[current_task].get_settings().size()) {
             std::cout << "Settings in " << state_names[State::TASK] << ":\n";
-            for (const auto &it : envs[current_task].get_tasks()[current_task].get_settings()) {
+            for (const auto &it : envs[current_env].get_tasks()[current_task].get_settings()) {
                 std::cout << "    \"" << it.first << "\" : \"" << it.second << "\"\n";
             }
         }
