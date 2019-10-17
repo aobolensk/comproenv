@@ -1,6 +1,6 @@
 # Quick start guide
 
-1. Build the project (follow instructions in [Building guide](docs/Building.md))  
+1. Build the project (follow instructions in [Building guide](Building.md))  
 2. Launch comproenv with sample configurations:  
 `python launch.py --f run --r config/windows_sample.yaml`
 3. Setup editor:  
@@ -40,8 +40,8 @@ Now you finally can create the task:
 `cat` - compile & test  
 `cr` - compile and run  
 `ctr` - compile, test and run  
-* Tests:
-In `t` (test) command you can specify your own test.
+* Tests:  
+In `t` (test) command you can specify your own test.  
 Note: end marker of multiline input (like tests, expected output and stuff like that) is double empty line  
 `ct <test_name>` - create test  
 `co <test_name>` - add expected answer for test  
