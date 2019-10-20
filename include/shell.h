@@ -32,8 +32,6 @@ class Shell {
     const std::array <std::string, (size_t)State::INVALID> state_names = { STATES };
     #undef X
  private:
-    static int MAX_HISTORY_SIZE;
-    static int MAX_LINES_COUNT;
     std::array <std::map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     std::array <std::map <std::string, std::set<std::string>>, (size_t)State::INVALID> help;
     int current_env, current_task, current_state;
@@ -46,6 +44,7 @@ class Shell {
     private:
         std::vector <std::string> buf;
         int start, end;
+        int buf_size;
     public:
         CommandsHistory() = default;
         CommandsHistory(int buf_size);

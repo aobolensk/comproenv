@@ -14,9 +14,6 @@ namespace fs = std::experimental::filesystem;
 static void sigint_handler(int sig_num) {}
 #endif  // _WIN32
 
-int Shell::MAX_LINES_COUNT;
-int Shell::MAX_HISTORY_SIZE;
-
 Shell::Shell(const std::string_view config_file_path,
              const std::string_view environments_file_path) :
              config_file(config_file_path),
@@ -240,15 +237,11 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
         global_settings.emplace("max_lines_count", "100");
     }
 
-    MAX_HISTORY_SIZE = std::stoi(global_settings.find("max_history_size")->second);
-    if (MAX_HISTORY_SIZE == 0) {
-        MAX_HISTORY_SIZE = 32;
+    int max_history_size = std::stoi(global_settings.find("max_history_size")->second);
+    if (max_history_size == 0) {
+        max_history_size = 32;
     }
-    MAX_LINES_COUNT = std::stoi(global_settings.find("max_lines_count")->second);
-    if (MAX_LINES_COUNT == 0) {
-        MAX_LINES_COUNT = 100;
-    }
-    commands_history = CommandsHistory(MAX_HISTORY_SIZE);
+    commands_history = CommandsHistory(max_history_size);
 
     if (config.has_key("global")) {
         YAMLParser::Mapping global_settings_map = config.get_value("global").get_mapping();
@@ -321,19 +314,20 @@ int Shell::read_cache() {
 
 Shell::CommandsHistory::CommandsHistory(int buf_size) {
     start = end = 0;
+    this->buf_size = buf_size;
     buf.resize(buf_size);
 }
 
 void Shell::CommandsHistory::push(const std::string &com) {
     buf[end] = com;
-    if (start == (end + 1) % MAX_HISTORY_SIZE)
-        start = (start + 1) % MAX_HISTORY_SIZE;
-    end = (end + 1) % MAX_HISTORY_SIZE;
+    if (start == (end + 1) % buf_size)
+        start = (start + 1) % buf_size;
+    end = (end + 1) % buf_size;
 }
 
 std::vector <std::string> Shell::CommandsHistory::get_all() {
     std::vector <std::string> result;
-    for (int i = start; i != end; i = (i + 1) % MAX_HISTORY_SIZE)
+    for (int i = start; i != end; i = (i + 1) % buf_size)
         result.push_back(buf[i]);
     return result;
 }
