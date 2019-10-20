@@ -136,8 +136,7 @@ void Shell::configure_commands_environment() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_settings().erase(arg[1]);
-        }
-        if (arg.size() >= 3) {
+        } else if (arg.size() >= 3) {
             std::string second_arg = arg[2];
             for (unsigned i = 3; i < arg.size(); ++i) {
                 second_arg.push_back(' ');
@@ -145,6 +144,20 @@ void Shell::configure_commands_environment() {
             }
             envs[current_env].get_settings().erase(arg[1]);
             envs[current_env].get_settings().emplace(arg[1], second_arg);
+        } else {
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        }
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
+        }
+        return 0;
+    });
+
+    add_command(State::ENVIRONMENT, "unset", "Delete environment setting",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() == 2) {
+            envs[current_env].get_settings().erase(arg[1]);
         } else {
             FAILURE("Incorrect arguments for command " + arg[0]);
         }
