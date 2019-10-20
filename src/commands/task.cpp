@@ -765,6 +765,20 @@ void Shell::configure_commands_task() {
         return 0;
     });
 
+    add_command(State::TASK, "unset", "Delete task setting",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() == 2) {
+            envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
+        } else {
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        }
+        if (global_settings["autosave"] == "on") {
+            std::vector <std::string> save_args = {"s"};
+            return commands[State::GLOBAL][save_args.front()](save_args);
+        }
+        return 0;
+    });
+
     add_command(State::TASK, "edit", "Edit task in text editor",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)

@@ -10,6 +10,7 @@
 | ce | Create environment |
 | alias | Define aliases for commands |
 | delete-alias | Delete aliases for commands |
+| unset | Delete global setting |
 | exit, q | Exit from program |
 | about | Get information about comproenv executable and environment |
 | ?, help | Help |
@@ -34,6 +35,7 @@
 | ct | Create task |
 | alias | Define aliases for commands |
 | delete-alias | Delete aliases for commands |
+| unset | Delete environment setting |
 | ee | Edit environment |
 | exit, q | Exit from environment |
 | ?, help | Help |
@@ -64,6 +66,7 @@
 | cte | Create test with expected result |
 | alias | Define aliases for commands |
 | delete-alias | Delete aliases for commands |
+| unset | Delete task setting |
 | eo | Edit output |
 | ee | Edit task |
 | edit | Edit task in text editor |
