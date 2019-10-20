@@ -147,11 +147,12 @@ void Shell::configure_commands_task() {
             error_code = system(command.c_str());
             auto time_finish = std::chrono::high_resolution_clock::now();
             f.open(temp_file_path);
+            int max_lines_count = std::stoi(get_setting_by_name("max_lines_count").value_or("100"));
             if (f.is_open()) {
                 int lines_count = 0;
-                while (lines_count++ < MAX_LINES_COUNT && std::getline(f, buf))
+                while (lines_count++ < max_lines_count && std::getline(f, buf))
                     std::cout << buf << '\n';
-                if (lines_count == MAX_LINES_COUNT)
+                if (lines_count == max_lines_count)
                     std::cout << "...\n";
                 f.close();
             }
