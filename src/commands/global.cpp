@@ -1,6 +1,10 @@
 #include <fstream>
 #include <vector>
+#ifndef __APPLE__
 #include <filesystem>
+#else
+#include <experimental/filesystem>
+#endif  // __APPLE__
 #include <csignal>
 #include <ctime>
 #ifdef _WIN32
@@ -19,7 +23,11 @@
 
 namespace comproenv {
 
+#ifndef __APPLE__
 namespace fs = std::filesystem;
+#else
+namespace fs = std::experimental::filesystem;
+#endif  // __APPLE__
 
 void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "se", "Set environment",

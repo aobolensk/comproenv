@@ -1,5 +1,9 @@
 #include <fstream>
+#ifndef __APPLE__
 #include <filesystem>
+#else
+#include <experimental/filesystem>
+#endif  // __APPLE__
 #include <csignal>
 #ifdef _WIN32
 #include <Windows.h>
@@ -8,7 +12,11 @@
 
 namespace comproenv {
 
+#ifndef __APPLE__
 namespace fs = std::filesystem;
+#else
+namespace fs = std::experimental::filesystem;
+#endif  // __APPLE__
 
 #ifndef _WIN32
 static void sigint_handler(int sig_num) {}
