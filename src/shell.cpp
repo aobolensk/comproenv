@@ -1,5 +1,5 @@
 #include <fstream>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <csignal>
 #ifdef _WIN32
 #include <Windows.h>
@@ -8,7 +8,7 @@
 
 namespace comproenv {
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 #ifndef _WIN32
 static void sigint_handler(int sig_num) {}

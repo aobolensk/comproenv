@@ -3,12 +3,12 @@
 #include <vector>
 #include <chrono>
 #include <thread>
-#include <experimental/filesystem>
+#include <filesystem>
 #include "shell.h"
 
 namespace comproenv {
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 void Shell::configure_commands_task() {
     add_command(State::TASK, "c", "Compile task", 

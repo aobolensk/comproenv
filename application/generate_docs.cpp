@@ -1,12 +1,12 @@
 #include <cstdio>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string_view>
 #include "shell.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {

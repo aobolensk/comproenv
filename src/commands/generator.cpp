@@ -2,7 +2,7 @@
 #include <string>
 #include <fstream>
 #include <thread>
-#include <experimental/filesystem>
+#include <filesystem>
 #ifdef _WIN32
 #include <direct.h>
 #define chdir _chdir
@@ -14,7 +14,7 @@
 
 namespace comproenv {
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "cg", "Compile generator",

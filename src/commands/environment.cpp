@@ -1,11 +1,11 @@
 #include <fstream>
-#include <experimental/filesystem>
+#include <filesystem>
 #include "shell.h"
 #include "utils.h"
 
 namespace comproenv {
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 void Shell::configure_commands_environment() {
     add_command(State::ENVIRONMENT, "st", "Set task",

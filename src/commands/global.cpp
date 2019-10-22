@@ -1,6 +1,6 @@
 #include <fstream>
 #include <vector>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <csignal>
 #include <ctime>
 #ifdef _WIN32
@@ -19,7 +19,7 @@
 
 namespace comproenv {
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "se", "Set environment",
