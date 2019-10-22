@@ -1,12 +1,20 @@
 #include <cstdio>
+#ifndef __APPLE__
+#include <filesystem>
+#else
 #include <experimental/filesystem>
+#endif  // __APPLE__
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string_view>
 #include "shell.h"
 
+#ifndef __APPLE__
+namespace fs = std::filesystem;
+#else
 namespace fs = std::experimental::filesystem;
+#endif  // __APPLE__
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {

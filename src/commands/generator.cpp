@@ -2,7 +2,11 @@
 #include <string>
 #include <fstream>
 #include <thread>
+#ifndef __APPLE__
+#include <filesystem>
+#else
 #include <experimental/filesystem>
+#endif  // __APPLE__
 #ifdef _WIN32
 #include <direct.h>
 #define chdir _chdir
@@ -14,7 +18,11 @@
 
 namespace comproenv {
 
+#ifndef __APPLE__
+namespace fs = std::filesystem;
+#else
 namespace fs = std::experimental::filesystem;
+#endif  // __APPLE__
 
 void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "cg", "Compile generator",

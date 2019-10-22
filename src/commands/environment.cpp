@@ -1,11 +1,19 @@
 #include <fstream>
+#ifndef __APPLE__
+#include <filesystem>
+#else
 #include <experimental/filesystem>
+#endif  // __APPLE__
 #include "shell.h"
 #include "utils.h"
 
 namespace comproenv {
 
+#ifndef __APPLE__
+namespace fs = std::filesystem;
+#else
 namespace fs = std::experimental::filesystem;
+#endif  // __APPLE__
 
 void Shell::configure_commands_environment() {
     add_command(State::ENVIRONMENT, "st", "Set task",
