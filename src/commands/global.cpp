@@ -1,10 +1,10 @@
 #include <fstream>
 #include <vector>
-#ifndef __APPLE__
+#ifndef EXP_FS
 #include <filesystem>
 #else
 #include <experimental/filesystem>
-#endif  // __APPLE__
+#endif  // EXP_FS
 #include <csignal>
 #include <ctime>
 #ifdef _WIN32
@@ -23,11 +23,11 @@
 
 namespace comproenv {
 
-#ifndef __APPLE__
+#ifndef EXP_FS
 namespace fs = std::filesystem;
 #else
 namespace fs = std::experimental::filesystem;
-#endif  // __APPLE__
+#endif  // EXP_FS
 
 void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "se", "Set environment",

@@ -22,6 +22,10 @@ else(MSVC)
     endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(MSVC)
 
+if (DEFINED EXP_FS)
+add_definitions(-DEXP_FS)
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCOMPROENV_DEBUG)
 endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
