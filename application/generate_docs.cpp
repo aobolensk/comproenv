@@ -1,20 +1,20 @@
 #include <cstdio>
-#ifndef __APPLE__
+#ifndef EXP_FS
 #include <filesystem>
 #else
 #include <experimental/filesystem>
-#endif  // __APPLE__
+#endif  // EXP_FS
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string_view>
 #include "shell.h"
 
-#ifndef __APPLE__
+#ifndef EXP_FS
 namespace fs = std::filesystem;
 #else
 namespace fs = std::experimental::filesystem;
-#endif  // __APPLE__
+#endif  // EXP_FS
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {

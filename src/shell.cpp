@@ -1,9 +1,9 @@
 #include <fstream>
-#ifndef __APPLE__
+#ifndef EXP_FS
 #include <filesystem>
 #else
 #include <experimental/filesystem>
-#endif  // __APPLE__
+#endif  // EXP_FS
 #include <csignal>
 #ifdef _WIN32
 #include <Windows.h>
@@ -12,11 +12,11 @@
 
 namespace comproenv {
 
-#ifndef __APPLE__
+#ifndef EXP_FS
 namespace fs = std::filesystem;
 #else
 namespace fs = std::experimental::filesystem;
-#endif  // __APPLE__
+#endif  // EXP_FS
 
 #ifndef _WIN32
 static void sigint_handler(int sig_num) {}
@@ -357,6 +357,11 @@ void Shell::set_console_title() {
 }
 
 void Shell::run() {
+    #ifndef EXP_FS
+    DEBUG_LOG("Built with std::filesystem");
+    #else
+    DEBUG_LOG("Built with std::experimental::filesystem");
+    #endif  // EXP_FS
     DEBUG_LOG("Launching shell: " << FUNC);
     std::string command;
     std::vector <std::string> args;

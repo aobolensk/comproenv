@@ -3,20 +3,20 @@
 #include <vector>
 #include <chrono>
 #include <thread>
-#ifndef __APPLE__
+#ifndef EXP_FS
 #include <filesystem>
 #else
 #include <experimental/filesystem>
-#endif  // __APPLE__
+#endif  // EXP_FS
 #include "shell.h"
 
 namespace comproenv {
 
-#ifndef __APPLE__
+#ifndef EXP_FS
 namespace fs = std::filesystem;
 #else
 namespace fs = std::experimental::filesystem;
-#endif  // __APPLE__
+#endif  // EXP_FS
 
 void Shell::configure_commands_task() {
     add_command(State::TASK, "c", "Compile task", 

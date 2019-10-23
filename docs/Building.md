@@ -19,6 +19,9 @@ $ python launch.py --f build docs run --r config/linux_sample.yaml            # 
 
 $ python launch.py --f build docs run --b \"-DCMAKE_BUILD_TYPE=Debug\"        # Debug build
 
+# Via python script:
+$ python launch.py --f build docs run --b \"-DEXP_FS=1\"                      # Use std::experimental::filesystem
+
 # Docker:
 $ docker build -t comproenv .
 $ docker run -v comproenv:/app -it comproenv
