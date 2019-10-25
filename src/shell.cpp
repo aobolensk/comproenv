@@ -8,6 +8,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif  // _WIN32
+#include "const.h"
 #include "shell.h"
 
 namespace comproenv {

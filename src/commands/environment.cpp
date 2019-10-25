@@ -4,6 +4,7 @@
 #else
 #include <experimental/filesystem>
 #endif  // EXP_FS
+#include "const.h"
 #include "shell.h"
 #include "utils.h"
 

@@ -13,11 +13,6 @@
 
 namespace comproenv {
 
-const static std::string env_prefix = "env_";
-const static std::string task_prefix = "task_";
-const static std::string cache_file_name = ".comproenv_cache";
-const static std::string application_name = "comproenv";
-
 class Shell {
  public:
     #define STATES /* List of states: */ \
