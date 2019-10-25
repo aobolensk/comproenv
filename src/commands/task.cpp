@@ -8,6 +8,7 @@
 #else
 #include <experimental/filesystem>
 #endif  // EXP_FS
+#include "const.h"
 #include "shell.h"
 
 namespace comproenv {

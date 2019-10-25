@@ -13,6 +13,7 @@
 #else
 #include <unistd.h>
 #endif  // _WIN32
+#include "const.h"
 #include "shell.h"
 #include "utils.h"
 

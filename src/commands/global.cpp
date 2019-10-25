@@ -16,6 +16,7 @@
 #if defined(__unix__) || defined(__linux__) || defined(__APPLE__)
 #include <sys/utsname.h>
 #endif
+#include "const.h"
 #include "environment.h"
 #include "yaml_parser.h"
 #include "shell.h"
