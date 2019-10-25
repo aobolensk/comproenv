@@ -15,7 +15,7 @@ namespace fs = std::filesystem;
 namespace fs = std::experimental::filesystem;
 #endif  // EXP_FS
 
-const static std::string env_prefix = "env_";
+const static std::string env_prefix = (fs::path("data") / "env_").string();
 const static std::string task_prefix = "task_";
 const static std::string cache_file_name = ".comproenv_cache";
 const static std::string application_name = "comproenv";
