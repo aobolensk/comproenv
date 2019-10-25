@@ -51,7 +51,7 @@ void Shell::configure_commands_environment() {
             envs[current_env].get_tasks().back().get_settings().emplace("language", lang);
         }
         if (!fs::exists(path)) {
-            fs::create_directory(path);
+            fs::create_directories(path);
         }
         if (!fs::exists(path / (arg[1] + "." + lang))) {
             std::ofstream f(path / (arg[1] + "." + lang), std::ios::out);
@@ -77,7 +77,7 @@ void Shell::configure_commands_environment() {
             }
         }
         if (!fs::exists(path / "tests")) {
-            fs::create_directory(path / "tests");
+            fs::create_directories(path / "tests");
         }
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};

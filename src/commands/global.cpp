@@ -57,7 +57,7 @@ void Shell::configure_commands_global() {
         envs.push_back(arg[1]);
         fs::path path = fs::path(env_prefix + arg[1]);
         if (!fs::exists(path)) {
-            fs::create_directory(path);
+            fs::create_directories(path);
         }
         if (global_settings["autosave"] == "on") {
             std::vector <std::string> save_args = {"s"};
