@@ -1,9 +1,5 @@
 #include <fstream>
-#ifndef EXP_FS
-#include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif  // EXP_FS
+#include "fs.h"
 #include <csignal>
 #ifdef _WIN32
 #include <Windows.h>
@@ -12,12 +8,6 @@
 #include "shell.h"
 
 namespace comproenv {
-
-#ifndef EXP_FS
-namespace fs = std::filesystem;
-#else
-namespace fs = std::experimental::filesystem;
-#endif  // EXP_FS
 
 #ifndef _WIN32
 static void sigint_handler(int sig_num) {}

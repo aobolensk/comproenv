@@ -1,20 +1,10 @@
 #include <cstdio>
-#ifndef EXP_FS
-#include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif  // EXP_FS
+#include "fs.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string_view>
 #include "shell.h"
-
-#ifndef EXP_FS
-namespace fs = std::filesystem;
-#else
-namespace fs = std::experimental::filesystem;
-#endif  // EXP_FS
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {

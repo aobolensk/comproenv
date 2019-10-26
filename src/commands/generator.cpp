@@ -2,11 +2,7 @@
 #include <string>
 #include <fstream>
 #include <thread>
-#ifndef EXP_FS
-#include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif  // EXP_FS
+#include "fs.h"
 #ifdef _WIN32
 #include <direct.h>
 #define chdir _chdir
@@ -18,12 +14,6 @@
 #include "utils.h"
 
 namespace comproenv {
-
-#ifndef EXP_FS
-namespace fs = std::filesystem;
-#else
-namespace fs = std::experimental::filesystem;
-#endif  // EXP_FS
 
 void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "cg", "Compile generator",

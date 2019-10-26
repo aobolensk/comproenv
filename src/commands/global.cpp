@@ -1,10 +1,6 @@
 #include <fstream>
 #include <vector>
-#ifndef EXP_FS
-#include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif  // EXP_FS
+#include "fs.h"
 #include <csignal>
 #include <ctime>
 #ifdef _WIN32
@@ -23,12 +19,6 @@
 #include "utils.h"
 
 namespace comproenv {
-
-#ifndef EXP_FS
-namespace fs = std::filesystem;
-#else
-namespace fs = std::experimental::filesystem;
-#endif  // EXP_FS
 
 void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "se", "Set environment",

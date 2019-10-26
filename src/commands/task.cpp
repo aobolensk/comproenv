@@ -3,21 +3,11 @@
 #include <vector>
 #include <chrono>
 #include <thread>
-#ifndef EXP_FS
-#include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif  // EXP_FS
+#include "fs.h"
 #include "const.h"
 #include "shell.h"
 
 namespace comproenv {
-
-#ifndef EXP_FS
-namespace fs = std::filesystem;
-#else
-namespace fs = std::experimental::filesystem;
-#endif  // EXP_FS
 
 void Shell::configure_commands_task() {
     add_command(State::TASK, "c", "Compile task", 

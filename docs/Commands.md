@@ -17,6 +17,7 @@
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
 | le | List of environments |
+| lef | List of environments (full) |
 | les | List of environments (short: only names) |
 | sets | Print settings |
 | reload-envs | Reload all environments and tasks from comproenv directory |
