@@ -115,6 +115,21 @@ void Shell::configure_commands_global() {
         return 0;
     });
 
+    add_command(State::GLOBAL, "lef", "List of environments (full)",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        std::cout << "List of environments in global:\n";
+        for (size_t i = 0; i < envs.size(); ++i) {
+            std::cout << "|-> " << envs[i].get_name() << "\n";
+            for (size_t j = 0; j < envs[i].get_tasks().size(); ++j) {
+                std::cout << "    |-> " << envs[i].get_tasks()[j].get_name() << ": " <<
+                    envs[i].get_tasks()[j].get_settings()["language"] << "\n";
+            }
+        }
+        return 0;
+    });
+
     add_command(State::GLOBAL, "s", "Save settings",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
