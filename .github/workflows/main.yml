@@ -3,7 +3,7 @@ name: Build and run
 on: [push, pull_request]
 
 jobs:
-  build:
+  ubuntu-build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -16,3 +16,12 @@ jobs:
     - name: Build application
       run: |
         printf "about\nq" | python3 launch.py --f build run
+  windows-build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build application
+      run: |
+        echo about > launch.txt
+        echo q >> launch.txt
+        cmd /c 'python launch.py --f build run < launch.txt'
