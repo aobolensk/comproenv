@@ -2,7 +2,7 @@
 
 namespace comproenv {
 
-Task::Task(const std::string &task_name) : name(task_name) {
+Task::Task(const std::string_view task_name) : name(task_name) {
 
 }
 
@@ -14,7 +14,7 @@ void Task::set_name(std::string_view new_name) {
     this->name = new_name;
 }
 
-void Task::add_setting(const std::string &key, const std::string &value) {
+void Task::add_setting(const std::string_view key, const std::string_view value) {
     settings.emplace(key, value);
 }
 

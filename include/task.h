@@ -10,8 +10,8 @@ class Task {
     std::map <std::string, std::string> settings;
     std::string name;
  public:
-    Task(const std::string &task_name);
-    void add_setting(const std::string &key, const std::string &value);
+    Task(const std::string_view task_name);
+    void add_setting(const std::string_view key, const std::string_view value);
     std::map <std::string, std::string> &get_settings();
     std::string get_name() const;
     void set_name(std::string_view new_name);

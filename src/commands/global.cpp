@@ -44,7 +44,7 @@ void Shell::configure_commands_global() {
         for (size_t i = 0; i < envs.size(); ++i)
             if (envs[i].get_name() == arg[1])
                 FAILURE("Environment named " + arg[1] + " already exists");
-        envs.push_back(arg[1]);
+        envs.emplace_back(arg[1]);
         fs::path path = fs::path(env_prefix + arg[1]);
         if (!fs::exists(path)) {
             fs::create_directories(path);
