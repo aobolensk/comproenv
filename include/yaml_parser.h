@@ -40,10 +40,10 @@ class YAMLParser {
         Sequence sequence;
      public:
         void print(std::ostream &os, int indent);
-        Value(const std::string &str) : type(Type::String), string(str) {}
+        Value(const std::string_view str) : type(Type::String), string(str) {}
         Value(const Mapping &map) : type(Type::Mapping), mapping(map) {}
         Value(const Sequence &seq) : type(Type::Sequence), sequence(seq) {}
-        const std::string &get_string() const;
+        const std::string get_string() const;
         const Mapping &get_mapping() const;
         const Sequence &get_sequence() const;
         const Type get_type() const;

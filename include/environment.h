@@ -12,13 +12,13 @@ class Environment {
     std::map <std::string, std::string> settings;
     std::string name;
  public:
-    Environment(const std::string &env_name);
+    Environment(const std::string_view env_name);
     void add_task(const Task &task);
     std::string get_name() const;
     void set_name(std::string_view new_name);
     std::vector <Task> &get_tasks();
     std::map <std::string, std::string> &get_settings();
-    void add_setting(const std::string &key, const std::string &value);
+    void add_setting(const std::string_view key, const std::string_view value);
 };
 
 }  // namespace comproenv

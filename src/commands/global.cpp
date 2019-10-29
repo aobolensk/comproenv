@@ -44,7 +44,7 @@ void Shell::configure_commands_global() {
         for (size_t i = 0; i < envs.size(); ++i)
             if (envs[i].get_name() == arg[1])
                 FAILURE("Environment named " + arg[1] + " already exists");
-        envs.push_back(arg[1]);
+        envs.emplace_back(arg[1]);
         fs::path path = fs::path(env_prefix + arg[1]);
         if (!fs::exists(path)) {
             fs::create_directories(path);
@@ -478,7 +478,7 @@ void Shell::configure_commands_global() {
         std::cout << "Help:" << "\n";
         size_t max_name_length = 0, max_desc_length = 0;
         for (auto &help_info : help[current_state]) {
-            for (const std::string &command : help_info.second)
+            for (const std::string_view command : help_info.second)
                 max_name_length = std::max(max_name_length, command.size());
             size_t current_line_length = 0;
             for (size_t i = 0; i < help_info.first.size(); ++i) {

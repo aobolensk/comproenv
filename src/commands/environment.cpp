@@ -30,7 +30,7 @@ void Shell::configure_commands_environment() {
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i)
             if (envs[current_env].get_tasks()[i].get_name() == arg[1])
                 FAILURE("Task named " + arg[1] + " already exists");
-        envs[current_env].get_tasks().push_back(arg[1]);
+        envs[current_env].get_tasks().emplace_back(arg[1]);
         fs::path path = fs::path(env_prefix + envs[current_env].get_name()) / (task_prefix + arg[1]);
         std::string lang;
         if (arg.size() == 2) {

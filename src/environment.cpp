@@ -2,7 +2,7 @@
 
 namespace comproenv {
 
-Environment::Environment(const std::string &env_name) : name(env_name) {
+Environment::Environment(const std::string_view env_name) : name(env_name) {
 
 }
 
@@ -10,7 +10,7 @@ void Environment::add_task(const Task &task) {
     tasks.emplace_back(task);
 }
 
-void Environment::add_setting(const std::string &key, const std::string &value) {
+void Environment::add_setting(const std::string_view key, const std::string_view value) {
     settings.emplace(key, value);
 }
 
