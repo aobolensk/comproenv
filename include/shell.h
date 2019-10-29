@@ -44,7 +44,7 @@ class Shell {
         CommandsHistory() = default;
         CommandsHistory(int buf_size);
         ~CommandsHistory() = default;
-        void push(const std::string &com);
+        void push(const std::string_view com);
         std::vector <std::string> get_all();
     } commands_history;
     void parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &environments);

@@ -29,7 +29,7 @@ bool YAMLParser::Mapping::has_key(const std::string_view name) const {
     return map.find(name.data()) != map.end();
 }
 
-const std::string &YAMLParser::Value::get_string() const {
+const std::string YAMLParser::Value::get_string() const {
     if (type != Type::String)
         throw std::runtime_error("Value is not String type");
     return string;

@@ -137,7 +137,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             std::map <std::string, YAMLParser::Value> compilers = map.get_value("compilers").get_mapping().get_map();
             for (auto &compiler_data : compilers) {
                 settings.emplace("compiler_" + compiler_data.first, compiler_data.second.get_string());
-                DEBUG_LOG("compiler_" + compiler_data.first + ": " + compiler_data.second.get_string());
+                DEBUG_LOG("compiler_" << compiler_data.first << ": " << compiler_data.second.get_string());
             }
         }
     };
@@ -146,7 +146,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             std::map <std::string, YAMLParser::Value> runners = map.get_value("runners").get_mapping().get_map();
             for (auto &runner_data : runners) {
                 settings.emplace("runner_" + runner_data.first, runner_data.second.get_string());
-                DEBUG_LOG("runner_" + runner_data.first + ": " + runner_data.second.get_string());
+                DEBUG_LOG("runner_" << runner_data.first << ": " << runner_data.second.get_string());
             }
         }
     };
@@ -155,7 +155,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             std::map <std::string, YAMLParser::Value> templates = map.get_value("templates").get_mapping().get_map();
             for (auto &template_data : templates) {
                 settings.emplace("template_" + template_data.first, template_data.second.get_string());
-                DEBUG_LOG("template_" + template_data.first + ": " + template_data.second.get_string());
+                DEBUG_LOG("template_" << template_data.first << ": " << template_data.second.get_string());
             }
         }
     };
@@ -164,7 +164,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
             std::map <std::string, YAMLParser::Value> aliases = map.get_value("aliases").get_mapping().get_map();
             for (auto &alias_data : aliases) {
                 settings.emplace("alias_" + alias_data.first, alias_data.second.get_string());
-                DEBUG_LOG("alias_" + alias_data.first + ": " + alias_data.second.get_string());
+                DEBUG_LOG("alias_" << alias_data.first << ": " << alias_data.second.get_string());
             }
         }
     };
@@ -186,7 +186,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
                 setting.first != "aliases" &&
                 setting.first != "commands_history") {
                 settings.emplace(setting.first, setting.second.get_string());
-                DEBUG_LOG(setting.first + ": " + setting.second.get_string());
+                DEBUG_LOG(setting.first << ": " << setting.second.get_string());
             }
         }
     };
@@ -196,7 +196,7 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
         for (auto &env_data : environments_content) {
             YAMLParser::Mapping map = env_data.get_mapping();
             Environment env(map.get_value("name").get_string());
-            DEBUG_LOG("env: " + map.get_value("name").get_string());
+            DEBUG_LOG("env: " << map.get_value("name").get_string());
             if (map.has_key("tasks")) {
                 std::vector <YAMLParser::Value> tasks = map.get_value("tasks").get_sequence();
                 for (auto &task_data : tasks) {
@@ -317,7 +317,7 @@ Shell::CommandsHistory::CommandsHistory(int buf_size) {
     buf.resize(buf_size);
 }
 
-void Shell::CommandsHistory::push(const std::string &com) {
+void Shell::CommandsHistory::push(const std::string_view com) {
     buf[end] = com;
     if (start == (end + 1) % buf_size)
         start = (start + 1) % buf_size;
@@ -429,7 +429,7 @@ std::string Shell::get_help(Shell::State state) {
     for (auto &help_info : help[state]) {
         bool flag = false;
         result += "| ";
-        for (const std::string &command : help_info.second) {
+        for (const std::string_view command : help_info.second) {
             if (flag)
                result += ", ";
             else

@@ -634,8 +634,8 @@ void Shell::configure_commands_task() {
                 test_names.push_back(std::string(test_name.begin(), test_name.end() - std::size(".in") + 1));
             }
             int index = 0;
-            for (const std::string &test : test_names) {
-                args.push_back(test);
+            for (const std::string_view test : test_names) {
+                args.emplace_back(test);
                 res = commands[current_state]["t"](args);
                 if (res != 0) {
                     std::cout << "\033[31m" << "-- Test failed! Stopped running tests. "
