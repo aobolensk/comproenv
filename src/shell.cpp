@@ -449,7 +449,7 @@ std::string Shell::get_help(Shell::State state) {
 }
 
 Shell::~Shell() {
-    
+
 }
 
 }  // namespace comproenv

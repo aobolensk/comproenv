@@ -10,7 +10,7 @@
 namespace comproenv {
 
 void Shell::configure_commands_task() {
-    add_command(State::TASK, "c", "Compile task", 
+    add_command(State::TASK, "c", "Compile task",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -20,7 +20,7 @@ void Shell::configure_commands_task() {
             FAILURE("There's no compiler for language " + current_compiler);
         }
         command = get_setting_by_name("compiler_" + current_compiler).value();
-        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) /
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         replace_all(command, "@lang@", current_compiler);
@@ -54,7 +54,7 @@ void Shell::configure_commands_task() {
         #endif  // _WIN32
         );
         DEBUG_LOG(command);
-        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) /
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         replace_all(command, "@lang@", current_runner);
@@ -137,7 +137,7 @@ void Shell::configure_commands_task() {
                     " < " + in_file.string() + " > " + temp_file_path
                 #endif  // _WIN32
             ) + " < " + in_file.string() + " > " + temp_file_path;
-            replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+            replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) /
                                 (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                                 envs[current_env].get_tasks()[current_task].get_name()).string());
             replace_all(command, "@lang@", current_runner);
@@ -786,7 +786,7 @@ void Shell::configure_commands_task() {
             FAILURE("There's no editor in config file");
         }
         std::string command = get_setting_by_name("editor").value();
-        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) /
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             envs[current_env].get_tasks()[current_task].get_name()).string());
         replace_all(command, "@lang@", envs[current_env].get_tasks()[current_task].get_settings()["language"]);

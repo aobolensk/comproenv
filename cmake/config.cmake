@@ -23,7 +23,7 @@ else(MSVC)
 endif(MSVC)
 
 if (DEFINED EXP_FS)
-add_definitions(-DEXP_FS)
+    add_definitions(-DEXP_FS)
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")

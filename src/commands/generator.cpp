@@ -25,7 +25,7 @@ void Shell::configure_commands_generator() {
             FAILURE("There's no compiler for language " + current_compiler);
         }
         std::string command = get_setting_by_name("compiler_" + current_compiler).value();
-        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) / 
+        replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) /
                             (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) /
                             "tests" / "generator").string());
         replace_all(command, "@lang@", current_compiler);
