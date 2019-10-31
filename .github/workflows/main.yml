@@ -25,3 +25,13 @@ jobs:
         echo about > launch.txt
         echo q >> launch.txt
         cmd /c 'python launch.py --f build run < launch.txt'
+  macos-build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup environment
+      run: |
+        brew install gcc
+    - name: Build application
+      run: |
+        printf "about\nq" | python3 launch.py --f build run --b \"-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DEXP_FS=1\"
