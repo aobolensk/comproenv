@@ -13,3 +13,6 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
 trim_trailing_whitespace = true
+
+[{data,3rdparty}/**]
+trim_trailing_whitespace = false
