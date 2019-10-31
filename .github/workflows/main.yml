@@ -34,4 +34,4 @@ jobs:
         brew install gcc
     - name: Build application
       run: |
-        printf "about\nq" | python3 launch.py --f build run --b \"-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DEXP_FS=1\"
+        printf "about\nq" | python3 launch.py --f build run --b "\-DCMAKE_C_COMPILER=gcc \-DCMAKE_CXX_COMPILER=g++ \-DEXP_FS=1"
