@@ -47,7 +47,9 @@ def build():
     return 0
 
 def generate_docs():
-    return subprocess.call(os.path.join(".", "build", "bin", executable("generate_docs")) + " docs", shell=True)
+    with open(os.devnull, 'w+') as devnull:
+        proc = subprocess.Popen(os.path.join(".", "build", "bin", executable("generate_docs")) + " docs", shell=True, stdout=devnull, stderr=devnull, stdin=devnull)
+        return proc.wait()
 
 def run():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
