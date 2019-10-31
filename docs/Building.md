@@ -7,15 +7,22 @@
   - bs4
   - requests
   - termcolor
+
+  Python dependencies installation:
+  ```console
+  python -m pip install bs4 requests termcolor
+  ```
 - [Optional] [rlwrap](https://github.com/hanslub42/rlwrap) - readline wrapper (Linux)
 
 ## Build and run:
 
+Launch commands from within project root directory!
+
 ```console
 # Via python script:
-$ python launch.py --f build run                                     # Default build
+$ python launch.py --f build run                                    # Default build
 
-$ python launch.py --f build run --r config/linux_sample.yaml        # With config file specification
+$ python launch.py --f build run --r config/linux_sample.yaml       # With config file specification
 
 $ python launch.py --f build run --b "\-DCMAKE_BUILD_TYPE=Debug"    # Debug build
 
