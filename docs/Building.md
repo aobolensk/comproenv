@@ -17,9 +17,9 @@ $ python launch.py --f build run                                     # Default b
 
 $ python launch.py --f build run --r config/linux_sample.yaml        # With config file specification
 
-$ python launch.py --f build run --b \"-DCMAKE_BUILD_TYPE=Debug\"    # Debug build
+$ python launch.py --f build run --b "\-DCMAKE_BUILD_TYPE=Debug"    # Debug build
 
-$ python launch.py --f build run --b \"-DEXP_FS=1\"                  # Use std::experimental::filesystem
+$ python launch.py --f build run --b "\-DEXP_FS=1"                  # Use std::experimental::filesystem
 # Use -DEXP_FS=1 only when comproenv does not compile on your machine
 # because of using more modern std::filesystem
 
