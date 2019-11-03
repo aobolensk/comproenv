@@ -4,15 +4,13 @@ import parser
 import shutil
 import tempfile
 
-from termcolor import colored
-
 
 def assert_eq(expected, result):
     if expected == result:
-        print(colored(f"assert_eq({expected}, {result}): OK", "green"))
+        print(f"\033[32massert_eq({expected}, {result}): OK\033[0m")
         return 0
     else:
-        print(colored(f"assert_eq({expected}, {result}): FAILED", "red"))
+        print(f"\033[31massert_eq({expected}, {result}): FAILED\033[0m")
         return 1
 
 def test():

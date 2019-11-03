@@ -6,11 +6,10 @@
   with modules:
   - bs4
   - requests
-  - termcolor
 
   Python dependencies installation:
   ```console
-  python -m pip install bs4 requests termcolor
+  python -m pip install bs4 requests
   ```
 - [Optional] [rlwrap](https://github.com/hanslub42/rlwrap) - readline wrapper (Linux)
 
