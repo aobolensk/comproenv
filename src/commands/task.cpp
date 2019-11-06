@@ -421,6 +421,19 @@ void Shell::configure_commands_task() {
         return 0;
     });
 
+    add_command(State::TASK, "rat", "Remove all tests",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() > 1)
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        std::vector <fs::path> in_files;
+        for(auto& p: fs::recursive_directory_iterator(fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests")) {
+            fs::remove(p.path());
+            std::cout << "Removed: " << p.path().filename().string() << '\n';
+        }
+        return 0;
+    });
+
     add_command(State::TASK, "et", "Edit test",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)

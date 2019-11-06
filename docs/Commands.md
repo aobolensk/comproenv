@@ -81,6 +81,7 @@
 | parse | Parse page with tests |
 | sets | Print settings |
 | reload-envs | Reload all environments and tasks from comproenv directory |
+| rat | Remove all tests |
 | rg | Remove generator |
 | ro | Remove output |
 | rt | Remove test |
