@@ -46,9 +46,13 @@ matrix:
       language: cpp
       osx_image: xcode10.2
       name: macOS-g++
+      addons:
+        homebrew:
+          packages:
+            - gcc
       install:
-        - export CC="gcc-8"
-        - export CXX="g++-8"
+        - export CC="gcc-9"
+        - export CXX="g++-9"
       script:
         - printf "about\nq" | python3 launch.py --f build run --b \"-DEXP_FS=1\"
     # - os: osx
