@@ -25,7 +25,7 @@ jobs:
         echo about > launch.txt
         echo q >> launch.txt
         cmd /c 'python launch.py --f build run < launch.txt'
-  macos-build:
+  macos-gcc-build:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
@@ -35,3 +35,10 @@ jobs:
     - name: Build application
       run: |
         printf "about\nq" | python3 launch.py --f build run --b "\-DCMAKE_C_COMPILER=gcc-9 \-DCMAKE_CXX_COMPILER=g++-9 \-DEXP_FS=1"
+  macos-appleclang-build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build application
+      run: |
+        printf "about\nq" | python3 launch.py --f build run
