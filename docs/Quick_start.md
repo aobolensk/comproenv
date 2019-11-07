@@ -60,3 +60,38 @@ In generator menu:
 Note: generator is launched within tests directory, so you can use `test_name.in` and `test_name.out` file names for your custom tests  
 
 You can use `help` command to get the list of all commands that are available in current menu.
+
+6. Editing config.yaml file (extra)  
+Also you can change settings directly in config.yaml file.  
+These changes will be automatically applied on comproenv startup.  
+But if you want to change settings when comproenv is already started, you need to manually apply these changes using `reload-settings` command.
+You can use some sample configs for beginning:
+
+Linux/macOS:
+```yaml
+global:
+  autosave: on
+  max_history_size: 32
+  max_lines_count: 100
+  editor: vim "@name@.@lang@"
+  python_interpreter: python3
+  compilers:
+    c: gcc "@name@.c" -o "@name@" -std=c11
+    cpp: g++ "@name@.cpp" -o "@name@" -std=c++17
+  runners:
+    py: python3 "@name@.py"
+```  
+Windows:
+```yaml
+global:
+  autosave: on
+  max_history_size: 32
+  max_lines_count: 100
+  editor: notepad "@name@.@lang@" &
+  python_interpreter: python
+  compilers:
+    c: gcc "@name@.c" -o "@name@" -std=c11
+    cpp: g++ "@name@.cpp" -o "@name@" -std=c++17
+  runners:
+    py: python "@name@.py"
+```

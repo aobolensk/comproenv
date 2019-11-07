@@ -1,9 +1,0 @@
-global:
-  autosave: on
-  editor: notepad "@name@.@lang@" &
-  python_interpreter: python
-  compilers:
-    c: gcc "@name@.c" -o "@name@"
-    cpp: g++ "@name@.cpp" -o "@name@"
-  runners:
-    py: python "@name@.py"

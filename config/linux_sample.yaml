@@ -1,9 +1,0 @@
-global:
-  autosave: on
-  editor: vim "@name@.@lang@"
-  python_interpreter: python3
-  compilers:
-    c: gcc "@name@.c" -o "@name@"
-    cpp: g++ "@name@.cpp" -o "@name@"
-  runners:
-    py: python "@name@.py"
