@@ -153,7 +153,15 @@ void Shell::configure_commands_global() {
                 for (auto &instance : instances) {
                     for (int i = 0; i < indent; ++i)
                         f << " ";
-                    f << "- " << '\"' << instance << '\"' << std::endl;
+                    std::string str;
+                    str.reserve(instance.size() + 1);
+                    for (size_t i = 0; i < instance.size(); ++i) {
+                        str.push_back(instance[i]);
+                        if (instance[i] == '\\') {
+                            str.push_back(instance[i]);
+                        }
+                    }
+                    f << "- " << '\"' << str << '\"' << std::endl;
                 }
                 indent -= 2;
             }
