@@ -95,3 +95,10 @@ global:
   runners:
     py: python "@name@.py"
 ```
+
+7. Setup templates:  
+You can use templates in comproenv in order to create new task with some already prepared code (so called, template) with different algorithms and so on.  
+You need to run the following command to do that:  
+`set template_<language> <path_to_your_template_file>`  
+Path can be either absolute or relative.  
+By default comproenv uses templates from "templates" folder. If there are no templates for your language, comproenv creates empty file.
