@@ -1,8 +1,6 @@
 build
 .vs
 .vscode
-env_*
-__pycache__
+data
 *.pyc
-config.yaml
-environments.yaml
+.comproenv_cache
