@@ -5,7 +5,8 @@
 
 namespace comproenv {
 
-const static std::string env_prefix = (fs::path("data") / "env_").string();
+const static std::string data_folder = "data";
+const static std::string env_prefix = (fs::path(data_folder) / "env_").string();
 const static std::string task_prefix = "task_";
 const static std::string cache_file_name = ".comproenv_cache";
 const static std::string application_name = "comproenv";

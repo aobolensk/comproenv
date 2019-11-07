@@ -28,7 +28,7 @@ Shell::Shell(const std::string_view config_file_path,
     YAMLParser::Mapping config, environments;
     configure_commands();
     if (config_file == "")
-        config_file = "config.yaml";
+        config_file = (fs::path(data_folder) / "config.yaml").string();
     if (fs::exists(config_file)) {
         YAMLParser p1(config_file);
         config = p1.parse().get_mapping();
@@ -36,7 +36,7 @@ Shell::Shell(const std::string_view config_file_path,
         std::cout << "Configuration file (" << config_file << ") does not exist. Creating new one." << std::endl;
     }
     if (environments_file == "")
-        environments_file = "environments.yaml";
+        environments_file = (fs::path(data_folder) / "environments.yaml").string();
     if (fs::exists(environments_file)) {
         YAMLParser p1(environments_file);
         try {
