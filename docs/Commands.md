@@ -13,6 +13,7 @@
 | unset | Delete global setting |
 | exit, q | Exit from program |
 | about | Get information about comproenv executable and environment |
+| docs | Get link to online documentation |
 | ?, help | Help |
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
@@ -39,6 +40,7 @@
 | unset | Delete environment setting |
 | ee | Edit environment |
 | exit, q | Exit from environment |
+| docs | Get link to online documentation |
 | ?, help | Help |
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
@@ -73,6 +75,7 @@
 | edit | Edit task in text editor |
 | et | Edit test |
 | exit, q | Exit from task |
+| docs | Get link to online documentation |
 | ?, help | Help |
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
@@ -101,6 +104,7 @@
 | delete-alias | Delete aliases for commands |
 | edit, eg | Edit generator |
 | exit, q | Exit from generator |
+| docs | Get link to online documentation |
 | ?, help | Help |
 | reload-settings | Hot reload settings from config file  |
 | py-shell | Launch Python shell |
