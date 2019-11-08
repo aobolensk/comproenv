@@ -551,6 +551,18 @@ void Shell::configure_commands_global() {
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
 
+    add_command(State::GLOBAL, "docs", "Get link to online documentation",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        std::cout << "Online docs: https://github.com/gooddoog/comproenv/tree/"
+            TOSTRING(COMPROENV_HASH) "/docs\n";
+        return 0;
+    });
+    add_alias(State::GLOBAL, "docs", State::ENVIRONMENT, "docs");
+    add_alias(State::GLOBAL, "docs", State::TASK, "docs");
+    add_alias(State::GLOBAL, "docs", State::GENERATOR, "docs");
+
     add_command(State::GLOBAL, "about", "Get information about comproenv executable\nand environment",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
