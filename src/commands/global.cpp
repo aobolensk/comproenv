@@ -552,7 +552,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
 
     add_command(State::GLOBAL, "docs", "Get link to online documentation",
-    [this](std::vector <std::string> &arg) -> int {
+    [](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
         std::cout << "Online docs: https://github.com/gooddoog/comproenv/tree/"
