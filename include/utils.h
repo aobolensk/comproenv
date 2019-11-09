@@ -35,6 +35,11 @@ namespace comproenv {
         return -1;                                              \
     } while (false)
 
+#define E_FAILURE(text) do {                                            \
+        std::cout << "Fatal error: " << std::string(text) << std::endl; \
+        exit(-1);                                                       \
+    } while (false)
+
 void split(std::vector <std::string> &out, const std::string_view str, char delim = ' ');
 void replace_all(std::string &str, const std::string_view old_value, const std::string_view new_value);
 

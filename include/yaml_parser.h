@@ -9,6 +9,7 @@
 #include <vector>
 #include <string_view>
 #include "libyaml/include/yaml.h"
+#include "utils.h"
 
 namespace comproenv {
 
@@ -49,9 +50,6 @@ class YAMLParser {
         const Type get_type() const;
     };
  private:
-    std::string file_name;
-    std::unique_ptr<FILE, decltype(&fclose)> file;
-    yaml_parser_t parser;
     struct YAMLEvent {
         yaml_event_type_t type;
         std::string value;
@@ -59,15 +57,10 @@ class YAMLParser {
             type(event.type),
             value(event.type == YAML_SCALAR_EVENT ? (const char *)event.data.scalar.value : "") {}
     };
-    YAMLEvent get_next_event() {
-        yaml_event_t event;
-        if (!yaml_parser_parse(&parser, &event))
-            throw std::runtime_error("Error parsing YAML at " +
-                                     std::to_string(parser.problem_mark.line) +
-                                     std::to_string(parser.problem_mark.column) +
-                                     parser.problem);
-        return YAMLEvent(event);
-    }
+    std::string file_name;
+    std::unique_ptr<FILE, decltype(&fclose)> file;
+    yaml_parser_t parser;
+    YAMLEvent get_next_event();
     Mapping read_mapping();
     Sequence read_sequence();
  public:
