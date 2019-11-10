@@ -28,8 +28,11 @@ def build():
     if not os.path.exists("build"):
         os.mkdir("build")
         os.chdir("build")
+        if args.build_args is not None:
+            args.build_args = ["-D" + x for x in args.build_args]
         ret_code = subprocess.call("cmake .. " +
-                    enumerate_args(args.build_args), shell=True)
+                    enumerate_args(args.build_args),
+                    shell=True)
         if ret_code != 0:
             print("Failed build (cmake)")
             return 1
