@@ -35,7 +35,7 @@ namespace comproenv {
         return -1;                                              \
     } while (false)
 
-#define E_FAILURE(text) do {                                            \
+#define FATAL_FAILURE(text) do {                                        \
         std::cout << "Fatal error: " << std::string(text) << std::endl; \
         exit(-1);                                                       \
     } while (false)
