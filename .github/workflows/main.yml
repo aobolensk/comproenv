@@ -34,7 +34,7 @@ jobs:
         brew install gcc
     - name: Build application
       run: |
-        printf "about\nq" | python3 launch.py --f build run --b "\-DCMAKE_C_COMPILER=gcc-9 \-DCMAKE_CXX_COMPILER=g++-9 \-DEXP_FS=1"
+        printf "about\nq" | python3 launch.py --f build run --b CMAKE_C_COMPILER=gcc-9 CMAKE_CXX_COMPILER=g++-9 EXP_FS=1
   macos-appleclang-build:
     runs-on: macos-latest
     steps:

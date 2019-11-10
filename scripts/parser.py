@@ -24,9 +24,10 @@ def remove_empty_lines(s):
         i = len(s)
     return s
 
+
 def run(path, link):
     if (link.startswith("http://codeforces.com/") or
-        link.startswith("https://codeforces.com/")):
+            link.startswith("https://codeforces.com/")):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
         inputs = soup.find_all("div", class_="input")
@@ -56,12 +57,11 @@ def run(path, link):
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".out", "w") as f:
                 f.write(result)
     elif (link.startswith("http://acmp.ru/") or
-        link.startswith("https://acmp.ru/")):
+            link.startswith("https://acmp.ru/")):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
-        tables = soup.find_all("table", {"class" : "main",
-                                        "cellpadding" : "2",
-                                        "cellspacing" : "1"})
+        tables = soup.find_all(
+            "table", {"class": "main", "cellpadding": "2", "cellspacing": "1"})
         for table in tables:
             rows = table.find_all("tr")
             cells = rows[0].find_all("th")
@@ -93,9 +93,9 @@ def run(path, link):
                     with open(os.path.join(path, "acmp_sample_" + str(i)) + ".out", "w") as f:
                         f.write(result)
     elif (link.startswith("http://acm.timus.ru/") or
-        link.startswith("https://acm.timus.ru/") or
-        link.startswith("http://timus.online/") or
-        link.startswith("https://timus.online/")):
+            link.startswith("https://acm.timus.ru/") or
+            link.startswith("http://timus.online/") or
+            link.startswith("https://timus.online/")):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
         tables = soup.find_all("table", class_="sample")
@@ -118,7 +118,7 @@ def run(path, link):
                     with open(os.path.join(path, "timus_sample_" + str(i)) + ".out", "w") as f:
                         f.write(result)
     elif (link.startswith("http://atcoder.jp/") or
-        link.startswith("https://atcoder.jp/")):
+            link.startswith("https://atcoder.jp/")):
         page = requests.get(link).text
         soup = BeautifulSoup(page, "html.parser")
         english_span = soup.find("span", class_="lang-en")
@@ -141,6 +141,7 @@ def run(path, link):
         print("Couldn't parse contents of this page")
         exit(-1)
 
+
 def parse_args():
     if sys.argv[1] == "run":
         if len(sys.argv) <= 3:
@@ -149,6 +150,7 @@ def parse_args():
         run(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "test":
         test_parser.test()
+
 
 if __name__ == "__main__":
     print(sys.argv)
