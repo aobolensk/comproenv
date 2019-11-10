@@ -31,17 +31,15 @@ def build():
     subprocess.call("git submodule update --init --recursive", shell=True)
     if not os.path.exists("build"):
         os.mkdir("build")
-        os.chdir("build")
-        if args.build_args is not None:
-            args.build_args = ["-D" + x for x in args.build_args]
-        ret_code = subprocess.call(
-            "cmake .. " + enumerate_args(args.build_args),
-            shell=True)
-        if ret_code != 0:
-            print("Failed build (cmake)")
-            return 1
-    else:
-        os.chdir("build")
+    os.chdir("build")
+    if args.build_args is not None:
+        args.build_args = ["-D" + x for x in args.build_args]
+    ret_code = subprocess.call(
+        "cmake .. " + enumerate_args(args.build_args),
+        shell=True)
+    if ret_code != 0:
+        print("Failed build (cmake)")
+        return 1
     if os.name == "posix":
         ret_code = subprocess.call(
             "cmake --build . --config Release -- -j" + str(multiprocessing.cpu_count()),
