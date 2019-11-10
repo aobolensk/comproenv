@@ -13,6 +13,7 @@ def assert_eq(expected, result):
         print(f"\033[31massert_eq({expected}, {result}): FAILED\033[0m")
         return 1
 
+
 def test():
     temp_dir = tempfile.mkdtemp()
 
@@ -95,7 +96,8 @@ def test():
     file_name = "acmp_sample_1.in"
     with open(os.path.join(temp_dir, file_name), "r") as f:
         print("Checking " + file_name)
-        errors += assert_eq("5 10\n##......#.\n.#..#...#.\n.###....#.\n..##....#.\n........#.".split(), f.read().split())
+        errors += assert_eq(
+            "5 10\n##......#.\n.#..#...#.\n.###....#.\n..##....#.\n........#.".split(), f.read().split())
     file_name = "acmp_sample_1.out"
     with open(os.path.join(temp_dir, file_name), "r") as f:
         print("Checking " + file_name)
@@ -103,7 +105,8 @@ def test():
     file_name = "acmp_sample_2.in"
     with open(os.path.join(temp_dir, file_name), "r") as f:
         print("Checking " + file_name)
-        errors += assert_eq("5 10\n##..#####.\n.#.#.#....\n###..##.#.\n..##.....#\n.###.#####".split(), f.read().split())
+        errors += assert_eq(
+            "5 10\n##..#####.\n.#.#.#....\n###..##.#.\n..##.....#\n.###.#####".split(), f.read().split())
     file_name = "acmp_sample_2.out"
     with open(os.path.join(temp_dir, file_name), "r") as f:
         print("Checking " + file_name)
