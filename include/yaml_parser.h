@@ -53,9 +53,7 @@ class YAMLParser {
     struct YAMLEvent {
         yaml_event_type_t type;
         std::string value;
-        YAMLEvent(const yaml_event_t &event) :
-            type(event.type),
-            value(event.type == YAML_SCALAR_EVENT ? (const char *)event.data.scalar.value : "") {}
+        YAMLEvent(const yaml_event_t &event);
     };
     std::string file_name;
     std::unique_ptr<FILE, decltype(&fclose)> file;
