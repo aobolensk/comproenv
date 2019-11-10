@@ -81,6 +81,21 @@ matrix:
       script:
         - python3 scripts/parser.py test
     - os: linux
+      language: python
+      dist: bionic
+      python:
+        - "3.8"
+      name: flake8 linter
+      install:
+        - python -m pip install flake8
+      script:
+        - |
+          python -m flake8
+            launch.py
+            scripts/parser.py
+            scripts/test_parser.py
+            --max-line-length 120
+    - os: linux
       language: cpp
       dist: bionic
       name: Documentation actuality
