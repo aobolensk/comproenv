@@ -25,6 +25,10 @@ YAMLParser::~YAMLParser() {
     yaml_parser_delete(&parser);
 }
 
+YAMLParser::YAMLEvent::YAMLEvent(const yaml_event_t &event) :
+    type(event.type),
+    value(event.type == YAML_SCALAR_EVENT ? (const char *)event.data.scalar.value : "") {}
+
 YAMLParser::YAMLEvent YAMLParser::get_next_event() {
     yaml_event_t event;
     if (!yaml_parser_parse(&parser, &event))
