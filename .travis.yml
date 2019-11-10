@@ -89,12 +89,7 @@ matrix:
       install:
         - python -m pip install flake8
       script:
-        - |
-          python -m flake8
-            launch.py
-            scripts/parser.py
-            scripts/test_parser.py
-            --max-line-length 120
+        - python -m flake8 --max-line-length 120 launch.py scripts/parser.py scripts/test_parser.py
     - os: linux
       language: cpp
       dist: bionic
