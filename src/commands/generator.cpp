@@ -80,9 +80,10 @@ void Shell::configure_commands_generator() {
         DEBUG_LOG(command);
         int ret_code = system(command.c_str());
         auto time_finish = std::chrono::high_resolution_clock::now();
-        if (chdir("../../..")) {
+        if (chdir("../../../..")) {
             std::cout << "Failed to change directory\n";
         }
+        DEBUG_LOG("go to: " << fs::current_path().string());
         std::cout << "\033[35m\n" << "-- Time elapsed:" <<
             std::chrono::duration_cast<std::chrono::duration<double>>(time_finish - time_start).count() <<
             "\033[0m\n";
