@@ -11,6 +11,10 @@
   ```console
   python -m pip install bs4 requests
   ```
+  or
+  ```console
+  python -r requirements.txt
+  ```
 - [Optional] [rlwrap](https://github.com/hanslub42/rlwrap) - readline wrapper (Linux)
 
 ## Build and run:
