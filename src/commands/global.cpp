@@ -590,6 +590,22 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "docs", State::TASK, "docs");
     add_alias(State::GLOBAL, "docs", State::GENERATOR, "docs");
 
+    add_command(State::GLOBAL, "clear", "Clear the console screen",
+    "clear <- clear the console screen\n",
+    [](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        #ifndef _WIN32
+        std::cout << "\033[2J\033[1;1H";
+        #else
+        system("cls");
+        #endif  // _WIN32
+        return 0;
+    });
+    add_alias(State::GLOBAL, "clear", State::ENVIRONMENT, "clear");
+    add_alias(State::GLOBAL, "clear", State::TASK, "clear");
+    add_alias(State::GLOBAL, "clear", State::GENERATOR, "clear");
+
     add_command(State::GLOBAL, "about", "Get information about comproenv executable\nand environment",
     "about <- get information about comproenv executable and environment\n",
     [this](std::vector <std::string> &arg) -> int {

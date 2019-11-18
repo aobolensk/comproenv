@@ -6,6 +6,7 @@
 
 | Command | Description |
 |---------|-------------|
+| clear | Clear the console screen |
 | set | Configure global settings |
 | ce | Create environment |
 | alias | Define aliases for commands |
@@ -33,6 +34,7 @@
 
 | Command | Description |
 |---------|-------------|
+| clear | Clear the console screen |
 | set | Configure environment settings |
 | ct | Create task |
 | alias | Define aliases for commands |
@@ -57,6 +59,7 @@
 
 | Command | Description |
 |---------|-------------|
+| clear | Clear the console screen |
 | cr | Compile & Run |
 | cat | Compile & Test |
 | catf | Compile & Test (stop testing after first failure) |
@@ -99,6 +102,7 @@
 
 | Command | Description |
 |---------|-------------|
+| clear | Clear the console screen |
 | cg | Compile generator |
 | alias | Define aliases for commands |
 | delete-alias | Delete aliases for commands |

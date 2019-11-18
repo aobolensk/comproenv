@@ -26,6 +26,10 @@ autosave <- toggle autosave (if it was 'on' it will be 'off' and vice versa)
 ```
 ce e1 <- create an environment with name 'e1'
 ```
+#### clear
+```
+clear <- clear the console screen
+```
 #### delete-alias
 ```
 delete-alias se <- delete all aliases for command 'se'
@@ -123,6 +127,10 @@ alias q quit <- create alias 'quit' for command 'q'
 #### autosave
 ```
 autosave <- toggle autosave (if it was 'on' it will be 'off' and vice versa)
+```
+#### clear
+```
+clear <- clear the console screen
 ```
 #### ct
 ```
@@ -237,6 +245,10 @@ catf <- compile and test (stop testing after first failure)
 ```
 cg <- create test generator in C++ (default language)
 cg py <- create test generator in Python
+```
+#### clear
+```
+clear <- clear the console screen
 ```
 #### co
 ```
@@ -406,6 +418,10 @@ autosave <- toggle autosave (if it was 'on' it will be 'off' and vice versa)
 ```
 cg <- compile generator
 You can setup compiler using set compiler_<language> <compile_command>
+```
+#### clear
+```
+clear <- clear the console screen
 ```
 #### delete-alias
 ```
