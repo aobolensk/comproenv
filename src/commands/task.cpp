@@ -11,6 +11,8 @@ namespace comproenv {
 
 void Shell::configure_commands_task() {
     add_command(State::TASK, "c", "Compile task",
+    "ct <- compile task\n"
+    "You can setup compiler using set compiler_<language> <compile_command>\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -37,6 +39,8 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "r", "Run task",
+    "r <- run task\n"
+    "You can setup custom runner (if you need) using set runner_<language> <compile_command>\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -71,6 +75,8 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "t", "Test task",
+    "t <- test task\n"
+    "This command launches all available tests and report results of testing\n",
     [this](std::vector <std::string> &arg) -> int {
         std::string command;
         std::string path;
@@ -250,6 +256,9 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "ee", "Edit task",
+    "ee <- edit task\n"
+    "You will get a list of editable settings, where you can either edit option or "
+    "leave it as is (by pressing Enter)\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -321,6 +330,10 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "ct", "Create test",
+    "ct <- create test\n"
+    "ct test_1 <- create test with name 'test_1'\n"
+    "After typing this command you need to provide input for test.\n"
+    "After that you need to enter empty line to save input.\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -356,6 +369,11 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "cte", "Create test with expected result",
+    "cte <- create test\n"
+    "cte test_1 <- create test with name 'test_1'\n"
+    "After typing this command you need to provide input for test.\n"
+    "After that you need to enter empty line to save input.\n"
+    "Same for expected output.\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -403,6 +421,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "rt", "Remove test",
+    "rt test_1 <- remove test with name 'test_1'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -422,6 +441,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "rat", "Remove all tests",
+    "rat <- remove all tests\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -435,6 +455,8 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "et", "Edit test",
+    "et test_1 <- edit test with name 'test_1'\n"
+    "Test will be opened in specified editor.\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -455,6 +477,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "lts", "List of tests (short: only names)",
+    "lts <- print list of tests\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -474,6 +497,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "lt", "List of tests (full: with input and output)",
+    "lt <- print list of tests\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -512,6 +536,8 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "cg", "Create generator",
+    "cg <- create test generator in C++ (default language)\n"
+    "cg py <- create test generator in Python\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2 || arg.size() < 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -558,6 +584,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "rg", "Remove generator",
+    "rg <- remove test generator\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -580,6 +607,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "sg", "Set generator",
+    "sg <- enter test generator\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -595,6 +623,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "cr", "Compile & Run",
+    "cr <- compile and run\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -610,6 +639,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "cat", "Compile & Test",
+    "cat <- compile and test\n",
     [this](std::vector <std::string> &arg) -> int {
         std::vector <std::string> args;
         args.push_back("c");
@@ -625,6 +655,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "catf", "Compile & Test (stop testing after first failure)",
+    "catf <- compile and test (stop testing after first failure)\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -666,6 +697,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "ctr", "Compile, Test & Run",
+    "ctr <- compile, test and run\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -686,6 +718,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "parse", "Parse page with tests",
+    "parse <link> <- parse tests from website\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -702,6 +735,9 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "co", "Create output",
+    "co test_1 <- create expected result for test with name 'test_1'\n"
+    "After typing this command you need to provide expected result for test.\n"
+    "After that you need to enter empty line to save expected result.\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -723,6 +759,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "ro", "Remove output",
+    "ro test_1 <- remove expected result for test with name 'test_1'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -736,6 +773,8 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "eo", "Edit output",
+    "eo test_1 <- edit expected result for test with name 'test_1'\n"
+    "Expected result will be opened in specified editor.\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -756,6 +795,12 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "set", "Configure task settings",
+    "set compiler_cpp g++ @name@.@lang@ -o @name@ -std=c++17 -O3 <- set compiler command for C++\n"
+    "set editor notepad @name@.@lang@ & <- set editor to notepad"
+    "set max_history_size 32 <- set history size buffer to 32 entries\n"
+    "set python_interpreter python <- set path to python interpreter\n"
+    "set runner_py python @name@.@lang@ <- set runner for Python\n"
+    "set template_cpp templates/cpp <- set path to template file for C++\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
@@ -778,6 +823,8 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "unset", "Delete task setting",
+    "unset runner_py <- delete runner for Python\n"
+    "unset template_cpp <- delete template for C++\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_tasks()[current_task].get_settings().erase(arg[1]);
@@ -792,6 +839,7 @@ void Shell::configure_commands_task() {
     });
 
     add_command(State::TASK, "edit", "Edit task in text editor",
+    "edit <- edit task in specified text editor\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -829,7 +877,9 @@ void Shell::configure_commands_task() {
         #endif  // _WIN32
     });
 
-    add_command(State::TASK, "q", "Exit from task", [this](std::vector <std::string> &arg) -> int {
+    add_command(State::TASK, "q", "Exit from task",
+    "q <- exit from task\n",
+    [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
         current_task = -1;

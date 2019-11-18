@@ -8,6 +8,7 @@ namespace comproenv {
 
 void Shell::configure_commands_environment() {
     add_command(State::ENVIRONMENT, "st", "Set task",
+    "st t1 <- enter the task with name 't1'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -24,6 +25,8 @@ void Shell::configure_commands_environment() {
     });
 
     add_command(State::ENVIRONMENT, "ct", "Create task",
+    "ct t1 <- create a task with name 't1' in C++ (default language)\n"
+    "ct t1 py <- create a task with name 't1' in Python\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() < 2 || arg.size() > 3)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -77,6 +80,7 @@ void Shell::configure_commands_environment() {
     });
 
     add_command(State::ENVIRONMENT, "rt", "Remove task",
+    "rt t1 <- remove the task with name 't1'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -97,6 +101,7 @@ void Shell::configure_commands_environment() {
     });
 
     add_command(State::ENVIRONMENT, "lt", "List of tasks",
+    "lt <- show list of all available tasks\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -109,6 +114,9 @@ void Shell::configure_commands_environment() {
     });
 
     add_command(State::ENVIRONMENT, "ee", "Edit environment",
+    "ee <- edit environment\n"
+    "You will get a list of editable settings, where you can either edit option or "
+    "leave it as is (by pressing Enter)\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -132,6 +140,12 @@ void Shell::configure_commands_environment() {
     });
 
     add_command(State::ENVIRONMENT, "set", "Configure environment settings",
+    "set compiler_cpp g++ @name@.@lang@ -o @name@ -std=c++17 -O3 <- set compiler command for C++\n"
+    "set editor notepad @name@.@lang@ & <- set editor to notepad"
+    "set max_history_size 32 <- set history size buffer to 32 entries\n"
+    "set python_interpreter python <- set path to python interpreter\n"
+    "set runner_py python @name@.@lang@ <- set runner for Python\n"
+    "set template_cpp templates/cpp <- set path to template file for C++\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_settings().erase(arg[1]);
@@ -154,6 +168,8 @@ void Shell::configure_commands_environment() {
     });
 
     add_command(State::ENVIRONMENT, "unset", "Delete environment setting",
+    "unset runner_py <- delete runner for Python\n"
+    "unset template_cpp <- delete template for C++\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             envs[current_env].get_settings().erase(arg[1]);
@@ -168,6 +184,7 @@ void Shell::configure_commands_environment() {
     });
 
     add_command(State::ENVIRONMENT, "q", "Exit from environment",
+    "q <- exit from the environment\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
