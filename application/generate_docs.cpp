@@ -11,6 +11,9 @@ int main(int argc, char *argv[]) {
     if (!fs::exists(argv[1])) {
         std::cerr << "Path " << argv[1] << " does not exist" << std::endl;
     }
+
+    comproenv::Shell shell;
+
     fs::path commands_path = fs::path(argv[1]) / "Commands.md";
     std::ofstream commands(commands_path);
     if (!commands.is_open()) {
@@ -18,7 +21,6 @@ int main(int argc, char *argv[]) {
     }
     commands << "#### Warning! This document is generated automatically by using 'generate_docs' executable\n\n";
     commands << "# Commands list";
-    comproenv::Shell shell;
     for (int i = 0; i < comproenv::Shell::State::INVALID; ++i) {
         commands << "\n\n"
                     "### Scope: " << shell.state_names[i] << "\n\n"
@@ -27,5 +29,22 @@ int main(int argc, char *argv[]) {
         commands << shell.get_help(comproenv::Shell::State(i));
     }
     commands.close();
+
+    fs::path examples_path = fs::path(argv[1]) / "Examples.md";
+    std::ofstream examples(examples_path);
+    if (!examples.is_open()) {
+        std::cerr << "File " << examples_path << " can not be opened" << std::endl;
+    }
+    examples << "#### Warning! This document is generated automatically by using 'generate_docs' executable\n\n";
+    examples << "# Examples of commands usage";
+    for (int i = 0; i < comproenv::Shell::State::INVALID; ++i) {
+        examples << "\n\n"
+                    "### Scope: " << shell.state_names[i] << "\n\n";
+        auto command_examples = shell.get_examples(comproenv::Shell::State(i));
+        for (const auto &example : command_examples) {
+            examples << "#### " << example.first << "\n```\n" << example.second << "```\n";
+        }
+    }
+    examples.close();
     return 0;
 }
