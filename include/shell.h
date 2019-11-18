@@ -69,6 +69,7 @@ class Shell {
     Shell(const std::string_view config_file_path = "", const std::string_view environments_file_path = "");
     void run();
     std::string get_help(State state);
+    const std::map <std::string, std::string> &get_examples(State state);
     ~Shell();
 };
 

@@ -451,6 +451,10 @@ std::string Shell::get_help(Shell::State state) {
     return result;
 }
 
+const std::map <std::string, std::string> &Shell::get_examples(Shell::State state) {
+    return examples[state];
+}
+
 Shell::~Shell() {
 
 }
