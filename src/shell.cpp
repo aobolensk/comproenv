@@ -84,9 +84,11 @@ Shell::Shell(const std::string_view config_file_path,
 
 void Shell::add_command(int state, std::string name,
                         std::string help_info,
+                        std::string examples_info,
                         std::function<int(std::vector <std::string> &)> func) {
     commands[state].emplace(name, func);
     help[state][help_info].insert(name);
+    examples[state][name] = examples_info;
 }
 
 void Shell::add_alias(int old_state, std::string old_name, int new_state, std::string new_name) {
@@ -102,6 +104,7 @@ void Shell::add_alias(int old_state, std::string old_name, int new_state, std::s
             break;
         }
     }
+    examples[new_state][new_name] = examples[old_state][old_name];
 }
 
 std::optional <std::string> Shell::get_setting_by_name(const std::string name) {

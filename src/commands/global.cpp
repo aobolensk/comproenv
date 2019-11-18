@@ -22,6 +22,7 @@ namespace comproenv {
 
 void Shell::configure_commands_global() {
     add_command(State::GLOBAL, "se", "Set environment",
+    "se e1 <- enter the environment with name 'e1'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -38,6 +39,7 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "ce", "Create environment",
+    "ce e1 <- create an environment with name 'e1'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -57,6 +59,7 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "re", "Remove environment",
+    "re e1 <- remove the environment with name 'e1'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -77,6 +80,7 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "le", "List of environments",
+    "le <- show list of all available environments\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -95,6 +99,7 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "les", "List of environments (short: only names)",
+    "les <- show list of all available environments\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -106,6 +111,7 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "lef", "List of environments (full)",
+    "lef <- show list of all available environments\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -121,6 +127,7 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "s", "Save settings",
+    "s <- save settings\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -233,6 +240,7 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "py-shell", "Launch Python shell",
+    "py-shell <- launch Python shell\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -247,6 +255,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "py-shell", State::GENERATOR, "py-shell");
 
     add_command(State::GLOBAL, "autosave", "Toggle autosave",
+    "autosave <- toggle autosave (if it was 'on' it will be 'off' and vice versa)\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -271,6 +280,8 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "autosave", State::GENERATOR, "autosave");
 
     add_command(State::GLOBAL, "history", "Show commands history",
+    "history <- show commands history\n"
+    "Commands history length can be set using: set max_history_size <new_history_size>\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -285,7 +296,8 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "history", State::TASK, "history");
     add_alias(State::GLOBAL, "history", State::GENERATOR, "history");
 
-    add_command(State::GLOBAL, "reload-settings", "Hot reload settings from config file ",
+    add_command(State::GLOBAL, "reload-settings", "Hot reload settings from config file",
+    "reload-settings <- reload settings from config.yaml file\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -310,6 +322,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "reload-settings", State::GENERATOR, "reload-settings");
 
     add_command(State::GLOBAL, "reload-envs", "Reload all environments and tasks\nfrom comproenv directory",
+    "reload-envs <- reload environments from environments.yaml file\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -344,6 +357,12 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "reload-envs", State::GENERATOR, "reload-envs");
 
     add_command(State::GLOBAL, "set", "Configure global settings",
+    "set compiler_cpp g++ @name@.@lang@ -o @name@ -std=c++17 -O3 <- set compiler command for C++\n"
+    "set editor notepad @name@.@lang@ & <- set editor to notepad"
+    "set max_history_size 32 <- set history size buffer to 32 entries\n"
+    "set python_interpreter python <- set path to python interpreter\n"
+    "set runner_py python @name@.@lang@ <- set runner for Python\n"
+    "set template_cpp templates/cpp <- set path to template file for C++\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             global_settings.erase(arg[1]);
@@ -366,6 +385,8 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "unset", "Delete global setting",
+    "unset runner_py <- delete runner for Python\n"
+    "unset template_cpp <- delete template for C++\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() == 2) {
             global_settings.erase(arg[1]);
@@ -380,6 +401,7 @@ void Shell::configure_commands_global() {
     });
 
     add_command(State::GLOBAL, "sets", "Print settings",
+    "sets <- print all settings in key:value format\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() > 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -407,6 +429,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "sets", State::TASK, "sets");
 
     add_command(State::GLOBAL, "q", "Exit from program",
+    "q <- exit\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -425,6 +448,8 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "q", State::GLOBAL, "exit");
 
     add_command(State::GLOBAL, "alias", "Define aliases for commands",
+    "alias se cd <- create alias 'cd' for command 'se'\n"
+    "alias q quit <- create alias 'quit' for command 'q'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 3)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -448,6 +473,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "alias", State::GENERATOR, "alias");
 
     add_command(State::GLOBAL, "delete-alias", "Delete aliases for commands",
+    "delete-alias cd <- create alias 'cd'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -480,78 +506,85 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "delete-alias", State::GENERATOR, "delete-alias");
 
     add_command(State::GLOBAL, "help", "Help",
+    "help <- get list of commands\n"
+    "help <command> <- get examples of using this command\n",
     [this](std::vector <std::string> &arg) -> int {
-        if (arg.size() != 1)
+        if (arg.size() > 2)
             FAILURE("Incorrect arguments for command " + arg[0]);
-        std::cout << "Help:" << "\n";
-        size_t max_name_length = 0, max_desc_length = 0;
-        for (auto &help_info : help[current_state]) {
-            for (const std::string_view command : help_info.second)
-                max_name_length = std::max(max_name_length, command.size());
-            size_t current_line_length = 0;
-            for (size_t i = 0; i < help_info.first.size(); ++i) {
-                if (help_info.first[i] == '\n') {
-                    max_desc_length = std::max(max_desc_length, current_line_length);
-                    current_line_length = 0;
-                } else {
-                    ++current_line_length;
-                }
-            }
-            max_desc_length = std::max(max_desc_length, current_line_length);
-        }
-        for (size_t i = 0; i < max_name_length + 1; ++i)
-            std::cout << '-';
-        std::cout << '|';
-        for (size_t i = 0; i < max_desc_length + 1; ++i)
-            std::cout << '-';
-        std::cout << '\n';
-        for (auto &help_info : help[current_state]) {
-            // Help info
-            auto command = help_info.second.begin();
-            size_t description_index = 0;
-            while (description_index < help_info.first.size()) {
-                if (command != help_info.second.end()) {
-                    for (size_t i = 0; i < max_name_length - command->size(); ++i)
-                        std::cout << ' ';
-                    std::cout << *command << " | ";
-                    ++command;
-                } else {
-                    for (size_t i = 0; i < max_name_length; ++i)
-                        std::cout << ' ';
-                    std::cout << *command << " | ";
-                }
-                bool endline_trigger = false;
-                while (description_index < help_info.first.size()) {
-                    if (help_info.first[description_index] == '\n') {
-                        endline_trigger = true;
-                    }
-                    std::cout << help_info.first[description_index];
-                    ++description_index;
-                    if (endline_trigger) {
-                        break;
+        if (arg.size() == 1) {
+            std::cout << "Help:" << "\n";
+            size_t max_name_length = 0, max_desc_length = 0;
+            for (auto &help_info : help[current_state]) {
+                for (const std::string_view command : help_info.second)
+                    max_name_length = std::max(max_name_length, command.size());
+                size_t current_line_length = 0;
+                for (size_t i = 0; i < help_info.first.size(); ++i) {
+                    if (help_info.first[i] == '\n') {
+                        max_desc_length = std::max(max_desc_length, current_line_length);
+                        current_line_length = 0;
+                    } else {
+                        ++current_line_length;
                     }
                 }
+                max_desc_length = std::max(max_desc_length, current_line_length);
             }
-            std::cout << '\n';
-            while (command != help_info.second.end()) {
-                for (size_t i = 0; i < max_name_length - command->size(); ++i)
-                    std::cout << ' ';
-                std::cout << *command << " |\n";
-                ++command;
-            }
-            // Separator
             for (size_t i = 0; i < max_name_length + 1; ++i)
                 std::cout << '-';
             std::cout << '|';
             for (size_t i = 0; i < max_desc_length + 1; ++i)
                 std::cout << '-';
             std::cout << '\n';
+            for (auto &help_info : help[current_state]) {
+                // Help info
+                auto command = help_info.second.begin();
+                size_t description_index = 0;
+                while (description_index < help_info.first.size()) {
+                    if (command != help_info.second.end()) {
+                        for (size_t i = 0; i < max_name_length - command->size(); ++i)
+                            std::cout << ' ';
+                        std::cout << *command << " | ";
+                        ++command;
+                    } else {
+                        for (size_t i = 0; i < max_name_length; ++i)
+                            std::cout << ' ';
+                        std::cout << *command << " | ";
+                    }
+                    bool endline_trigger = false;
+                    while (description_index < help_info.first.size()) {
+                        if (help_info.first[description_index] == '\n') {
+                            endline_trigger = true;
+                        }
+                        std::cout << help_info.first[description_index];
+                        ++description_index;
+                        if (endline_trigger) {
+                            break;
+                        }
+                    }
+                }
+                std::cout << '\n';
+                while (command != help_info.second.end()) {
+                    for (size_t i = 0; i < max_name_length - command->size(); ++i)
+                        std::cout << ' ';
+                    std::cout << *command << " |\n";
+                    ++command;
+                }
+                // Separator
+                for (size_t i = 0; i < max_name_length + 1; ++i)
+                    std::cout << '-';
+                std::cout << '|';
+                for (size_t i = 0; i < max_desc_length + 1; ++i)
+                    std::cout << '-';
+                std::cout << '\n';
+            }
+        } else if (arg.size() == 2) {
+            std::cout << examples[current_state][arg[1]];
         }
         return 0;
     });
     add_alias(State::GLOBAL, "help", State::GLOBAL, "?");
 
     add_command(State::GLOBAL, "docs", "Get link to online documentation",
+    "docs <- get link to online documentation\n",
     [](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -564,6 +597,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "docs", State::GENERATOR, "docs");
 
     add_command(State::GLOBAL, "about", "Get information about comproenv executable\nand environment",
+    "about <- get information about comproenv executable and environment\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);

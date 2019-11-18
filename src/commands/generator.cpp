@@ -17,6 +17,8 @@ namespace comproenv {
 
 void Shell::configure_commands_generator() {
     add_command(State::GENERATOR, "cg", "Compile generator",
+    "cg <- compile generator\n"
+    "You can setup compiler using set compiler_<language> <compile_command>\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -43,6 +45,8 @@ void Shell::configure_commands_generator() {
     });
 
     add_command(State::GENERATOR, "rg", "Run generator",
+    "rg <- run task\n"
+    "You can setup custom runner (if you need) using set runner_<language> <compile_command>\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -91,6 +95,7 @@ void Shell::configure_commands_generator() {
     });
 
     add_command(State::GENERATOR, "eg", "Edit generator",
+    "eg <- edit generator in specified text editor\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -132,6 +137,7 @@ void Shell::configure_commands_generator() {
     add_alias(State::GENERATOR, "eg", State::GENERATOR, "edit");
 
     add_command(State::GENERATOR, "lts", "List of tests (short: only names)",
+    "lts <- print list of tests\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -151,6 +157,7 @@ void Shell::configure_commands_generator() {
     });
 
     add_command(State::GENERATOR, "lt", "List of tests (full: with input and output)",
+    "lt <- print list of tests\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
@@ -189,6 +196,7 @@ void Shell::configure_commands_generator() {
     });
 
     add_command(State::GENERATOR, "q", "Exit from generator",
+    "q <- exit from generator\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);

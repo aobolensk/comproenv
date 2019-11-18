@@ -29,6 +29,7 @@ class Shell {
  private:
     std::array <std::map <std::string, std::function<int(std::vector <std::string> &)>>, (size_t)State::INVALID> commands;
     std::array <std::map <std::string, std::set<std::string>>, (size_t)State::INVALID> help;
+    std::array <std::map <std::string, std::string>, (size_t)State::INVALID> examples;
     int current_env, current_task, current_state;
     std::vector <Environment> envs;
     std::map <std::string, std::string> global_settings;
@@ -60,6 +61,7 @@ class Shell {
     void set_console_title();
     void add_command(int state, std::string name,
                     std::string help_info,
+                    std::string examples_info,
                     std::function<int(std::vector <std::string> &)> func);
     void add_alias(int old_state, std::string new_name, int new_state, std::string old_name);
     std::optional <std::string> get_setting_by_name(const std::string name);
