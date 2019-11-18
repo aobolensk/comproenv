@@ -15,7 +15,7 @@
 | about | Get information about comproenv executable and environment |
 | docs | Get link to online documentation |
 | ?, help | Help |
-| reload-settings | Hot reload settings from config file  |
+| reload-settings | Hot reload settings from config file |
 | py-shell | Launch Python shell |
 | le | List of environments |
 | lef | List of environments (full) |
@@ -42,7 +42,7 @@
 | exit, q | Exit from environment |
 | docs | Get link to online documentation |
 | ?, help | Help |
-| reload-settings | Hot reload settings from config file  |
+| reload-settings | Hot reload settings from config file |
 | py-shell | Launch Python shell |
 | lt | List of tasks |
 | sets | Print settings |
@@ -77,7 +77,7 @@
 | exit, q | Exit from task |
 | docs | Get link to online documentation |
 | ?, help | Help |
-| reload-settings | Hot reload settings from config file  |
+| reload-settings | Hot reload settings from config file |
 | py-shell | Launch Python shell |
 | lt | List of tests (full: with input and output) |
 | lts | List of tests (short: only names) |
@@ -106,7 +106,7 @@
 | exit, q | Exit from generator |
 | docs | Get link to online documentation |
 | ?, help | Help |
-| reload-settings | Hot reload settings from config file  |
+| reload-settings | Hot reload settings from config file |
 | py-shell | Launch Python shell |
 | lt | List of tests (full: with input and output) |
 | lts | List of tests (short: only names) |
