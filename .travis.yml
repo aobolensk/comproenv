@@ -89,8 +89,10 @@ matrix:
       script:
         - python3 launch.py --f build
         - mv docs/Commands.md docs/Commands.md.old
+        - mv docs/Examples.md docs/Examples.md.old
         - python3 launch.py --f docs
         - diff docs/Commands.md docs/Commands.md.old
+        - diff docs/Examples.md docs/Examples.md.old
     # - os: linux
     #   language: cpp
     #   dist: bionic
