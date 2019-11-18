@@ -22,17 +22,13 @@ alias q quit <- create alias 'quit' for command 'q'
 ```
 autosave <- toggle autosave (if it was 'on' it will be 'off' and vice versa)
 ```
-#### cd
-```
-se e1 <- enter the environment with name 'e1'
-```
 #### ce
 ```
 ce e1 <- create an environment with name 'e1'
 ```
 #### delete-alias
 ```
-delete-alias cd <- create alias 'cd'
+delete-alias se <- delete all aliases for command 'se'
 ```
 #### docs
 ```
@@ -95,7 +91,8 @@ se e1 <- enter the environment with name 'e1'
 #### set
 ```
 set compiler_cpp g++ @name@.@lang@ -o @name@ -std=c++17 -O3 <- set compiler command for C++
-set editor notepad @name@.@lang@ & <- set editor to notepadset max_history_size 32 <- set history size buffer to 32 entries
+set editor notepad @name@.@lang@ & <- set editor to notepad
+set max_history_size 32 <- set history size buffer to 32 entries
 set python_interpreter python <- set path to python interpreter
 set runner_py python @name@.@lang@ <- set runner for Python
 set template_cpp templates/cpp <- set path to template file for C++
@@ -127,10 +124,6 @@ alias q quit <- create alias 'quit' for command 'q'
 ```
 autosave <- toggle autosave (if it was 'on' it will be 'off' and vice versa)
 ```
-#### cd
-```
-st t1 <- enter the task with name 't1'
-```
 #### ct
 ```
 ct t1 <- create a task with name 't1' in C++ (default language)
@@ -138,7 +131,7 @@ ct t1 py <- create a task with name 't1' in Python
 ```
 #### delete-alias
 ```
-delete-alias cd <- create alias 'cd'
+delete-alias se <- delete all aliases for command 'se'
 ```
 #### docs
 ```
@@ -190,7 +183,8 @@ rt t1 <- remove the task with name 't1'
 #### set
 ```
 set compiler_cpp g++ @name@.@lang@ -o @name@ -std=c++17 -O3 <- set compiler command for C++
-set editor notepad @name@.@lang@ & <- set editor to notepadset max_history_size 32 <- set history size buffer to 32 entries
+set editor notepad @name@.@lang@ & <- set editor to notepad
+set max_history_size 32 <- set history size buffer to 32 entries
 set python_interpreter python <- set path to python interpreter
 set runner_py python @name@.@lang@ <- set runner for Python
 set template_cpp templates/cpp <- set path to template file for C++
@@ -275,7 +269,7 @@ ctr <- compile, test and run
 ```
 #### delete-alias
 ```
-delete-alias cd <- create alias 'cd'
+delete-alias se <- delete all aliases for command 'se'
 ```
 #### docs
 ```
@@ -366,7 +360,8 @@ rt test_1 <- remove test with name 'test_1'
 #### set
 ```
 set compiler_cpp g++ @name@.@lang@ -o @name@ -std=c++17 -O3 <- set compiler command for C++
-set editor notepad @name@.@lang@ & <- set editor to notepadset max_history_size 32 <- set history size buffer to 32 entries
+set editor notepad @name@.@lang@ & <- set editor to notepad
+set max_history_size 32 <- set history size buffer to 32 entries
 set python_interpreter python <- set path to python interpreter
 set runner_py python @name@.@lang@ <- set runner for Python
 set template_cpp templates/cpp <- set path to template file for C++
@@ -414,7 +409,7 @@ You can setup compiler using set compiler_<language> <compile_command>
 ```
 #### delete-alias
 ```
-delete-alias cd <- create alias 'cd'
+delete-alias se <- delete all aliases for command 'se'
 ```
 #### docs
 ```

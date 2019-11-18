@@ -352,7 +352,7 @@ void Shell::configure_commands_global() {
 
     add_command(State::GLOBAL, "set", "Configure global settings",
     "set compiler_cpp g++ @name@.@lang@ -o @name@ -std=c++17 -O3 <- set compiler command for C++\n"
-    "set editor notepad @name@.@lang@ & <- set editor to notepad"
+    "set editor notepad @name@.@lang@ & <- set editor to notepad\n"
     "set max_history_size 32 <- set history size buffer to 32 entries\n"
     "set python_interpreter python <- set path to python interpreter\n"
     "set runner_py python @name@.@lang@ <- set runner for Python\n"
@@ -467,7 +467,7 @@ void Shell::configure_commands_global() {
     add_alias(State::GLOBAL, "alias", State::GENERATOR, "alias");
 
     add_command(State::GLOBAL, "delete-alias", "Delete aliases for commands",
-    "delete-alias cd <- create alias 'cd'\n",
+    "delete-alias se <- delete all aliases for command 'se'\n",
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 2)
             FAILURE("Incorrect arguments for command " + arg[0]);

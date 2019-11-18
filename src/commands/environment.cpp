@@ -141,7 +141,7 @@ void Shell::configure_commands_environment() {
 
     add_command(State::ENVIRONMENT, "set", "Configure environment settings",
     "set compiler_cpp g++ @name@.@lang@ -o @name@ -std=c++17 -O3 <- set compiler command for C++\n"
-    "set editor notepad @name@.@lang@ & <- set editor to notepad"
+    "set editor notepad @name@.@lang@ & <- set editor to notepad\n"
     "set max_history_size 32 <- set history size buffer to 32 entries\n"
     "set python_interpreter python <- set path to python interpreter\n"
     "set runner_py python @name@.@lang@ <- set runner for Python\n"
