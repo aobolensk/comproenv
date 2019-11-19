@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import multiprocessing
 import os
 import shutil
@@ -24,6 +25,22 @@ def enumerate_args(args):
 def clean():
     if os.path.exists("build"):
         shutil.rmtree("build")
+    return 0
+
+
+def backup():
+    dst_directory = enumerate_args(args.directory)
+    if len(dst_directory) == 0:
+        print("Failed backup (please, specify destination directory)")
+        return 1
+    dst_directory = os.path.join(
+        os.path.abspath(dst_directory),
+        "comproenv_data_backup_%s" % datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    try:
+        shutil.copytree("data", dst_directory)
+    except IOError as e:
+        print("Failed backup: %s" % e)
+        return 1
     return 0
 
 
@@ -83,6 +100,7 @@ def parse_args():
     parser.add_argument("--function", nargs='*', help="Provide function name")
     parser.add_argument("--build_args", nargs='*', help="Args for build system")
     parser.add_argument("--run_args", nargs='*', help="Args for application")
+    parser.add_argument("--directory", nargs='*', help="Directory for backup")
     args = parser.parse_args()
     if args.function is None:
         parser.print_help()
@@ -96,7 +114,9 @@ def main():
     args = parse_args()
     ret_code = 0
     for arg in args.function:
-        if arg == "build":
+        if arg == "backup":
+            ret_code = backup()
+        elif arg == "build":
             ret_code = build()
         elif arg == "clean":
             ret_code = clean()
