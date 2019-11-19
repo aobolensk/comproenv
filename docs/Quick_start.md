@@ -102,3 +102,10 @@ You need to run the following command to do that:
 `set template_<language> <path_to_your_template_file>`  
 Path can be either absolute or relative.  
 By default comproenv uses templates from "templates" folder. If there are no templates for your language, comproenv creates empty file.
+
+8. Create backup:  
+You can create backup for your data folder where you store all environments and tasks.
+```console
+python launch.py --f backup --dir path/to/backup/directory
+```
+
