@@ -1,7 +1,6 @@
 import os
 import sys
-
-import requests
+import urllib.request
 from bs4 import BeautifulSoup
 
 import test_parser
@@ -25,10 +24,16 @@ def remove_empty_lines(s):
     return s
 
 
+def get_page(link):
+    response = urllib.request.urlopen(link)
+    text = response.read()
+    return text
+
+
 def run(path, link):
     if (link.startswith("http://codeforces.com/") or
             link.startswith("https://codeforces.com/")):
-        page = requests.get(link).text
+        page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
         inputs = soup.find_all("div", class_="input")
         outputs = soup.find_all("div", class_="output")
@@ -58,7 +63,7 @@ def run(path, link):
                 f.write(result)
     elif (link.startswith("http://acmp.ru/") or
             link.startswith("https://acmp.ru/")):
-        page = requests.get(link).text
+        page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
         tables = soup.find_all(
             "table", {"class": "main", "cellpadding": "2", "cellspacing": "1"})
@@ -96,7 +101,7 @@ def run(path, link):
             link.startswith("https://acm.timus.ru/") or
             link.startswith("http://timus.online/") or
             link.startswith("https://timus.online/")):
-        page = requests.get(link).text
+        page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
         tables = soup.find_all("table", class_="sample")
         for table in tables:
@@ -119,7 +124,7 @@ def run(path, link):
                         f.write(result)
     elif (link.startswith("http://atcoder.jp/") or
             link.startswith("https://atcoder.jp/")):
-        page = requests.get(link).text
+        page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
         english_span = soup.find("span", class_="lang-en")
         divs = english_span.find_all("div", class_="part")
