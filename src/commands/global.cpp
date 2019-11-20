@@ -199,8 +199,8 @@ void Shell::configure_commands_global() {
             indent -= 2;
         }
         f.close();
-        f.open(environments_file, std::ios::out);
         if (envs.size()) {
+            f.open(environments_file, std::ios::out);
             f << "environments:" << std::endl;
             indent += 2;
             for (auto &env : envs) {
@@ -228,8 +228,8 @@ void Shell::configure_commands_global() {
             }
             indent -= 2;
             f << std::endl;
+            f.close();
         }
-        f.close();
         return 0;
     });
 
