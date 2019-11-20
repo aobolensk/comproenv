@@ -5,11 +5,10 @@
 - [Python](https://www.python.org/downloads/) 3.7+ (needed for website parser)
   with modules:
   - bs4
-  - requests
 
   Python dependencies installation:
   ```console
-  python -m pip install bs4 requests
+  python -m pip install bs4
   ```
   or
   ```console

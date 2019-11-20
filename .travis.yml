@@ -52,7 +52,7 @@ matrix:
         - "3.7"
       name: Parser script
       install:
-        - pip3 install bs4 requests
+        - pip3 install bs4
       script:
         - python3 scripts/parser.py test
     - os: linux
