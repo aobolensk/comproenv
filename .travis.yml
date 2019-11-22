@@ -55,44 +55,6 @@ matrix:
         - pip3 install bs4
       script:
         - python3 scripts/parser.py test
-    - os: linux
-      language: python
-      dist: bionic
-      python:
-        - "3.8"
-      name: flake8 linter
-      install:
-        - python -m pip install flake8
-      script:
-        - >
-          python -m flake8
-          --max-line-length 120
-          launch.py
-          scripts/parser.py
-          scripts/test_parser.py
-    - os: linux
-      language: cpp
-      dist: bionic
-      name: Documentation actuality
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages:
-            - g++-9
-      install:
-        - >
-          sudo update-alternatives
-          --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
-          --slave /usr/bin/g++ g++ /usr/bin/g++-9
-      script:
-        - python3 launch.py --f build
-        - mv docs/Commands.md docs/Commands.md.old
-        - mv docs/Examples.md docs/Examples.md.old
-        - python3 launch.py --f docs
-        - diff docs/Commands.md docs/Commands.md.old
-        - diff docs/Examples.md docs/Examples.md.old
     # - os: linux
     #   language: cpp
     #   dist: bionic

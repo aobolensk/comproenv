@@ -1,0 +1,25 @@
+name: Documentation
+
+on: [push, pull_request]
+
+jobs:
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup environment
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt update
+        sudo apt install g++-9
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+    - name: Build application
+      run: |
+        python3 launch.py --f build
+    - name: Check docs
+      run: |
+        mv docs/Commands.md docs/Commands.md.old
+        mv docs/Examples.md docs/Examples.md.old
+        python3 launch.py --f docs
+        diff docs/Commands.md docs/Commands.md.old
+        diff docs/Examples.md docs/Examples.md.old
