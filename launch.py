@@ -76,7 +76,7 @@ def generate_docs():
             os.path.join(
                 ".", "build", "bin",
                 executable("generate_docs")) + " docs",
-            shell=True, stdout=devnull, stderr=devnull, stdin=devnull)
+            shell=True, stdout=devnull, stdin=devnull)
         return proc.wait()
 
 
