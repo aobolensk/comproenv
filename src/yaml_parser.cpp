@@ -3,11 +3,13 @@
 
 namespace comproenv {
 
+std::string current_file;
+
 YAMLParser::YAMLParser(std::string file_name) :
     file_name(file_name),
     file(fopen(file_name.c_str(), "r"), &fclose) {
     if (!file)
-        FATAL_FAILURE("YAMLParser: File is not found");
+        FATAL_FAILURE("[" + file_name + "] YAMLParser: File is not found");
     yaml_parser_initialize(&parser);
     yaml_parser_set_input_file(&parser, file.get());
 }
@@ -16,7 +18,7 @@ YAMLParser::YAMLParser(const YAMLParser &p) :
     file_name(p.file_name),
     file(fopen(file_name.c_str(), "r"), &fclose) {
     if (!file)
-        FATAL_FAILURE("YAMLParser: File is not found");
+        FATAL_FAILURE("[" + file_name + "] YAMLParser: File is not found");
     yaml_parser_initialize(&parser);
     yaml_parser_set_input_file(&parser, file.get());
 }
@@ -32,7 +34,7 @@ YAMLParser::YAMLEvent::YAMLEvent(const yaml_event_t &event) :
 YAMLParser::YAMLEvent YAMLParser::get_next_event() {
     yaml_event_t event;
     if (!yaml_parser_parse(&parser, &event))
-        FATAL_FAILURE("Error parsing YAML at " +
+        FATAL_FAILURE("[" + file_name + "] YAMLParser: Error parsing YAML at " +
                     std::to_string(parser.problem_mark.line) + ":" +
                     std::to_string(parser.problem_mark.column) + " " +
                     parser.problem);
@@ -45,19 +47,19 @@ bool YAMLParser::Mapping::has_key(const std::string_view name) const {
 
 const std::string YAMLParser::Value::get_string() const {
     if (type != Type::String)
-        FATAL_FAILURE("YAMLParser: Value is not String type");
+        FATAL_FAILURE("[" + current_file + "] YAMLParser: Value is not String type");
     return string;
 }
 
 const YAMLParser::Mapping &YAMLParser::Value::get_mapping() const {
     if (type != Type::Mapping)
-        FATAL_FAILURE("YAMLParser: Value is not Mapping type");
+        FATAL_FAILURE("[" + current_file + "] YAMLParser: Value is not Mapping type");
     return mapping;
 }
 
 const YAMLParser::Sequence &YAMLParser::Value::get_sequence() const {
     if (type != Type::Sequence)
-        FATAL_FAILURE("YAMLParser: Value is not Sequence type");
+        FATAL_FAILURE("[" + current_file + "] YAMLParser: Value is not Sequence type");
     return sequence;
 }
 
@@ -68,28 +70,28 @@ const YAMLParser::Value::Type YAMLParser::Value::get_type() const {
 YAMLParser::Value YAMLParser::Mapping::get_value(const std::string_view name) const {
     auto res = map.find(name.data());
     if (res == map.end())
-        FATAL_FAILURE("YAMLParser: Wrong key");
+        FATAL_FAILURE("[" + current_file + "] YAMLParser: Wrong key");
     return (*res).second;
 }
 
 std::string YAMLParser::Mapping::get_string(const std::string_view name) const {
     auto res = map.find(name.data());
     if (res == map.end())
-        FATAL_FAILURE("YAMLParser: Wrong key");
+        FATAL_FAILURE("[" + current_file + "] YAMLParser: Wrong key");
     return (*res).second.get_string();
 }
 
 YAMLParser::Mapping YAMLParser::Mapping::get_mapping(const std::string_view name) const {
     auto res = map.find(name.data());
     if (res == map.end())
-        FATAL_FAILURE("YAMLParser: Wrong key");
+        FATAL_FAILURE("[" + current_file + "] YAMLParser: Wrong key");
     return (*res).second.get_mapping();
 }
 
 YAMLParser::Sequence YAMLParser::Mapping::get_sequence(const std::string_view name) const {
     auto res = map.find(name.data());
     if (res == map.end())
-        FATAL_FAILURE("YAMLParser: Wrong key");
+        FATAL_FAILURE("[" + current_file + "] YAMLParser: Wrong key");
     return (*res).second.get_sequence();
 }
 
@@ -98,22 +100,23 @@ const std::map <std::string, YAMLParser::Value> YAMLParser::Mapping::get_map() c
 }
 
 YAMLParser::Value YAMLParser::parse() {
+    current_file = this->file_name;
     int preparing = 2;
     while (preparing) {
         YAMLEvent event = get_next_event();
         switch(event.type) {
         case YAML_STREAM_START_EVENT:
             if (preparing != 2)
-                FATAL_FAILURE("YAMLParser: Unexpected YAML_STREAM_START_EVENT");
+                FATAL_FAILURE("[" + file_name + "] YAMLParser: Unexpected YAML_STREAM_START_EVENT");
             preparing = 1;
             break;
         case YAML_DOCUMENT_START_EVENT:
             if (preparing != 1)
-                FATAL_FAILURE("YAMLParser: Unexpected YAML_DOCUMENT_START_EVENT");
+                FATAL_FAILURE("[" + file_name + "] YAMLParser: Unexpected YAML_DOCUMENT_START_EVENT");
             preparing = 0;
             break;
         default:
-            FATAL_FAILURE("YAMLParser: Unexpected event " + std::to_string(event.type));
+            FATAL_FAILURE("[" + file_name + "] YAMLParser: Unexpected event " + std::to_string(event.type));
         }
     }
     YAMLEvent event = get_next_event();
@@ -128,8 +131,9 @@ YAMLParser::Value YAMLParser::parse() {
         return Value(read_mapping());
         break;
     default:
-        FATAL_FAILURE("YAMLParser: Unexpected event " + std::to_string(event.type));
+        FATAL_FAILURE("[" + file_name + "] YAMLParser: Unexpected event " + std::to_string(event.type));
     }
+    current_file = "";
 }
 
 YAMLParser::Mapping YAMLParser::read_mapping() {
@@ -146,7 +150,7 @@ YAMLParser::Mapping YAMLParser::read_mapping() {
             return mapping;
             break;
         default:
-            FATAL_FAILURE("YAMLParser: Unexpected event " + std::to_string(event.type));
+            FATAL_FAILURE("[" + file_name + "] YAMLParser: Unexpected event " + std::to_string(event.type));
         }
         event = get_next_event();
         switch(event.type) {
@@ -160,7 +164,7 @@ YAMLParser::Mapping YAMLParser::read_mapping() {
             mapping.map.emplace(key, read_mapping());
             break;
         default:
-	        FATAL_FAILURE("YAMLParser: Unexpected event " + std::to_string(event.type));
+	        FATAL_FAILURE("[" + file_name + "] YAMLParser: Unexpected event " + std::to_string(event.type));
         }
     }
 }
@@ -182,7 +186,7 @@ YAMLParser::Sequence YAMLParser::read_sequence() {
         case YAML_SEQUENCE_END_EVENT:
             return seq;
         default:
-            FATAL_FAILURE("YAMLParser: Unexpected event " + std::to_string(event.type));
+            FATAL_FAILURE("[" + file_name + "] YAMLParser: Unexpected event " + std::to_string(event.type));
         }
     }
 }
