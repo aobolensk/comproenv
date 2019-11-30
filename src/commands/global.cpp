@@ -4,9 +4,9 @@
 #include <csignal>
 #include <ctime>
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <Windows.h>
-#undef min
-#undef max
 #pragma warning(disable: 4996)
 #endif  // _WIN32
 #if defined(__unix__) || defined(__linux__) || defined(__APPLE__)
