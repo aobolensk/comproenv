@@ -133,7 +133,6 @@ YAMLParser::Value YAMLParser::parse() {
     default:
         FATAL_FAILURE("[" + file_name + "] YAMLParser: Unexpected event " + std::to_string(event.type));
     }
-    current_file = "";
 }
 
 YAMLParser::Mapping YAMLParser::read_mapping() {
