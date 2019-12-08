@@ -65,6 +65,13 @@ void Shell::configure_commands_global() {
             FAILURE("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs.size(); ++i) {
             if (envs[i].get_name() == arg[1]) {
+                std::string buf;
+                std::cout << "Are you sure? [y/n]: " << std::flush;
+                std::getline(std::cin, buf);
+                if (tolower(buf[0]) != 'y') {
+                    std::cout << "Removing " << arg[1] << " environment is cancelled" << '\n';
+                    return 1;
+                }
                 envs.erase(envs.begin() + i);
                 fs::path path = fs::path(env_prefix + arg[1]);
                 if (global_settings["autosave"] == "on") {

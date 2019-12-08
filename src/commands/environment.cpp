@@ -86,6 +86,13 @@ void Shell::configure_commands_environment() {
             FAILURE("Incorrect arguments for command " + arg[0]);
         for (size_t i = 0; i < envs[current_env].get_tasks().size(); ++i) {
             if (envs[current_env].get_tasks()[i].get_name() == arg[1]) {
+                std::string buf;
+                std::cout << "Are you sure? [y/n]: " << std::flush;
+                std::getline(std::cin, buf);
+                if (tolower(buf[0]) != 'y') {
+                    std::cout << "Removing " << arg[1] << " task is cancelled" << '\n';
+                    return 1;
+                }
                 envs[current_env].get_tasks().erase(envs[current_env].get_tasks().begin() + i);
                 fs::path path = fs::path(env_prefix + envs[current_env].get_name()) / (task_prefix + arg[1]);
                 if (global_settings["autosave"] == "on") {
