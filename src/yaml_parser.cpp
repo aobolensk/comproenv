@@ -38,7 +38,9 @@ YAMLParser::YAMLEvent YAMLParser::get_next_event() {
                     std::to_string(parser.problem_mark.line) + ":" +
                     std::to_string(parser.problem_mark.column) + " " +
                     parser.problem);
-    return YAMLParser::YAMLEvent(event);
+    YAMLParser::YAMLEvent next_event(event);
+    yaml_event_delete(&event);
+    return next_event;
 }
 
 bool YAMLParser::Mapping::has_key(const std::string_view name) const {
