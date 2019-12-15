@@ -391,6 +391,10 @@ sg <- enter test generator
 t <- test task
 This command launches all available tests and report results of testing
 ```
+#### tf
+```
+tf <- test (stop testing after first failure)
+```
 #### unset
 ```
 unset runner_py <- delete runner for Python

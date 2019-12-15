@@ -94,6 +94,7 @@
 | r | Run task |
 | sg | Set generator |
 | history | Show commands history |
+| tf | Test (stop testing after first failure) |
 | t | Test task |
 | autosave | Toggle autosave |
 
