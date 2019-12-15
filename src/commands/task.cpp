@@ -255,6 +255,44 @@ void Shell::configure_commands_task() {
         return errors;
     });
 
+    add_command(State::TASK, "tf", "Test (stop testing after first failure)",
+    "tf <- test (stop testing after first failure)\n",
+    [this](std::vector <std::string> &arg) -> int {
+        if (arg.size() != 1)
+            FAILURE("Incorrect arguments for command " + arg[0]);
+        std::vector <std::string> args;
+        args.push_back("t");
+        std::vector <fs::path> in_files;
+        fs::recursive_directory_iterator it_begin(fs::path(env_prefix + envs[current_env].get_name()) /
+            (task_prefix + envs[current_env].get_tasks()[current_task].get_name()) / "tests"), it_end;
+        std::copy_if(it_begin, it_end, std::back_inserter(in_files), [](const fs::path &path) {
+            return fs::is_regular_file(path) && path.extension() == ".in";
+        });
+        std::sort(in_files.begin(), in_files.end());
+        std::vector <std::string> test_names;
+        for (const fs::path &path : in_files) {
+            std::string test_name = path.filename().string();
+            test_names.push_back(std::string(test_name.begin(), test_name.end() - std::size(".in") + 1));
+        }
+        int index = 0;
+        int res = 0;
+        for (const std::string_view test : test_names) {
+            args.emplace_back(test);
+            res = commands[current_state]["t"](args);
+            if (res != 0) {
+                std::cout << "\033[31m" << "-- Test failed! Stopped running tests. "
+                        << index << " of " << test_names.size()
+                        << " tests passed before failure" << "\033[0m" << '\n';
+                return 1;
+            }
+            ++index;
+            args.pop_back();
+        }
+        std::cout << "\033[32m" << "-- All " << std::size(in_files) <<
+            " tests successfully passed!" << "\033[0m\n";
+        return res;
+    });
+
     add_command(State::TASK, "ee", "Edit task",
     "ee <- edit task\n"
     "You will get a list of editable settings, where you can either edit option or "
