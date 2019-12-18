@@ -18,3 +18,7 @@ endif (DEFINED EXP_FS)
 
 add_executable(comproenv comproenv.cpp)
 add_executable(generate_docs generate_docs.cpp)
+if (MSVC)
+    target_compile_options(comproenv PRIVATE "/MP")
+    target_compile_options(generate_docs PRIVATE "/MP")
+endif (MSVC)
