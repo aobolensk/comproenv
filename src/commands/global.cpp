@@ -624,9 +624,17 @@ void Shell::configure_commands_global() {
         std::cout << "    libyaml: " TOSTRING(COMPROENV_LIBYAML_HASH) "\n";
         tm build_time;
         memset(&build_time, 0, sizeof(tm));
-        strptime(TOSTRING(COMPROENV_BUILDTIME), "%Y-%m-%d %H:%M:%S", &build_time);
+        sscanf(TOSTRING(COMPROENV_BUILDTIME), "%d-%d-%d %d:%d:%d",
+                &build_time.tm_year, &build_time.tm_mon, &build_time.tm_mday,
+                &build_time.tm_hour, &build_time.tm_min, &build_time.tm_sec);
+        build_time.tm_year -= 1900;
+        build_time.tm_mon -= 1;
         time_t bt = mktime(&build_time);
+        #ifdef _WIN32
+        bt -= _timezone;
+        #else
         bt -= timezone;
+        #endif  // _WIN32
         std::cout << "Build   time: ";
         tm *btm = localtime(&bt);
         printf("%d-%02d-%02d %02d:%02d:%02d\n",
