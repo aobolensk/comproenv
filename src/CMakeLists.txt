@@ -14,7 +14,7 @@ string(STRIP ${libyaml_hash} libyaml_hash)
 add_definitions(-DCOMPROENV_LIBYAML_HASH=${libyaml_hash})
 
 # Get build timestamp
-string(TIMESTAMP build_time "%Y-%m-%d %H:%M:%S")
+string(TIMESTAMP build_time "%Y-%m-%d %H:%M:%S" UTC)
 add_definitions(-DCOMPROENV_BUILDTIME=${build_time})
 
 add_library(comproenv-lib ${headers} ${sources})
