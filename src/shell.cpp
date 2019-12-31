@@ -67,7 +67,7 @@ Shell::Shell(const std::string_view config_file_path,
         std::vector <std::string> s_result;
         split(s_result, result);
         if ((s_result[0] == "Python") && (s_result[1][0] - '0' >= 3)) {
-            std::cout << "Found: " + result << std::endl;
+            std::cout << "Found: " + result;
         } else if ((s_result[0] == "Python") && (s_result[1][0] - '0' < 3)) {
             std::cout << "Warning: Python with version that less than 3 is not supported, "
                 "so some features like parsing websites may be unavailable" << std::endl;

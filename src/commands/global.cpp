@@ -688,7 +688,7 @@ void Shell::configure_commands_global() {
         std::vector <std::string> s_result;
         split(s_result, result);
         if ((s_result[0] == "Python")) {
-            std::cout << s_result[1] << '\n';
+            std::cout << s_result[1];
         } else {
             std::cout << "not found\n";
         }
