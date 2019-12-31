@@ -42,3 +42,13 @@ jobs:
     - name: Build application
       run: |
         printf "about\nq" | python3 launch.py --f build run
+  docker-linux-gcc-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build application
+      run: |
+        echo about > launch.txt
+        echo q >> launch.txt
+        docker build -t comproenv .
+        docker run -v comproenv:/app -i comproenv /bin/bash -c "cat launch.txt | python3 launch.py --f run"
