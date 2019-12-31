@@ -51,4 +51,4 @@ jobs:
         echo about > launch.txt
         echo q >> launch.txt
         docker build -t comproenv .
-        docker run -v comproenv:/app -it comproenv bash -c "cat launch.txt | python3 launch.py --f run"
+        docker run -v comproenv:/app -i comproenv /bin/bash -c "cat launch.txt | python3 launch.py --f run"
