@@ -30,9 +30,12 @@ def get_page(link):
     return text
 
 
+def get_link(domain):
+    return ("http://" + domain + "/", "https://" + domain + "/")
+
+
 def run(path, link):
-    if (link.startswith("http://codeforces.com/") or
-            link.startswith("https://codeforces.com/")):
+    if link.startswith(get_link("codeforces.com")):
         page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
         inputs = soup.find_all("div", class_="input")
@@ -61,8 +64,7 @@ def run(path, link):
             result = remove_empty_lines(result)
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".out", "w") as f:
                 f.write(result)
-    elif (link.startswith("http://acmp.ru/") or
-            link.startswith("https://acmp.ru/")):
+    elif link.startswith(get_link("acmp.ru")):
         page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
         tables = soup.find_all(
@@ -97,10 +99,7 @@ def run(path, link):
                     result = remove_empty_lines(result)
                     with open(os.path.join(path, "acmp_sample_" + str(i)) + ".out", "w") as f:
                         f.write(result)
-    elif (link.startswith("http://acm.timus.ru/") or
-            link.startswith("https://acm.timus.ru/") or
-            link.startswith("http://timus.online/") or
-            link.startswith("https://timus.online/")):
+    elif link.startswith(get_link("acm.timus.ru") + get_link("timus.online")):
         page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
         tables = soup.find_all("table", class_="sample")
@@ -122,8 +121,7 @@ def run(path, link):
                     result = cells[1].get_text()
                     with open(os.path.join(path, "timus_sample_" + str(i)) + ".out", "w") as f:
                         f.write(result)
-    elif (link.startswith("http://atcoder.jp/") or
-            link.startswith("https://atcoder.jp/")):
+    elif link.startswith(get_link("atcoder.jp")):
         page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
         english_span = soup.find("span", class_="lang-en")
