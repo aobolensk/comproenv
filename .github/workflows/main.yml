@@ -3,7 +3,7 @@ name: Build and run
 on: [push, pull_request]
 
 jobs:
-  ubuntu-build:
+  ubuntu-gcc-build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -16,6 +16,21 @@ jobs:
     - name: Build application
       run: |
         printf "about\nq" | python3 launch.py --f build run
+  ubuntu-clang-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup environment
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt update
+        sudo apt install clang-8
+    - name: Build application
+      run: |
+        printf "about\nq" | python3 launch.py --f build run --b EXP_FS=1
+      env:
+        CC: clang-8
+        CXX: clang++-8
   windows-build:
     runs-on: windows-latest
     steps:
