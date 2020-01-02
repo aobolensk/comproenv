@@ -5,7 +5,9 @@
 #include <ctime>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif  // NOMINMAX
 #include <Windows.h>
 #pragma warning(disable: 4996)
 #endif  // _WIN32
