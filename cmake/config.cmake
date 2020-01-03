@@ -22,8 +22,9 @@ else(MSVC)
     endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(MSVC)
 
-if (DEFINED EXP_FS)
+if (EXP_FS)
     add_definitions(-DEXP_FS)
+    message(STATUS "Using compatibility mode with std::experimental::filesystem support")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
