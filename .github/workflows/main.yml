@@ -23,14 +23,15 @@ jobs:
     - name: Setup environment
       run: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
         sudo apt update
-        sudo apt install clang-8
+        sudo apt install clang-9
     - name: Build application
       run: |
         printf "about\nq" | python3 launch.py --f build run --b EXP_FS=1
       env:
-        CC: clang-8
-        CXX: clang++-8
+        CC: clang-9
+        CXX: clang++-9
   windows-build:
     runs-on: windows-latest
     steps:
