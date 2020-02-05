@@ -64,6 +64,7 @@ def run(path, link):
             result = remove_empty_lines(result)
             with open(os.path.join(path, "cf_sample_" + str(i + 1)) + ".out", "w") as f:
                 f.write(result)
+        print(f"Parsed {len(inputs)} tests")
     elif link.startswith(get_link("acmp.ru")):
         page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
@@ -99,6 +100,7 @@ def run(path, link):
                     result = remove_empty_lines(result)
                     with open(os.path.join(path, "acmp_sample_" + str(i)) + ".out", "w") as f:
                         f.write(result)
+            print(f"Parsed {len(rows) - 1} tests")
     elif link.startswith(get_link("acm.timus.ru") + get_link("timus.online")):
         page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
@@ -121,6 +123,7 @@ def run(path, link):
                     result = cells[1].get_text()
                     with open(os.path.join(path, "timus_sample_" + str(i)) + ".out", "w") as f:
                         f.write(result)
+                print(f"Parsed {len(rows) - 1} tests")
     elif link.startswith(get_link("atcoder.jp")):
         page = get_page(link)
         soup = BeautifulSoup(page, "html.parser")
@@ -140,6 +143,7 @@ def run(path, link):
                 result = remove_empty_lines(result)
                 with open(os.path.join(path, "atcoder_sample_" + str(i)) + ".out", "w") as f:
                     f.write(result)
+        print(f"Parsed {i} tests")
     else:
         print("Couldn't parse contents of this page")
         exit(-1)
