@@ -591,7 +591,7 @@ void Shell::configure_commands_global() {
     [](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
-        std::cout << "Online docs: https://github.com/gooddoog/comproenv/tree/"
+        std::cout << "Online docs: https://github.com/aobolensk/comproenv/tree/"
             TOSTRING(COMPROENV_HASH) "/docs\n";
         return 0;
     });
@@ -620,7 +620,7 @@ void Shell::configure_commands_global() {
     [this](std::vector <std::string> &arg) -> int {
         if (arg.size() != 1)
             FAILURE("Incorrect arguments for command " + arg[0]);
-        std::cout << "Repo: https://github.com/gooddoog/comproenv.git\n";
+        std::cout << "Repo: https://github.com/aobolensk/comproenv.git\n";
         std::cout << "Commit: " TOSTRING(COMPROENV_HASH) "\n";
         std::cout << "3rd party dependencies:\n";
         std::cout << "    libyaml: " TOSTRING(COMPROENV_LIBYAML_HASH) "\n";
