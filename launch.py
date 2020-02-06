@@ -13,22 +13,19 @@ def executable(filename):
     return filename
 
 
-args = None
-
-
 def enumerate_args(args):
     if args is None:
         return ''
     return ' '.join(args)
 
 
-def clean():
+def clean(args):
     if os.path.exists("build"):
         shutil.rmtree("build")
     return 0
 
 
-def backup():
+def backup(args):
     dst_directory = enumerate_args(args.directory)
     if len(dst_directory) == 0:
         print("Failed backup (please, specify destination directory)")
@@ -44,7 +41,7 @@ def backup():
     return 0
 
 
-def build():
+def build(args):
     subprocess.call("git submodule update --init --recursive", shell=True)
     if not os.path.exists("build"):
         os.mkdir("build")
@@ -70,7 +67,7 @@ def build():
     return 0
 
 
-def generate_docs():
+def generate_docs(args):
     with open(os.devnull, 'w+') as devnull:
         proc = subprocess.Popen(
             os.path.join(
@@ -80,7 +77,7 @@ def generate_docs():
         return proc.wait()
 
 
-def run():
+def run(args):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     if os.name == "posix":
         signal.signal(signal.SIGTSTP, signal.SIG_IGN)
@@ -110,20 +107,19 @@ def parse_args():
 
 
 def main():
-    global args
     args = parse_args()
     ret_code = 0
     for arg in args.function:
         if arg == "backup":
-            ret_code = backup()
+            ret_code = backup(args)
         elif arg == "build":
-            ret_code = build()
+            ret_code = build(args)
         elif arg == "clean":
-            ret_code = clean()
+            ret_code = clean(args)
         elif arg == "docs":
-            ret_code = generate_docs()
+            ret_code = generate_docs(args)
         elif arg == "run":
-            ret_code = run()
+            ret_code = run(args)
         else:
             print("Unknown function argument: " + arg)
             continue
