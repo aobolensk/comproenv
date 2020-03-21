@@ -14,7 +14,7 @@
 namespace comproenv {
 
 #ifndef _WIN32
-static void sigint_handler(int sig_num) {}
+static void sigint_handler([[maybe_unused]] int sig_num) {}
 #endif  // _WIN32
 
 Shell::Shell(const std::string_view config_file_path,
