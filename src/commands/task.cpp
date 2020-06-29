@@ -135,12 +135,10 @@ void Shell::configure_commands_task() {
             command = get_setting_by_name("runner_" + current_runner).value_or(
                 #ifdef _WIN32
                 path + "\\" +
-                envs[current_env].get_tasks()[current_task].get_name() +
-                    ".exe < " + in_file.string() + " > " + temp_file_path
+                envs[current_env].get_tasks()[current_task].get_name() + ".exe"
                 #else
                 std::string("./") + path + "/" +
-                envs[current_env].get_tasks()[current_task].get_name() +
-                    " < " + in_file.string() + " > " + temp_file_path
+                envs[current_env].get_tasks()[current_task].get_name()
                 #endif  // _WIN32
             ) + " < " + in_file.string() + " > " + temp_file_path;
             replace_all(command, "@name@", (fs::path(env_prefix + envs[current_env].get_name()) /
