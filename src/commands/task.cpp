@@ -130,7 +130,6 @@ void Shell::configure_commands_task() {
             while (std::getline(f, buf))
                 std::cout << buf << '\n';
             f.close();
-            std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
             std::string current_runner = envs[current_env].get_tasks()[current_task].get_settings()["language"];
             command = get_setting_by_name("runner_" + current_runner).value_or(
                 #ifdef _WIN32
@@ -147,6 +146,7 @@ void Shell::configure_commands_task() {
             replace_all(command, "@lang@", current_runner);
             auto time_start = std::chrono::high_resolution_clock::now();
             DEBUG_LOG(command);
+            std::cout << "\033[35m" << "-- Result:" << "\033[0m" << std::endl;
             error_code = system(command.c_str());
             auto time_finish = std::chrono::high_resolution_clock::now();
             f.open(temp_file_path);
