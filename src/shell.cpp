@@ -193,7 +193,6 @@ void Shell::parse_settings(YAMLParser::Mapping &config, YAMLParser::Mapping &env
                 setting.first != "aliases" &&
                 setting.first != "commands_history") {
                 settings.emplace(setting.first, setting.second.get_string());
-                DEBUG_LOG(setting.first << ": " << setting.second.get_string());
             }
         }
     };
