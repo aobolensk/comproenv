@@ -8,11 +8,7 @@
 
   Python dependencies installation:
   ```console
-  python -m pip install bs4
-  ```
-  or
-  ```console
-  python -r requirements.txt
+  $ python -r requirements.txt
   ```
 - [Optional] [rlwrap](https://github.com/hanslub42/rlwrap) - readline wrapper (Linux)
 
