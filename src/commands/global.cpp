@@ -632,8 +632,18 @@ void Shell::configure_commands_global() {
         build_time.tm_year -= 1900;
         build_time.tm_mon -= 1;
         time_t bt = mktime(&build_time);
-        #ifdef _WIN32
+        #if defined(_WIN32)
         bt -= _timezone;
+        #elif defined(__FreeBSD__)
+        // Bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=24590
+        int timezone_ = []() {
+            struct tm tm;
+            time_t t = 0;
+            tzset();
+            localtime_r(&t, &tm);
+            return -(tm.tm_gmtoff);
+        }();
+        bt -= timezone_;
         #else
         bt -= timezone;
         #endif  // _WIN32
