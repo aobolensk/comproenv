@@ -58,6 +58,19 @@ jobs:
     - name: Build application
       run: |
         printf "about\nq" | python3 launch.py --f build run
+  FreeBSD-clang-build:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build on FreeBSD
+      id: build
+      uses: vmactions/freebsd-vm@v0.0.9
+      with:
+        usesh: true
+        prepare: pkg install -y cmake git
+        run: |
+          freebsd-version
+          printf "about\nq" | python3 launch.py --f build run
   docker-linux-gcc-build:
     runs-on: ubuntu-latest
     steps:
