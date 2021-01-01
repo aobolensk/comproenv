@@ -66,7 +66,7 @@ jobs:
       uses: vmactions/freebsd-vm@v0.0.9
       with:
         usesh: true
-        prepare: pkg install -y cmake git
+        prepare: pkg install -y cmake git python3
         run: |
           freebsd-version
           printf "about\nq" | python3 launch.py --f build run
