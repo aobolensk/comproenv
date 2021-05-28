@@ -63,7 +63,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build on FreeBSD
       id: build
-      uses: vmactions/freebsd-vm@v0.0.9
+      uses: vmactions/freebsd-vm@v0.1.4
       with:
         usesh: true
         prepare: pkg install -y cmake git python3
