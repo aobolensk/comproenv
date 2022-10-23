@@ -58,12 +58,12 @@ jobs:
       run: |
         printf "about\nq" | python3 launch.py --f build run
   FreeBSD-clang-build:
-    runs-on: macOS-latest
+    runs-on: macos-12
     steps:
     - uses: actions/checkout@v1
     - name: Build on FreeBSD
       id: build
-      uses: vmactions/freebsd-vm@v0.1.4
+      uses: vmactions/freebsd-vm@v0
       with:
         usesh: true
         prepare: pkg install -y cmake git python3
