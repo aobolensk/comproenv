@@ -2,6 +2,7 @@ import os
 import sys
 import urllib.request
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 
 import test_parser
 
@@ -47,7 +48,9 @@ def run(path, link):
             content = inputs[i].contents[-1].contents
             result = ""
             for x in content:
-                if isinstance(x, str):
+                if isinstance(x, Tag):
+                    result += x.get_text() + '\n'
+                elif isinstance(x, str):
                     result += x
                 else:
                     result += '\n'

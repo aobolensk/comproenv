@@ -62,6 +62,18 @@ def test():
         print("Checking " + file_name)
         errors += assert_eq("10\n3\n3\n5\n0".split(), f.read().split())
 
+    link = base64.b64decode("aHR0cHM6Ly9jb2RlZm9yY2VzLmNvbS9jb250ZXN0LzE3NDIvcHJvYmxlbS9B").decode("utf-8")
+    print("Test: " + link)
+    parser.run(temp_dir, link)
+    file_name = "cf_sample_1.in"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("7\n1 4 3\n2 5 8\n9 11 20\n0 0 0\n20 20 20\n4 12 3\n15 7 8".split(), f.read().split())
+    file_name = "cf_sample_1.out"
+    with open(os.path.join(temp_dir, file_name), "r") as f:
+        print("Checking " + file_name)
+        errors += assert_eq("YES\nNO\nYES\nYES\nNO\nNO\nYES".split(), f.read().split())
+
     link = base64.b64decode("aHR0cDovL2FjbXAucnUvaW5kZXguYXNwP21haW49dGFzayZpZF90YXNrPTc=").decode("utf-8")
     print("Test: " + link)
     parser.run(temp_dir, link)
