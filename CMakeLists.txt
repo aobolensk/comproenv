@@ -6,6 +6,6 @@ project(PROJECT_NAME)
 include_directories("include")
 include_directories("3rdparty")
 
-add_subdirectory("3rdparty/libyaml")
+add_subdirectory("3rdparty")
 add_subdirectory("src")
 add_subdirectory("application")
