@@ -69,6 +69,7 @@ jobs:
         prepare: pkg install -y cmake git python3
         run: |
           freebsd-version
+          git config --global --add safe.directory '*'
           printf "about\nq" | python3 launch.py --f build run
   docker-linux-gcc-build:
     runs-on: ubuntu-latest
