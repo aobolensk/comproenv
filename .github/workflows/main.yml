@@ -67,6 +67,8 @@ jobs:
       with:
         usesh: true
         prepare: pkg install -y cmake git python3
+        sync: rsync
+        copyback: false
         run: |
           freebsd-version
           git config --global --add safe.directory '*'
