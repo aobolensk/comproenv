@@ -649,14 +649,22 @@ void Shell::configure_commands_global() {
         #endif  // _WIN32
         std::cout << "Build   time: ";
         tm btm;
+        #ifdef _WIN32
+        localtime_s(&btm, &bt);
+        #else
         localtime_r(&bt, &btm);
+        #endif  // _WIN32
         printf("%d-%02d-%02d %02d:%02d:%02d\n",
                 1900 + btm.tm_year, 1 + btm.tm_mon, btm.tm_mday,
                 btm.tm_hour, btm.tm_min, btm.tm_sec);
         std::cout << "Current time: ";
         time_t now = time(0);
         tm ctm;
+        #ifdef _WIN32
+        localtime_s(&ctm, &now);
+        #else
         localtime_r(&now, &ctm);
+        #endif  // _WIN32
         printf("%d-%02d-%02d %02d:%02d:%02d\n",
                 1900 + ctm.tm_year, 1 + ctm.tm_mon, ctm.tm_mday,
                 ctm.tm_hour, ctm.tm_min, ctm.tm_sec);
